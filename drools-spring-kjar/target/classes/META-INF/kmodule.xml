@@ -2,6 +2,6 @@
 <kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule" 
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <kbase name="BodyTypeKieBase" packages="sbnz.integracija.bodyType">
-        <ksession name="bodyType" type="stateful"/>
+        <ksession name="bodyTypeSession" type="stateful"/>
     </kbase>
 </kmodule>

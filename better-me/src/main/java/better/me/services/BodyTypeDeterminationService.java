@@ -2,31 +2,70 @@ package better.me.services;
 
 import java.util.ArrayList;
 
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import better.me.dto.BodyInfoDTO;
 import better.me.exceptions.NotLoggedInException;
+import better.me.exceptions.RequestException;
+import better.me.model.RegisteredUser;
 import better.me.model.User;
+import better.me.repositories.IRegisteredUser;
 import better.me.rules.dto.BodyTypeDTO;
+import better.me.util.MyLogger;
 
 @Service
 public class BodyTypeDeterminationService {
 
+	@Autowired
+	private KieContainer kieContainer;
+
+	@Autowired
+	private IRegisteredUser registeredUserRepository;
+	
 	private static int ectoScore;
 	private static int endoScore;
 	private static int mesoScore;
 	
-	public String determine(BodyInfoDTO dto) throws NotLoggedInException {
+	public String determine(BodyInfoDTO dto) throws NotLoggedInException, RequestException {
 		User current = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (current == null) {
-			throw new NotLoggedInException();
-		}
-		getTypesScore(dto);
+		if (current == null) throw new NotLoggedInException("You must login first. No logged in user found!");
 		
-		return "Tip tela";
+		RegisteredUser rUser = registeredUserRepository.findByEmail(current.getEmail());
+		if (rUser == null) throw new NotLoggedInException("Registered user must be logged in!");
+		
+		getTypesScore(dto);
+		KieSession kieSession = getBodyTypeKieSession();
+		
+		kieSession.setGlobal("ectoScore", ectoScore);
+		kieSession.setGlobal("endooScore", endoScore);
+		kieSession.setGlobal("mesoScore", mesoScore);
+		kieSession.setGlobal("myLogger", new MyLogger());
+	
+		kieSession.insert(dto);
+		BodyTypeDTO bodyType = new BodyTypeDTO();
+		kieSession.insert(bodyType);
+		
+		kieSession.fireAllRules();
+		kieSession.dispose();
+		
+		if (bodyType.getBodyType() == null) {
+			throw new RequestException("Answers you entered don't belong to any body type!");
+		}
+		
+		rUser.setBodyType(bodyType.getBodyType());
+		registeredUserRepository.save(rUser);
+		
+		return bodyType.getBodyType().toString();
 	}
 
+	private KieSession getBodyTypeKieSession() {
+        return kieContainer.newKieSession("bodyTypeSession");
+    }
+	
 	private void getTypesScore(BodyInfoDTO dto) {
 		ArrayList<String> endoAnswers = new ArrayList<String>() {
 			private static final long serialVersionUID = 1L;
@@ -123,8 +162,7 @@ public class BodyTypeDeterminationService {
         	ectoScore = 0;
             endoScore = 0;
             mesoScore = 0;
-        }
-        
+        } 
 	}
 
 }
