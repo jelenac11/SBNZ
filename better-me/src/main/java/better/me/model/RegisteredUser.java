@@ -10,6 +10,13 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+
+import better.me.enums.ActivityLevel;
+import better.me.enums.BodyType;
+import better.me.enums.Category;
+import better.me.enums.Diet;
+import better.me.enums.Sex;
+
 import javax.persistence.JoinColumn;
 
 
@@ -59,7 +66,7 @@ public class RegisteredUser extends User {
 	private Category previousCategory;
 	
 	@ManyToMany(cascade=CascadeType.ALL)  
-    @JoinTable(name="allergen_user", joinColumns=@JoinColumn(name="user_id"), inverseJoinColumns=@JoinColumn(name="allergen_id"))  
+    @JoinTable(name="allergen_user", joinColumns=@JoinColumn(name="user_id", referencedColumnName = "user_id"), inverseJoinColumns=@JoinColumn(name="allergen_id", referencedColumnName = "allergen_id"))  
 	private Set<Allergen> allergens;
 	
 	@Column

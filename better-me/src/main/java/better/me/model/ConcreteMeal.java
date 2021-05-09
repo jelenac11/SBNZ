@@ -2,6 +2,7 @@ package better.me.model;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
@@ -34,9 +36,6 @@ public class ConcreteMeal {
 	
 	@Column
 	private boolean isCustomMeal;
-	
-	@ManyToMany(mappedBy = "concrete_meals_ingredients", fetch = FetchType.LAZY)
-	private Set<Ingredient> ingredients;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "meal_id")
@@ -45,4 +44,8 @@ public class ConcreteMeal {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "day_id")
 	private Day day;
+	
+	@ManyToMany(cascade=CascadeType.ALL)  
+    @JoinTable(name="concrete_meals_ingredients", joinColumns=@JoinColumn(name="concrete_meal_id", referencedColumnName = "concrete_meal_id"), inverseJoinColumns=@JoinColumn(name="ingredient_id", referencedColumnName = "ingredient_id"))  
+	private Set<Ingredient> ingredients;
 }

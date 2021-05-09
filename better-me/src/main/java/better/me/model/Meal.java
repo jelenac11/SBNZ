@@ -2,12 +2,14 @@ package better.me.model;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
@@ -49,7 +51,8 @@ public class Meal {
 	@Column
 	private String description;
 	
-	@ManyToMany(mappedBy = "meals_ingredients", fetch = FetchType.LAZY)
+	@ManyToMany(cascade=CascadeType.ALL)  
+    @JoinTable(name="meals_ingredients", joinColumns=@JoinColumn(name="meal_id", referencedColumnName = "meal_id"), inverseJoinColumns=@JoinColumn(name="ingredient_id", referencedColumnName = "ingredient_id"))  
 	private Set<Ingredient> ingredients;
 	
 	@OneToMany(mappedBy = "meal")
