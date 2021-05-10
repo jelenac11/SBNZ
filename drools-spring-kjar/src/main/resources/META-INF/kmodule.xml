@@ -3,5 +3,8 @@
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <kbase name="BodyTypeKieBase" packages="sbnz.integracija.bodyType">
         <ksession name="bodyTypeSession" type="stateful"/>
-    </kbase>
+   </kbase>
+   <kbase name="BmiKieBase" packages="sbnz.integracija.bmi">
+        <ksession name="bmiSession" type="stateful"/>
+   </kbase>
 </kmodule>

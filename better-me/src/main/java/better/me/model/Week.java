@@ -1,5 +1,6 @@
 package better.me.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -13,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import better.me.dto.WeekDTO;
 import better.me.enums.Goal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -55,5 +57,9 @@ public class Week {
 	@OneToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER, optional = false)
 	@JoinColumn(name="user_id")
 	private RegisteredUser user;
+	
+	public Week(WeekDTO dto, RegisteredUser rUser) {
+		this(null, dto.getGoal(), dto.getGoalCalories(), dto.getGoalCarbs(), dto.getGoalProteins(), dto.getGoalFats(), false, new HashSet<Day>(), rUser);
+	}
 
 }

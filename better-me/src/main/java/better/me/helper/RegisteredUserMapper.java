@@ -13,19 +13,13 @@ import better.me.model.RegisteredUser;
 @Component
 public class RegisteredUserMapper {
 
-	public RegisteredUser toEntity(RegisteredUserDTO user) {
-		return new RegisteredUser(user.getUsername(), user.getEmail(), user.getPassword(), user.getFirstName(),
-				user.getLastName());
-	}
-
 	public RegisteredUser toEntity(UserDTO user) {
 		return new RegisteredUser(user.getUsername(), user.getEmail(), user.getPassword(), user.getFirstName(),
 				user.getLastName());
 	}
 
 	public RegisteredUserDTO toDto(RegisteredUser entity) {
-		return new RegisteredUserDTO(entity.getUsername(), entity.getEmail(), entity.getPassword(),
-				entity.getFirstName(), entity.getLastName());
+		return new RegisteredUserDTO(entity);
 	}
 
 	public UserResDTO toResDTO(RegisteredUser entity) {

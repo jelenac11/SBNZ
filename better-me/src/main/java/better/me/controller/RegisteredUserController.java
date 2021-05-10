@@ -36,5 +36,14 @@ public class RegisteredUserController {
 		}
 		return new ResponseEntity<>(registeredUserMapper.toResDTO(registeredUser), HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/determine-bmi")
+	public ResponseEntity<?> determineBmi() {
+		try {
+			return new ResponseEntity<>(registeredUserService.determineBmi(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
 
 }

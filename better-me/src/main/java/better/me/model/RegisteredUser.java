@@ -77,7 +77,6 @@ public class RegisteredUser extends User {
 	
 	@Column
 	private int score;
-	
 
 	public RegisteredUser(Long id) {
 		super(id);
