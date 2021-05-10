@@ -1,0 +1,82 @@
+package sbnz.integracija.rules
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.dto.*;
+import better.me.facts.*;
+import better.me.util.*;
+
+global MyLogger myLogger;
+
+
+rule "Activity count INACTIVE"
+	agenda-group "nutrition"
+	salience 100
+    when
+        $user: RegisteredUserDTO(activityLevel == ActivityLevel.INACTIVE.value)
+    then
+        myLogger.log("User inactive");
+        modify ($user) {setActivityCount(1);}
+end
+
+rule "Activity count SEDENTARY"
+	agenda-group "nutrition"
+	salience 100
+    when
+        $user: RegisteredUserDTO(activityLevel == ActivityLevel.SEDENTARY.value)
+    then
+        myLogger.log("User sedentary");
+        modify ($user) {setActivityCount(1.2);}
+end
+
+rule "Activity count LIGHTLY ACTIVE"
+	agenda-group "nutrition"
+	salience 100
+    when
+        $user: RegisteredUserDTO(activityLevel == ActivityLevel.LIGHTLY_ACTIVE.value)
+    then
+        myLogger.log("User lightly active");
+        modify ($user) {setActivityCount(1.375);}
+end
+
+rule "Activity count MODERATELY ACTIVE"
+	agenda-group "nutrition"
+	salience 100
+    when
+        $user: RegisteredUserDTO(activityLevel == ActivityLevel.MODERATELY_ACTIVE.value)
+    then
+        myLogger.log("User moderately active");
+        modify ($user) {setActivityCount(1.55);}
+end
+
+rule "Activity count VERY ACTIVE"
+	agenda-group "nutrition"
+	salience 100
+    when
+        $user: RegisteredUserDTO(activityLevel == ActivityLevel.VERY_ACTIVE.value)
+    then
+        myLogger.log("User very active");
+        modify ($user) {setActivityCount(1.725);}
+end
+
+rule "Calculate goal calories for MALE"
+	agenda-group "nutrition"
+	salience 90
+	when
+    	$user: RegisteredUserDTO(sex == Sex.MALE.value, $weight: weight, $height: height, $age: age, $activityCount: activityCount)
+    	$week: WeekDTO(goalCalories == 0)
+    then
+        myLogger.log("Calculated goal calories");
+        modify ($week) {setGoalCalories($activityCount * (10 * $weight + 6.25 * $height - 5 * $age + 5));}
+end
+
+rule "Calculate goal calories for FEMALE"
+	agenda-group "nutrition"
+	salience 90
+	when
+    	$user: RegisteredUserDTO(sex == Sex.FEMALE.value, $weight: weight, $height: height, $age: age, $activityCount: activityCount)
+    	$week: WeekDTO(goalCalories == 0)
+    then
+        myLogger.log("Calculated goal calories");
+        modify ($week) {setGoalCalories($activityCount * (10 * $weight + 6.25 * $height - 5 * $age - 161));}
+end

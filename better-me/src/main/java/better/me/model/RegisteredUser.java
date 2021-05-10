@@ -73,7 +73,7 @@ public class RegisteredUser extends User {
 	private double bmi;
 	
 	@Column
-	private int activityCount;
+	private double activityCount;
 	
 	@Column
 	private int score;
