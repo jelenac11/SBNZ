@@ -1,6 +1,7 @@
 package better.me.services;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,8 +14,13 @@ import org.springframework.stereotype.Service;
 
 import better.me.dto.RegisteredUserDTO;
 import better.me.dto.WeekDTO;
+import better.me.enums.ActivityLevel;
+import better.me.enums.BodyType;
+import better.me.enums.Diet;
+import better.me.enums.Sex;
 import better.me.exceptions.NotLoggedInException;
 import better.me.exceptions.RequestException;
+import better.me.model.Allergen;
 import better.me.model.Authority;
 import better.me.model.RegisteredUser;
 import better.me.model.User;
@@ -105,6 +111,28 @@ public class RegisteredUserService {
 		weekRepository.save(week);
 		
 		return userDto.getBmi() + "";
+	}
+	
+	public String fillInfo(RegisteredUserDTO user) throws NotLoggedInException, RequestException {
+		User current = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (current == null) throw new NotLoggedInException("You must login first. No logged in user found!");
+		
+		RegisteredUser rUser = registeredUserRepository.findByEmail(current.getEmail());
+		if (rUser == null) throw new NotLoggedInException("Registered user must be logged in!");
+		
+		rUser.setAge(user.getAge());
+		rUser.setSex(Sex.valueOf(user.getSex()));
+		rUser.setHeight(user.getHeight());
+		rUser.setWeight(user.getWeight());
+		rUser.setBodyType(BodyType.valueOf(user.getBodyType()));
+		rUser.setActivityLevel(ActivityLevel.valueOf(user.getActivityLevel()));
+		rUser.setDiet(Diet.valueOf(user.getDiet()));
+		rUser.setAllergens(new HashSet<Allergen>(user.getAllergens()));
+		registeredUserRepository.save(rUser);
+		
+		determineBmi();
+		
+		return rUser.getUsername();
 	}
 
 }

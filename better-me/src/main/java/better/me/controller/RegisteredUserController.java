@@ -1,5 +1,7 @@
 package better.me.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -7,12 +9,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import better.me.dto.RegisteredUserDTO;
+import better.me.dto.UserDTO;
 import better.me.dto.UserResDTO;
 import better.me.helper.RegisteredUserMapper;
 import better.me.model.RegisteredUser;
+import better.me.model.User;
 import better.me.services.RegisteredUserService;
 
 @RestController
@@ -37,12 +44,12 @@ public class RegisteredUserController {
 		return new ResponseEntity<>(registeredUserMapper.toResDTO(registeredUser), HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/determine-bmi")
-	public ResponseEntity<?> determineBmi() {
+	@PostMapping(value = "/fill-info", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> fillInfo(@Valid @RequestBody RegisteredUserDTO user) throws Exception {
 		try {
-			return new ResponseEntity<>(registeredUserService.determineBmi(), HttpStatus.OK);
+			return new ResponseEntity<>(registeredUserService.fillInfo(user), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
