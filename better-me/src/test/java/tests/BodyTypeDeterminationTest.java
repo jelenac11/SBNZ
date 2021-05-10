@@ -12,7 +12,7 @@ import org.kie.api.runtime.KieSession;
 
 import better.me.dto.BodyInfoDTO;
 import better.me.enums.BodyType;
-import better.me.rules.dto.BodyTypeDTO;
+import better.me.facts.BodyTypeDTO;
 import better.me.util.MyLogger;
 
 public class BodyTypeDeterminationTest {

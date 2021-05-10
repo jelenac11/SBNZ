@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 import better.me.dto.BodyInfoDTO;
 import better.me.exceptions.NotLoggedInException;
 import better.me.exceptions.RequestException;
+import better.me.facts.BodyTypeDTO;
 import better.me.model.RegisteredUser;
 import better.me.model.User;
 import better.me.repositories.IRegisteredUser;
-import better.me.rules.dto.BodyTypeDTO;
 import better.me.util.MyLogger;
 
 @Service
