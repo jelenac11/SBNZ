@@ -1,64 +1,26 @@
-package sbnz.integracija.bodyType
+package sbnz.integracija.rules;
 
 import better.me.enums.*;
 import better.me.model.*;
 import better.me.dto.*;
-import better.me.rules.dto.*;
+import better.me.facts.*;
 import better.me.util.*;
+import java.util.Map;
 
-global Integer ectoScore;
-global Integer endoScore;
-global Integer mesoScore;
 global MyLogger myLogger;
 
 
-rule "Endomorph body type"
-	agenda-group "bodyType"
-	salience endoScore
+rule "Determine body type"
+	agenda-group "body-type"
     when
-        $infoDTO: BodyInfoDTO(shoulders == Shoulders.WIDER_THAN_HIPS.value,
-        					  jeans == Jeans.LOOSE.value,
-        					  forearms == Forearms.BIG.value,
-        					  bodyTendation == BodyTendation.CARRY_FAT.value,
-        					  bodyLook == BodyLook.PEAR.value,
-        					  weightTendation == WeightTendation.HARD_LOSE.value,
-        					  encircleHandWrist == EncircleHandWrist.DONT_TOUCH.value) and
+    	$a: Answers($answers: answers)
+        $u: UserAnswers($userAnswers: userAnswers)
+        Number($value: intValue >= 7) from accumulate (
+        	Map.Entry($t:this, $answers.entrySet() contains this) from $userAnswers.entrySet(),
+        	count($t)
+        )
         $bodyType: BodyTypeDTO(bodyType == null)
     then
         myLogger.log("User has endomorph body type");
-        modify ($bodyType) {setBodyType(BodyType.ENDOMORPH);}
-end
-
-rule "Ectomorph body type"
-	agenda-group "bodyType"
-	salience ectoScore
-    when
-        $infoDTO: BodyInfoDTO(shoulders == Shoulders.NARROWER_THAN_HIPS.value,
-        					  jeans == Jeans.TIGHT.value,
-        					  forearms == Forearms.SMALL.value,
-        					  bodyTendation == BodyTendation.STAY_SKINNY.value,
-        					  bodyLook == BodyLook.MOSTLY_RECTANGLE.value,
-        					  weightTendation == WeightTendation.HARD_GAIN.value,
-        					  encircleHandWrist == EncircleHandWrist.OVERLAP.value) and
-        $bodyType: BodyTypeDTO(bodyType == null)
-    then
-        myLogger.log("User has ectomorph body type");
-        modify ($bodyType) {setBodyType(BodyType.ECTOMORPH);}
-end
-
-rule "Mesomorph body type"
-	agenda-group "bodyType"
-	salience mesoScore
-    when
-        $infoDTO: BodyInfoDTO(shoulders == Shoulders.SAME_AS_HIPS.value,
-        					  jeans == Jeans.PERFECT.value,
-        					  forearms == Forearms.AVERAGE.value,
-        					  bodyTendation == BodyTendation.STAY_MUSCULAR.value,
-        					  bodyLook == BodyLook.HOURGLASS.value,
-        					  weightTendation == WeightTendation.EASY_BOTH.value,
-        					  encircleHandWrist == EncircleHandWrist.TOUCH.value) and
-        $bodyType: BodyTypeDTO(bodyType == null)
-    then
-        myLogger.log("User has mesomorph body type");
-        modify ($bodyType) {setBodyType(BodyType.MESOMORPH);}
+        modify ($bodyType) {setBodyType($a.getBodyType());}
 end

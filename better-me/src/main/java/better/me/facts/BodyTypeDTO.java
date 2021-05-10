@@ -1,4 +1,4 @@
-package better.me.rules.dto;
+package better.me.facts;
 
 import better.me.enums.BodyType;
 import lombok.AllArgsConstructor;

@@ -31,7 +31,7 @@ public class RegisteredUserDTO {
 	private String previousCategory;
 	private double bmi;
 	private List<Allergen> allergens;
-	private int activityCount;
+	private double activityCount;
 	private int score;
 
 	public RegisteredUserDTO(RegisteredUser user) {
