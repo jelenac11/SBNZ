@@ -22,7 +22,7 @@ public class BodyTypeDeterminationTest {
     private static Integer mesoScore;
     private final MyLogger myLogger = new MyLogger();
     
-    protected final String ksessionName = "bodyTypeSession";
+    protected final String ksessionName = "session";
     
     private KieSession kieSession;
     
@@ -30,7 +30,8 @@ public class BodyTypeDeterminationTest {
 	public void setUp() {
     	KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.newKieContainer(ks.newReleaseId("sbnz.integracija", "drools-spring-kjar", "0.0.1-SNAPSHOT"));
-        kieSession = kContainer.newKieSession("bodyTypeSession");
+        kieSession = kContainer.newKieSession("session");
+		kieSession.getAgenda().getAgendaGroup("bodyType").setFocus();
 	}
     
     @Test

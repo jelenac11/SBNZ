@@ -13,6 +13,7 @@ global MyLogger myLogger;
 
 
 rule "Endomorph body type"
+	agenda-group "bodyType"
 	salience endoScore
     when
         $infoDTO: BodyInfoDTO(shoulders == Shoulders.WIDER_THAN_HIPS.value,
@@ -29,6 +30,7 @@ rule "Endomorph body type"
 end
 
 rule "Ectomorph body type"
+	agenda-group "bodyType"
 	salience ectoScore
     when
         $infoDTO: BodyInfoDTO(shoulders == Shoulders.NARROWER_THAN_HIPS.value,
@@ -45,6 +47,7 @@ rule "Ectomorph body type"
 end
 
 rule "Mesomorph body type"
+	agenda-group "bodyType"
 	salience mesoScore
     when
         $infoDTO: BodyInfoDTO(shoulders == Shoulders.SAME_AS_HIPS.value,

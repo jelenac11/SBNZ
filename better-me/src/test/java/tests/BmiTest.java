@@ -17,7 +17,7 @@ public class BmiTest {
 
 	private final MyLogger myLogger = new MyLogger();
 
-	protected final String ksessionName = "bmiSession";
+	protected final String ksessionName = "session";
 
 	private KieSession kieSession;
 
@@ -26,7 +26,8 @@ public class BmiTest {
 		KieServices ks = KieServices.Factory.get();
 		KieContainer kContainer = ks
 				.newKieContainer(ks.newReleaseId("sbnz.integracija", "drools-spring-kjar", "0.0.1-SNAPSHOT"));
-		kieSession = kContainer.newKieSession("bmiSession");
+		kieSession = kContainer.newKieSession("session");
+		kieSession.getAgenda().getAgendaGroup("bmi").setFocus();
 	}
 
 	@Test

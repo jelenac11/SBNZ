@@ -84,7 +84,9 @@ public class RegisteredUserService {
 		RegisteredUser rUser = registeredUserRepository.findByEmail(current.getEmail());
 		if (rUser == null) throw new NotLoggedInException("Registered user must be logged in!");
 		
-		KieSession kieSession = kieContainer.newKieSession("bmiSession");
+		KieSession kieSession = kieContainer.newKieSession("session");
+		kieSession.getAgenda().getAgendaGroup("bmi").setFocus();
+
 		kieSession.setGlobal("myLogger", new MyLogger());
 	
 		RegisteredUserDTO userDto = new RegisteredUserDTO(rUser);

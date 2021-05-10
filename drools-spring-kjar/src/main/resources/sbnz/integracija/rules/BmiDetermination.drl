@@ -10,6 +10,7 @@ global MyLogger myLogger;
 
 
 rule "BMI determination"
+	agenda-group "bmi"
 	salience 100
     when
         $user: RegisteredUserDTO(bmi == 0, $weight: weight, $height: height)
@@ -19,7 +20,7 @@ rule "BMI determination"
 end
 
 rule "Male, age 14-16, bmi < 16.5 GAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.MALE.value, age >= 14, age < 16, bmi < 16.5)
     	$week: WeekDTO(goal == null)
@@ -29,7 +30,7 @@ rule "Male, age 14-16, bmi < 16.5 GAIN_WEIGHT"
 end
 
 rule "Male, age 14-16, bmi >= 26.5 LOSE_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.MALE.value, age >= 14, age < 16, bmi >= 26.5)
     	$week: WeekDTO(goal == null)
@@ -39,7 +40,7 @@ rule "Male, age 14-16, bmi >= 26.5 LOSE_WEIGHT"
 end
 
 rule "Male, age 14-16, bmi >= 16.5, bmi < 26.5 MAINTAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.MALE.value, age >= 14, age < 16, bmi >= 16.5, bmi < 26.5)
     	$week: WeekDTO(goal == null)
@@ -49,7 +50,7 @@ rule "Male, age 14-16, bmi >= 16.5, bmi < 26.5 MAINTAIN_WEIGHT"
 end
 
 rule "Female, age 14-16, bmi < 16 GAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.FEMALE.value, age >= 14, age < 16, bmi < 16)
     	$week: WeekDTO(goal == null)
@@ -59,7 +60,7 @@ rule "Female, age 14-16, bmi < 16 GAIN_WEIGHT"
 end
 
 rule "Female, age 14-16, bmi >= 28 LOSE_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.FEMALE.value, age >= 14, age < 16, bmi >= 28)
     	$week: WeekDTO(goal == null)
@@ -69,7 +70,7 @@ rule "Female, age 14-16, bmi >= 28 LOSE_WEIGHT"
 end
 
 rule "Female, age 14-16, bmi >= 16, bmi < 28 MAINTAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.FEMALE.value, age >= 14, age < 16, bmi >= 16, bmi < 28)
     	$week: WeekDTO(goal == null)
@@ -79,7 +80,7 @@ rule "Female, age 14-16, bmi >= 16, bmi < 28 MAINTAIN_WEIGHT"
 end
 
 rule "Male, age 16-18, bmi < 17.5 GAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.MALE.value, age >= 16, age < 18, bmi < 17.5)
     	$week: WeekDTO(goal == null)
@@ -89,7 +90,7 @@ rule "Male, age 16-18, bmi < 17.5 GAIN_WEIGHT"
 end
 
 rule "Male, age 16-18, bmi >= 28 LOSE_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.MALE.value, age >= 16, age < 18, bmi >= 28)
     	$week: WeekDTO(goal == null)
@@ -99,7 +100,7 @@ rule "Male, age 16-18, bmi >= 28 LOSE_WEIGHT"
 end
 
 rule "Male, age 16-18, bmi >= 17.5, bmi < 28 MAINTAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.MALE.value, age >= 16, age < 18, bmi >= 17.5, bmi < 28)
     	$week: WeekDTO(goal == null)
@@ -109,7 +110,7 @@ rule "Male, age 16-18, bmi >= 17.5, bmi < 28 MAINTAIN_WEIGHT"
 end
 
 rule "Female, age 16-18, bmi < 17 GAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.FEMALE.value, age >= 16, age < 18, bmi < 17)
     	$week: WeekDTO(goal == null)
@@ -119,7 +120,7 @@ rule "Female, age 16-18, bmi < 17 GAIN_WEIGHT"
 end
 
 rule "Female, age 16-18, bmi >= 29.5 LOSE_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.FEMALE.value, age >= 16, age < 18, bmi >= 29.5)
     	$week: WeekDTO(goal == null)
@@ -129,7 +130,7 @@ rule "Female, age 16-18, bmi >= 29.5 LOSE_WEIGHT"
 end
 
 rule "Female, age 16-18, bmi >= 17, bmi < 29.5 MAINTAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.FEMALE.value, age >= 16, age < 18, bmi >= 17, bmi < 29.5)
     	$week: WeekDTO(goal == null)
@@ -139,7 +140,7 @@ rule "Female, age 16-18, bmi >= 17, bmi < 29.5 MAINTAIN_WEIGHT"
 end
 
 rule "Male, age 18-20, bmi < 19 GAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.MALE.value, age >= 18, age < 20, bmi < 19)
     	$week: WeekDTO(goal == null)
@@ -149,7 +150,7 @@ rule "Male, age 18-20, bmi < 19 GAIN_WEIGHT"
 end
 
 rule "Male, age 18-20, bmi >= 30 LOSE_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.MALE.value, age >= 18, age < 20, bmi >= 30)
     	$week: WeekDTO(goal == null)
@@ -159,7 +160,7 @@ rule "Male, age 18-20, bmi >= 30 LOSE_WEIGHT"
 end
 
 rule "Male, age 18-20, bmi >= 19, bmi < 30 MAINTAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.MALE.value, age >= 18, age < 20, bmi >= 19, bmi < 30)
     	$week: WeekDTO(goal == null)
@@ -169,7 +170,7 @@ rule "Male, age 18-20, bmi >= 19, bmi < 30 MAINTAIN_WEIGHT"
 end
 
 rule "Female, age 18-20, bmi < 18 GAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.FEMALE.value, age >= 18, age < 20, bmi < 18)
     	$week: WeekDTO(goal == null)
@@ -179,7 +180,7 @@ rule "Female, age 18-20, bmi < 18 GAIN_WEIGHT"
 end
 
 rule "Female, age 18-20, bmi >= 31 LOSE_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.FEMALE.value, age >= 18, age < 20, bmi >= 31)
     	$week: WeekDTO(goal == null)
@@ -189,7 +190,7 @@ rule "Female, age 18-20, bmi >= 31 LOSE_WEIGHT"
 end
 
 rule "Female, age 18-20, bmi >= 18, bmi < 31 MAINTAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(sex == Sex.FEMALE.value, age >= 18, age < 20, bmi >= 18, bmi < 31)
     	$week: WeekDTO(goal == null)
@@ -199,7 +200,7 @@ rule "Female, age 18-20, bmi >= 18, bmi < 31 MAINTAIN_WEIGHT"
 end
 
 rule "age 20+, bmi < 18.5 GAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(age >= 20, bmi < 18.5)
     	$week: WeekDTO(goal == null)
@@ -209,7 +210,7 @@ rule "age 20+, bmi < 18.5 GAIN_WEIGHT"
 end
 
 rule "age 20+, bmi >= 25 LOSE_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(age >= 20, bmi >= 25)
     	$week: WeekDTO(goal == null)
@@ -219,7 +220,7 @@ rule "age 20+, bmi >= 25 LOSE_WEIGHT"
 end
 
 rule "age 20+, bmi >= 18.5, bmi < 15 MAINTAIN_WEIGHT"
-	salience 50
+	agenda-group "bmi"
     when
     	$user: RegisteredUserDTO(age >= 20, bmi >= 18.5, bmi < 25)
     	$week: WeekDTO(goal == null)
