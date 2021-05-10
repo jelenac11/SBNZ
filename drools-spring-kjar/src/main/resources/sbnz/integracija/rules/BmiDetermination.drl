@@ -1,9 +1,9 @@
-package sbnz.integracija.bmi
+package sbnz.integracija.rules
 
 import better.me.enums.*;
 import better.me.model.*;
 import better.me.dto.*;
-import better.me.rules.dto.*;
+import better.me.facts.*;
 import better.me.util.*;
 
 global MyLogger myLogger;

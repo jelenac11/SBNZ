@@ -1,6 +1,7 @@
-package better.me.rules.dto;
+package better.me.facts;
 
-import better.me.enums.BodyType;
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BodyTypeDTO {
+public class UserAnswers {
 
-	private BodyType bodyType;
+	private Map<String, String> userAnswers;
 }
