@@ -28,7 +28,7 @@ public class WeekFact {
 	public WeekFact(Week w) {
 		this(w.getId(), w.getGoal().toString(), w.getGoalCalories(), w.getGoalCarbs(), w.getGoalProteins(), w.getGoalFats(), w.isSubmitted(), (new ArrayList<Day>(w.getDays())).stream().map(DayFact::new).collect(Collectors.toList()), w.getUser().getId());
 	}
-	
+
 	public WeekFact() {
 		this.days = new ArrayList<DayFact>();
 		for (int i = 0; i <= 6; i++) 

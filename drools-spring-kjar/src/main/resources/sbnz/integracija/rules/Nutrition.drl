@@ -13,7 +13,7 @@ rule "Activity count INACTIVE"
 	agenda-group "nutrition"
 	salience 100
     when
-        $user: RegisteredUserDTO(activityLevel == ActivityLevel.INACTIVE.value)
+        $user: RegisteredUserFact(activityLevel == ActivityLevel.INACTIVE.value)
     then
         myLogger.log("User inactive");
         modify ($user) {setActivityCount(1);}
@@ -23,7 +23,7 @@ rule "Activity count SEDENTARY"
 	agenda-group "nutrition"
 	salience 100
     when
-        $user: RegisteredUserDTO(activityLevel == ActivityLevel.SEDENTARY.value)
+        $user: RegisteredUserFact(activityLevel == ActivityLevel.SEDENTARY.value)
     then
         myLogger.log("User sedentary");
         modify ($user) {setActivityCount(1.2);}
@@ -33,7 +33,7 @@ rule "Activity count LIGHTLY ACTIVE"
 	agenda-group "nutrition"
 	salience 100
     when
-        $user: RegisteredUserDTO(activityLevel == ActivityLevel.LIGHTLY_ACTIVE.value)
+        $user: RegisteredUserFact(activityLevel == ActivityLevel.LIGHTLY_ACTIVE.value)
     then
         myLogger.log("User lightly active");
         modify ($user) {setActivityCount(1.375);}
@@ -43,7 +43,7 @@ rule "Activity count MODERATELY ACTIVE"
 	agenda-group "nutrition"
 	salience 100
     when
-        $user: RegisteredUserDTO(activityLevel == ActivityLevel.MODERATELY_ACTIVE.value)
+        $user: RegisteredUserFact(activityLevel == ActivityLevel.MODERATELY_ACTIVE.value)
     then
         myLogger.log("User moderately active");
         modify ($user) {setActivityCount(1.55);}
@@ -53,7 +53,7 @@ rule "Activity count VERY ACTIVE"
 	agenda-group "nutrition"
 	salience 100
     when
-        $user: RegisteredUserDTO(activityLevel == ActivityLevel.VERY_ACTIVE.value)
+        $user: RegisteredUserFact(activityLevel == ActivityLevel.VERY_ACTIVE.value)
     then
         myLogger.log("User very active");
         modify ($user) {setActivityCount(1.725);}
@@ -63,8 +63,8 @@ rule "Calculate goal calories for MALE"
 	agenda-group "nutrition"
 	salience 90
 	when
-    	$user: RegisteredUserDTO(sex == Sex.MALE.value, $weight: weight, $height: height, $age: age, $activityCount: activityCount)
-    	$week: WeekDTO(goalCalories == 0)
+    	$user: RegisteredUserFact(sex == Sex.MALE.value, $weight: weight, $height: height, $age: age, $activityCount: activityCount)
+    	$week: WeekFact(goalCalories == 0)
     then
         myLogger.log("Calculated goal calories");
         modify ($week) {setGoalCalories($activityCount * (10 * $weight + 6.25 * $height - 5 * $age + 5));}
@@ -74,9 +74,78 @@ rule "Calculate goal calories for FEMALE"
 	agenda-group "nutrition"
 	salience 90
 	when
-    	$user: RegisteredUserDTO(sex == Sex.FEMALE.value, $weight: weight, $height: height, $age: age, $activityCount: activityCount)
-    	$week: WeekDTO(goalCalories == 0)
+    	$user: RegisteredUserFact(sex == Sex.FEMALE.value, $weight: weight, $height: height, $age: age, $activityCount: activityCount)
+    	$week: WeekFact(goalCalories == 0)
     then
         myLogger.log("Calculated goal calories");
         modify ($week) {setGoalCalories($activityCount * (10 * $weight + 6.25 * $height - 5 * $age - 161));}
+end
+
+rule "Calculate goal proteins for GAIN WEIGHT"
+	agenda-group "nutrition"
+	salience 80
+	when
+    	$user: RegisteredUserFact($weight: weight)
+    	$week: WeekFact(goalProteins == 0, goal == Goal.GAIN_WEIGHT.value)
+    then
+        myLogger.log("Calculated goal proteins GAIN WEIGHT");
+        modify ($week) {setGoalProteins(2.4 * $weight);}
+end
+
+rule "Calculate goal proteins for LOSE WEIGHT"
+	agenda-group "nutrition"
+	salience 80
+	when
+    	$user: RegisteredUserFact($weight: weight)
+    	$week: WeekFact(goalProteins == 0, goal == Goal.LOSE_WEIGHT.value)
+    then
+        myLogger.log("Calculated goal proteins LOSE WEIGHT");
+        modify ($week) {setGoalProteins(1.4 * $weight);}
+end
+
+rule "Calculate goal proteins for MAINTAIN WEIGHT"
+	agenda-group "nutrition"
+	salience 80
+	when
+    	$user: RegisteredUserFact($weight: weight)
+    	$week: WeekFact(goalProteins == 0, goal == Goal.MAINTAIN_WEIGHT.value)
+    then
+        myLogger.log("Calculated goal proteins MAINTAIN WEIGHT");
+        modify ($week) {setGoalProteins(1.8 * $weight);}
+end
+
+rule "Calculate goal fats and carbs for ECTOMORPH"
+	agenda-group "nutrition"
+	salience 70
+	when
+    	$user: RegisteredUserFact(bodyType == BodyType.ECTOMORPH.value)
+    	$week: WeekFact(goalFats == 0, goalCarbs == 0, goalProteins != 0, $goalCalories: goalCalories, $goalProteins: goalProteins)
+    then
+        myLogger.log("Calculated goal fats and calories for ECTOMORPH");
+        modify ($week) {setGoalCarbs(($goalCalories - ($goalProteins * 4)) * 0.7 * 0.25);}
+        modify ($week) {setGoalFats(($goalCalories - ($goalProteins * 4)) * 0.3 * 0.111);}
+end
+
+rule "Calculate goal fats and carbs for MESOMORPH"
+	agenda-group "nutrition"
+	salience 70
+	when
+    	$user: RegisteredUserFact(bodyType == BodyType.MESOMORPH.value)
+    	$week: WeekFact(goalFats == 0, goalCarbs == 0, goalProteins != 0, $goalCalories: goalCalories, $goalProteins: goalProteins)
+    then
+        myLogger.log("Calculated goal fats and calories for MESOMORPH");
+        modify ($week) {setGoalCarbs(($goalCalories - ($goalProteins * 4)) * 0.6 * 0.25);}
+        modify ($week) {setGoalFats(($goalCalories - ($goalProteins * 4)) * 0.4 * 0.111);}
+end
+
+rule "Calculate goal fats and carbs for ENDOMORPH"
+	agenda-group "nutrition"
+	salience 70
+	when
+    	$user: RegisteredUserFact(bodyType == BodyType.ENDOMORPH.value)
+    	$week: WeekFact(goalFats == 0, goalCarbs == 0, goalProteins != 0, $goalCalories: goalCalories, $goalProteins: goalProteins)
+    then
+        myLogger.log("Calculated goal fats and calories for ENDOMORPH");
+        modify ($week) {setGoalCarbs(($goalCalories - ($goalProteins * 4)) * 0.5 * 0.25);}
+        modify ($week) {setGoalFats(($goalCalories - ($goalProteins * 4)) * 0.5 * 0.111);}
 end

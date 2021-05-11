@@ -1,5 +1,6 @@
 package better.me.services;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -13,15 +14,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import better.me.dto.RegisteredUserDTO;
-import better.me.dto.WeekDTO;
 import better.me.enums.ActivityLevel;
 import better.me.enums.BodyType;
 import better.me.enums.Diet;
 import better.me.enums.Sex;
 import better.me.exceptions.NotLoggedInException;
 import better.me.exceptions.RequestException;
+import better.me.facts.RegisteredUserFact;
+import better.me.facts.WeekFact;
 import better.me.model.Allergen;
 import better.me.model.Authority;
+import better.me.model.Day;
 import better.me.model.RegisteredUser;
 import better.me.model.User;
 import better.me.model.Week;
@@ -83,37 +86,54 @@ public class RegisteredUserService {
 		return registeredUserRepository.findByUsername(username);
 	}
 	
-	public String determineBmi() throws NotLoggedInException, RequestException {
+	public WeekFact determineBmi() throws RequestException {
 		User current = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (current == null) throw new NotLoggedInException("You must login first. No logged in user found!");
-		
 		RegisteredUser rUser = registeredUserRepository.findByEmail(current.getEmail());
-		if (rUser == null) throw new NotLoggedInException("Registered user must be logged in!");
 		
 		KieSession kieSession = kieContainer.newKieSession("session");
 		kieSession.getAgenda().getAgendaGroup("bmi").setFocus();
 
 		kieSession.setGlobal("myLogger", new MyLogger());
 	
-		RegisteredUserDTO userDto = new RegisteredUserDTO(rUser);
-		WeekDTO weekDto = new WeekDTO();
+		RegisteredUserFact userFact = new RegisteredUserFact(rUser);
+		WeekFact weekFact = new WeekFact();
 
-		kieSession.insert(userDto);
-		kieSession.insert(weekDto);
+		kieSession.insert(userFact);
+		kieSession.insert(weekFact);
 		
 		kieSession.fireAllRules();
 		kieSession.dispose();
 		
-		rUser.setBmi(userDto.getBmi());
+		rUser.setBmi(userFact.getBmi());
 		registeredUserRepository.save(rUser);
 		
-		Week week = new Week(weekDto, rUser);
-		weekRepository.save(week);
-		
-		return userDto.getBmi() + "";
+		return weekFact;
 	}
 	
-	public String fillInfo(RegisteredUserDTO user) throws NotLoggedInException, RequestException {
+	public WeekFact determineNutrition(WeekFact weekFact) throws RequestException {
+		User current = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		RegisteredUser rUser = registeredUserRepository.findByEmail(current.getEmail());
+
+		KieSession kieSession = kieContainer.newKieSession("session");
+		kieSession.getAgenda().getAgendaGroup("nutrition").setFocus();
+
+		kieSession.setGlobal("myLogger", new MyLogger());
+
+		RegisteredUserFact userFact = new RegisteredUserFact(rUser);
+
+		kieSession.insert(userFact);
+		kieSession.insert(weekFact);
+
+		kieSession.fireAllRules();
+		kieSession.dispose();
+		
+		rUser.setActivityCount(userFact.getActivityCount());
+		registeredUserRepository.save(rUser);
+		
+		return weekFact;
+	}
+	
+	public RegisteredUserDTO fillInfo(RegisteredUserDTO user) throws NotLoggedInException, RequestException {
 		User current = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (current == null) throw new NotLoggedInException("You must login first. No logged in user found!");
 		
@@ -130,9 +150,17 @@ public class RegisteredUserService {
 		rUser.setAllergens(new HashSet<Allergen>(user.getAllergens()));
 		registeredUserRepository.save(rUser);
 		
-		determineBmi();
+		WeekFact weekFact = determineBmi();
+		WeekFact weekNutritionFact = determineNutrition(weekFact);
+		Week week = new Week(weekNutritionFact, rUser);
+		ArrayList<Day> days = new ArrayList<Day>();
+		for (int i = 0; i < 7; i++) {
+			days.add(new Day());
+		}
+		week.setDays(new HashSet<Day>(days));
+		weekRepository.save(week);
 		
-		return rUser.getUsername();
+		return new RegisteredUserDTO(rUser);
 	}
 
 }
