@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BodyTypeDTO {
+public class BodyTypeFact {
 
 	private BodyType bodyType;
 }

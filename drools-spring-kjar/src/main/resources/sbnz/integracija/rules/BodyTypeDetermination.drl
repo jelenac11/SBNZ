@@ -19,7 +19,7 @@ rule "Determine body type"
         	Map.Entry($t:this, $answers.entrySet() contains this) from $userAnswers.entrySet(),
         	count($t)
         )
-        $bodyType: BodyTypeDTO(bodyType == null)
+        $bodyType: BodyTypeFact(bodyType == null)
     then
         myLogger.log("User has endomorph body type");
         modify ($bodyType) {setBodyType($a.getBodyType());}
