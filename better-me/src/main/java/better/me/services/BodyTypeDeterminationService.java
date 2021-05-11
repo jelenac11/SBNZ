@@ -15,7 +15,7 @@ import better.me.enums.BodyType;
 import better.me.exceptions.NotLoggedInException;
 import better.me.exceptions.RequestException;
 import better.me.facts.Answers;
-import better.me.facts.BodyTypeDTO;
+import better.me.facts.BodyTypeFact;
 import better.me.facts.Constants;
 import better.me.facts.UserAnswers;
 import better.me.model.RegisteredUser;
@@ -60,7 +60,7 @@ public class BodyTypeDeterminationService {
 		kieSession.insert(new Answers(BodyType.ECTOMORPH, Constants.ectoAnswers));
 		kieSession.insert(new Answers(BodyType.ENDOMORPH, Constants.endoAnswers));
 		kieSession.insert(new Answers(BodyType.MESOMORPH, Constants.mesoAnswers));
-		BodyTypeDTO bodyType = new BodyTypeDTO();
+		BodyTypeFact bodyType = new BodyTypeFact();
 		kieSession.insert(bodyType);
 		
 		kieSession.fireAllRules();

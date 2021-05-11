@@ -8,12 +8,10 @@ import better.me.model.ConcreteMeal;
 import better.me.model.Day;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class DayFact {
 
@@ -30,4 +28,7 @@ public class DayFact {
 		this(d.getId(), d.isSubmitted(), d.getCalories(), d.getCarbs(), d.getProteins(), d.getFats(), d.isExceed(), (new ArrayList<ConcreteMeal>(d.getConcreteMeals())).stream().map(ConcreteMealFact::new).collect(Collectors.toList()));
 	}
 	
+	public DayFact() {
+		concreteMeals = new ArrayList<ConcreteMealFact>();
+	}
 }

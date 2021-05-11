@@ -14,10 +14,10 @@ public class IngredientFact {
 
 	private Long id;
 	private int grams;
-	private Long groceryId;
+	private GroceryFact grocery;
 	
 	public IngredientFact(Ingredient i) {
-		this(i.getId(), i.getGrams(), i.getGrocery().getId());
+		this(i.getId(), i.getGrams(), new GroceryFact(i.getGrocery()));
 	}
 
 }

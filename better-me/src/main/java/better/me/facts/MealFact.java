@@ -8,12 +8,10 @@ import better.me.model.Ingredient;
 import better.me.model.Meal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class MealFact {
 
@@ -29,6 +27,10 @@ public class MealFact {
 	
 	public MealFact(Meal m) {
 		this(m.getId(), m.getName(), m.getCalories(), m.getCarbs(), m.getProteins(), m.getFats(), m.getTime(), m.getDescription(), (new ArrayList<Ingredient>(m.getIngredients())).stream().map(IngredientFact::new).collect(Collectors.toList()));
+	}
+	
+	public MealFact() {
+		ingredients = new ArrayList<IngredientFact>();
 	}
 
 }

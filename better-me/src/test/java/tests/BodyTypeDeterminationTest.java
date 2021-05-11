@@ -13,7 +13,7 @@ import org.kie.api.runtime.KieSession;
 import better.me.dto.BodyInfoDTO;
 import better.me.enums.BodyType;
 import better.me.facts.Answers;
-import better.me.facts.BodyTypeDTO;
+import better.me.facts.BodyTypeFact;
 import better.me.facts.Constants;
 import better.me.facts.UserAnswers;
 import better.me.util.MyLogger;
@@ -37,7 +37,7 @@ public class BodyTypeDeterminationTest {
     @Test
     public void bodyTypeRule_answersForEctomorphGiven_shouldDetermineEctomorphBodyType() {
         BodyInfoDTO infoDTO = new BodyInfoDTO("NARROWER THAN YOUR HIPS", "TIGHT AROUND YOUR GLUTES", "SMALL", "STAY SKINNY", "MOSTLY RECTANGLE", "FIND IT DIFFICULT TO GAIN AND MAINTAIN WEIGHT", "THE FINGERS OVERLAP");
-        BodyTypeDTO bodyType = new BodyTypeDTO();
+        BodyTypeFact bodyType = new BodyTypeFact();
        
 		kieSession.setGlobal("myLogger", myLogger);
 	
@@ -55,7 +55,7 @@ public class BodyTypeDeterminationTest {
     @Test
     public void bodyTypeRule_answersForEndomorphGiven_shouldDetermineEndomorphBodyType() {
         BodyInfoDTO infoDTO = new BodyInfoDTO("WIDER THAN YOUR HIPS", "LOOSE AROUND YOUR GLUTES", "BIG", "CARRY SOME EXTRA FAT", "PEAR", "GAIN WEIGHT EASILY BUT HAVE A HARD TIME LOSING IT", "THE FINGERS DON'T TOUCH");
-        BodyTypeDTO bodyType = new BodyTypeDTO();
+        BodyTypeFact bodyType = new BodyTypeFact();
 
 		kieSession.setGlobal("myLogger", myLogger);
 	
@@ -73,7 +73,7 @@ public class BodyTypeDeterminationTest {
     @Test
     public void bodyTypeRule_answersForMesomorphGiven_shouldDetermineMesomorphBodyType() {
         BodyInfoDTO infoDTO = new BodyInfoDTO("SAME AS YOUR HIPS", "PERFECT AROUND YOUR GLUTES", "AVERAGE", "STAY FIT AND MUSCULAR", "HOURGLASS", "HAVE AN EASY TIME LOSING OR GAINING WEIGHT", "THE FINGERS JUST TOUCH");
-        BodyTypeDTO bodyType = new BodyTypeDTO();
+        BodyTypeFact bodyType = new BodyTypeFact();
         		
 		kieSession.setGlobal("myLogger", myLogger);
 	
@@ -91,7 +91,7 @@ public class BodyTypeDeterminationTest {
     @Test
     public void bodyTypeRule_randomAnswersGiven_shouldDetermineNoBodyType() {
         BodyInfoDTO infoDTO = new BodyInfoDTO("SAME AS YOUR HIPS", "LOOSE AROUND YOUR GLUTES", "BIG", "STAY SKINNY", "MOSTLY RECTANGLE", "FIND IT DIFFICULT TO GAIN AND MAINTAIN WEIGHT", "THE FINGERS OVERLAP");
-        BodyTypeDTO bodyType = new BodyTypeDTO();
+        BodyTypeFact bodyType = new BodyTypeFact();
         
 		kieSession.setGlobal("myLogger", myLogger);
 	
