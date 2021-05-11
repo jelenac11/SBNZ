@@ -15,11 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import better.me.dto.RegisteredUserDTO;
-import better.me.dto.UserDTO;
 import better.me.dto.UserResDTO;
 import better.me.helper.RegisteredUserMapper;
 import better.me.model.RegisteredUser;
-import better.me.model.User;
 import better.me.services.RegisteredUserService;
 
 @RestController
