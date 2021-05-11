@@ -14,8 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import better.me.dto.WeekDTO;
 import better.me.enums.Goal;
+import better.me.facts.WeekFact;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,8 +58,8 @@ public class Week {
 	@JoinColumn(name="user_id")
 	private RegisteredUser user;
 	
-	public Week(WeekDTO dto, RegisteredUser rUser) {
-		this(null, dto.getGoal(), dto.getGoalCalories(), dto.getGoalCarbs(), dto.getGoalProteins(), dto.getGoalFats(), false, new HashSet<Day>(), rUser);
+	public Week(WeekFact fact, RegisteredUser rUser) {
+		this(null, Goal.valueOf(fact.getGoal()), fact.getGoalCalories(), fact.getGoalCarbs(), fact.getGoalProteins(), fact.getGoalFats(), false, new HashSet<Day>(), rUser);
 	}
 
 }
