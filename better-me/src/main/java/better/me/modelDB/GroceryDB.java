@@ -4,11 +4,14 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import better.me.enums.Diet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +31,10 @@ public class GroceryDB {
 	
 	@Column
 	private String name;
+	
+	@Column
+	@Enumerated(EnumType.STRING)
+	private Diet diet;
 	
 	@Column
 	private double calories;

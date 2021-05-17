@@ -15,6 +15,7 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
 import better.me.dto.FilterDTO;
+import better.me.enums.Diet;
 import better.me.model.Allergen;
 import better.me.model.DailyNutrition;
 import better.me.model.Grocery;
@@ -44,22 +45,22 @@ public class FilterTest {
 		kieSession.getAgenda().getAgendaGroup("filter").setFocus();
 		kieSession.setGlobal("myLogger", myLogger);
 		
-		Grocery pepper = new Grocery(1L, "pepper", 150, 9, 7, 1);
-    	Grocery banana = new Grocery(2L, "banana", 100, 10, 1, 1);
+		Grocery pepper = new Grocery(1L, "pepper", Diet.OMNIVORE, 150, 9, 7, 1);
+    	Grocery banana = new Grocery(2L, "banana", Diet.OMNIVORE, 100, 10, 1, 1);
     	List<Ingredient> ingredients = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, pepper));
     	ingredients.add(new Ingredient(2L, 200, banana));
     	Meal meal1 = new Meal(1L, "meal1", 350, 29, 9, 3, 10, "", ingredients);
     	
-    	Grocery peanut = new Grocery(3L, "peanut", 100, 10, 10, 10);
-    	Grocery pineapple = new Grocery(4L, "pineapple", 100, 10, 1, 1);
+    	Grocery peanut = new Grocery(3L, "peanut", Diet.OMNIVORE, 100, 10, 10, 10);
+    	Grocery pineapple = new Grocery(4L, "pineapple", Diet.OMNIVORE, 100, 10, 1, 1);
     	List<Ingredient> ingredients2 = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, peanut));
     	ingredients.add(new Ingredient(2L, 100, pineapple));
     	Meal meal2 = new Meal(2L, "meal2", 200, 20, 11, 11, 40, "", ingredients2);
     	
-    	Grocery milk = new Grocery(5L, "milk", 100, 10, 10, 10);
-    	Grocery apple = new Grocery(6L, "apple", 100, 10, 1, 1);
+    	Grocery milk = new Grocery(5L, "milk", Diet.OMNIVORE, 100, 10, 10, 10);
+    	Grocery apple = new Grocery(6L, "apple", Diet.OMNIVORE, 100, 10, 1, 1);
     	List<Ingredient> ingredients3 = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, milk));
     	ingredients.add(new Ingredient(2L, 200, apple));

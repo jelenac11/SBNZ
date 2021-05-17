@@ -11,6 +11,7 @@ import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
+import better.me.enums.Diet;
 import better.me.model.ConcreteMeal;
 import better.me.model.DailyNutrition;
 import better.me.model.Day;
@@ -64,8 +65,8 @@ public class DailyNutritionTest {
     public void calculateDailyNutrition_allMealsGiven_shouldReturnDailyNutrition() {
     	DailyNutrition nutrition = new DailyNutrition();
     	List<ConcreteMeal> concreteMeals = new ArrayList<ConcreteMeal>();
-    	Grocery pepper = new Grocery(1L, "pepper", 150, 9, 7, 1);
-    	Grocery banana = new Grocery(2L, "banana", 100, 10, 1, 1);
+    	Grocery pepper = new Grocery(1L, "pepper", Diet.OMNIVORE, 150, 9, 7, 1);
+    	Grocery banana = new Grocery(2L, "banana", Diet.OMNIVORE, 100, 10, 1, 1);
     	List<Ingredient> ingredients = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, pepper));
     	ingredients.add(new Ingredient(2L, 200, banana));
@@ -89,8 +90,8 @@ public class DailyNutritionTest {
     public void calculateDailyNutrition_customMealGiven_shouldReturnDailyNutrition() {
     	DailyNutrition nutrition = new DailyNutrition();
     	List<ConcreteMeal> concreteMeals = new ArrayList<ConcreteMeal>();
-    	Grocery pepper = new Grocery(1L, "pepper", 150, 9, 7, 1);
-    	Grocery banana = new Grocery(2L, "banana", 100, 10, 1, 1);
+    	Grocery pepper = new Grocery(1L, "pepper", Diet.OMNIVORE, 150, 9, 7, 1);
+    	Grocery banana = new Grocery(2L, "banana", Diet.OMNIVORE, 100, 10, 1, 1);
     	List<Ingredient> ingredients = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, pepper));
     	ingredients.add(new Ingredient(2L, 200, banana));
@@ -112,8 +113,8 @@ public class DailyNutritionTest {
     public void calculateDailyNutrition_notCustomMealGiven_shouldReturnDailyNutrition() {
     	DailyNutrition nutrition = new DailyNutrition();
     	List<ConcreteMeal> concreteMeals = new ArrayList<ConcreteMeal>();
-    	Grocery pepper = new Grocery(1L, "pepper", 150, 9, 7, 1);
-    	Grocery banana = new Grocery(2L, "banana", 100, 10, 1, 1);
+    	Grocery pepper = new Grocery(1L, "pepper", Diet.OMNIVORE, 150, 9, 7, 1);
+    	Grocery banana = new Grocery(2L, "banana", Diet.OMNIVORE, 100, 10, 1, 1);
     	List<Ingredient> ingredients = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, pepper));
     	ingredients.add(new Ingredient(2L, 200, banana));
@@ -136,8 +137,8 @@ public class DailyNutritionTest {
     public void sendNotificationWarning_goalCaloriesExceeded_shouldSendNotification() {
     	DailyNutrition nutrition = new DailyNutrition();
     	List<ConcreteMeal> concreteMeals = new ArrayList<ConcreteMeal>();
-    	Grocery pepper = new Grocery(1L, "pepper", 150, 9, 7, 1);
-    	Grocery banana = new Grocery(2L, "banana", 100, 10, 1, 1);
+    	Grocery pepper = new Grocery(1L, "pepper", Diet.OMNIVORE, 150, 9, 7, 1);
+    	Grocery banana = new Grocery(2L, "banana", Diet.OMNIVORE, 100, 10, 1, 1);
     	List<Ingredient> ingredients = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, pepper));
     	ingredients.add(new Ingredient(2L, 200, banana));
@@ -163,8 +164,8 @@ public class DailyNutritionTest {
     public void sendNotificationOnCaloriesLeft_goalCaloriesNotExceeded_shouldSendNotification() {
     	DailyNutrition nutrition = new DailyNutrition();
     	List<ConcreteMeal> concreteMeals = new ArrayList<ConcreteMeal>();
-    	Grocery pepper = new Grocery(1L, "pepper", 150, 9, 7, 1);
-    	Grocery banana = new Grocery(2L, "banana", 100, 10, 1, 1);
+    	Grocery pepper = new Grocery(1L, "pepper", Diet.OMNIVORE, 150, 9, 7, 1);
+    	Grocery banana = new Grocery(2L, "banana", Diet.OMNIVORE, 100, 10, 1, 1);
     	List<Ingredient> ingredients = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, pepper));
     	ingredients.add(new Ingredient(2L, 200, banana));
