@@ -24,6 +24,7 @@ rule "Filter meals by allergens"
 					for (Object allergen : $allergens) {
 						if (((Allergen)allergen).getName().equals( ((Ingredient)ingredient).getGrocery().getName())) {
 							withAllergens.add($meal);
+							break;
 						}
 					}
 				}
@@ -65,7 +66,30 @@ rule "Filter meals by name"
 		modify ( $allMeals) { addAll($meals); }
 end
 
-
+rule "Filter meals by diet"
+	agenda-group "filter"
+	no-loop
+	when
+		$allMeals: List()
+		$user: RegisteredUser($diet: diet)
+        $meals: List ()  from accumulate ( 
+			$meal : Meal ($ingredients: ingredients) from $allMeals,
+			init( List<Meal> dietMeals = new ArrayList(); ),
+			action(  
+				for (Object ingredient : $ingredients) {
+					if (((Allergen)allergen).getName().equals( ((Ingredient)ingredient).getGrocery().getName())) {
+						withAllergens.add($meal);
+					}
+				}
+			 ),
+			result ( withAllergens )
+		)
+	then
+		myLogger.log("Filtering meals by name");
+		modify ( $allMeals ) { removeAll($allMeals); }
+		modify ( $allMeals) { addAll($meals); }
+end		
+		
 rule "Sort meals by calories ascending"
 	salience -$cals
 	agenda-group "filter"
