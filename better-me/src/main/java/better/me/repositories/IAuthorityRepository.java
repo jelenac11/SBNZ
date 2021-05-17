@@ -3,11 +3,11 @@ package better.me.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import better.me.model.Authority;
+import better.me.modelDB.AuthorityDB;
 
 @Repository
-public interface IAuthorityRepository extends JpaRepository<Authority, Long> {
+public interface IAuthorityRepository extends JpaRepository<AuthorityDB, Long> {
 
-	Authority findByName(String name);
+	AuthorityDB findByName(String name);
 
 }

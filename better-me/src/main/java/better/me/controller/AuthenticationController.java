@@ -24,9 +24,9 @@ import better.me.dto.UserResDTO;
 import better.me.dto.UserTokenStateDTO;
 import better.me.helper.RegisteredUserMapper;
 import better.me.helper.UserMapper;
-import better.me.model.Authority;
-import better.me.model.RegisteredUser;
-import better.me.model.User;
+import better.me.modelDB.AuthorityDB;
+import better.me.modelDB.RegisteredUserDB;
+import better.me.modelDB.UserDB;
 import better.me.security.TokenUtils;
 import better.me.services.RegisteredUserService;
 import better.me.services.UserService;
@@ -67,9 +67,9 @@ public class AuthenticationController {
 			return new ResponseEntity<>("Incorrect email or password.", HttpStatus.UNAUTHORIZED);
 		}
 
-		User user = (User) authentication.getPrincipal();
+		UserDB user = (UserDB) authentication.getPrincipal();
 		@SuppressWarnings("unchecked")
-		List<Authority> auth = (List<Authority>) user.getAuthorities();
+		List<AuthorityDB> auth = (List<AuthorityDB>) user.getAuthorities();
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -81,15 +81,15 @@ public class AuthenticationController {
 
 	@PostMapping(value = "/sign-up", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO userRequest) throws Exception {
-		User existEmail = this.userDetailsService.findByEmail(userRequest.getEmail());
+		UserDB existEmail = this.userDetailsService.findByEmail(userRequest.getEmail());
 		if (existEmail != null) {
 			return new ResponseEntity<>("Email already exists.", HttpStatus.CONFLICT);
 		}
-		User existUser = this.userDetailsService.findByUsername(userRequest.getUsername());
+		UserDB existUser = this.userDetailsService.findByUsername(userRequest.getUsername());
 		if (existUser != null) {
 			return new ResponseEntity<>("Username already exists.", HttpStatus.CONFLICT);
 		}
-		RegisteredUser newUser = null;
+		RegisteredUserDB newUser = null;
 		try {
 			newUser = registeredUserService.create(registeredUserMapper.toEntity(userRequest));
 		} catch (Exception e) {
@@ -100,7 +100,7 @@ public class AuthenticationController {
 
 	@GetMapping(value = "/current-user")
 	public ResponseEntity<UserResDTO> currentUser() {
-		User current = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return new ResponseEntity<>(userMapper.toResDTO(current), HttpStatus.OK);
 	}
 

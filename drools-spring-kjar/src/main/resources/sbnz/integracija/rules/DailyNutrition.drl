@@ -3,7 +3,7 @@ package sbnz.integracija.rules;
 import better.me.enums.*;
 import better.me.model.*;
 import better.me.dto.*;
-import better.me.facts.*;
+import better.me.modelDB.*;
 import better.me.util.*;
 
 global MyLogger myLogger;
@@ -13,11 +13,11 @@ rule "Number of submitted days"
 	agenda-group "daily-nutrition"
 	no-loop
     when
-    	$user: RegisteredUserFact($id: id)
-    	$week: WeekFact($days: days, userId == $id)
-        $nutrition: DailyNutritionFact(day == 0)
+    	$user: RegisteredUser($id: id)
+    	$week: Week($days: days, userId == $id)
+        $nutrition: DailyNutrition(day == 0)
         $value: Number(intValue >= 0) from accumulate (
-        	DayFact($t:this, submitted == true) from $days,
+        	Day($t:this, submitted == true) from $days,
         	count($t)
         )
     then
@@ -29,19 +29,20 @@ rule "Calculate entered daily calories"
 	agenda-group "daily-nutrition"
 	no-loop
 	when 
-		$dayHistory: DayFact($meals: concreteMeals, submitted == false)
+		$dayHistory: Day($meals: concreteMeals, submitted == false)
 		accumulate(
-		 	ConcreteMealFact($grams: grams, $meal: meal, customMeal == false) from $meals,
+		 	ConcreteMeal($grams: grams, $meal: meal, customMeal == false) from $meals,
 		 	$totalNotCustom: sum(($grams * $meal.getCalories())/100)
 		 )
 		 accumulate(
-		 	ConcreteMealFact($ingredients: ingredients, customMeal == true) from $meals
-		 	and IngredientFact($quantity: grams, $grocery: grocery) from $ingredients,
+		 	ConcreteMeal($ingredients: ingredients, customMeal == true) from $meals
+		 	and Ingredient($quantity: grams, $grocery: grocery) from $ingredients,
 		 	$totalCustom: sum(($quantity * $grocery.getCalories())/100)
 		 )
-		 $nutrition: DailyNutritionFact()
+		 $nutrition: DailyNutrition()
 	then
 		myLogger.log("Daily calories calculated");
+		modify ( $dayHistory ) { setCalories($totalNotCustom + $totalCustom); }
 		modify ( $nutrition ) { setCalories($totalNotCustom + $totalCustom); }		
 end
 
@@ -49,19 +50,20 @@ rule "Calculate entered daily fats"
 	agenda-group "daily-nutrition"
 	no-loop
 	when 
-		$dayHistory: DayFact($meals: concreteMeals, submitted == false)
+		$dayHistory: Day($meals: concreteMeals, submitted == false)
 		accumulate(
-		 	ConcreteMealFact($grams: grams, $meal: meal, customMeal == false) from $meals,
+		 	ConcreteMeal($grams: grams, $meal: meal, customMeal == false) from $meals,
 		 	$totalNotCustom: sum(($grams * $meal.getFats())/100)
 		 )
 		 accumulate(
-		 	ConcreteMealFact($ingredients: ingredients, customMeal == true) from $meals
-		 	and IngredientFact($quantity: grams, $grocery: grocery) from $ingredients,
+		 	ConcreteMeal($ingredients: ingredients, customMeal == true) from $meals
+		 	and Ingredient($quantity: grams, $grocery: grocery) from $ingredients,
 		 	$totalCustom: sum(($quantity * $grocery.getFats())/100)
 		 )
-		 $nutrition: DailyNutritionFact()
+		 $nutrition: DailyNutrition()
 	then
 		myLogger.log("Daily fats calculated");
+		modify ( $dayHistory ) { setFats($totalNotCustom + $totalCustom); }
 		modify ( $nutrition ) { setFats($totalNotCustom + $totalCustom); }		
 end
 
@@ -69,19 +71,20 @@ rule "Calculate entered daily carbs"
 	agenda-group "daily-nutrition"
 	no-loop
 	when 
-		$dayHistory: DayFact($meals: concreteMeals, submitted == false)
+		$dayHistory: Day($meals: concreteMeals, submitted == false)
 		accumulate(
-		 	ConcreteMealFact($grams: grams, $meal: meal, customMeal == false) from $meals,
+		 	ConcreteMeal($grams: grams, $meal: meal, customMeal == false) from $meals,
 		 	$totalNotCustom: sum(($grams * $meal.getCarbs())/100)
 		 )
 		 accumulate(
-		 	ConcreteMealFact($ingredients: ingredients, customMeal == true) from $meals
-		 	and IngredientFact($quantity: grams, $grocery: grocery) from $ingredients,
+		 	ConcreteMeal($ingredients: ingredients, customMeal == true) from $meals
+		 	and Ingredient($quantity: grams, $grocery: grocery) from $ingredients,
 		 	$totalCustom: sum(($quantity * $grocery.getCarbs())/100)
 		 )
-		 $nutrition: DailyNutritionFact()
+		 $nutrition: DailyNutrition()
 	then
 		myLogger.log("Daily carbs calculated");
+		modify ( $dayHistory ) { setCarbs($totalNotCustom + $totalCustom); }
 		modify ( $nutrition ) { setCarbs($totalNotCustom + $totalCustom); }		
 end
 
@@ -89,18 +92,49 @@ rule "Calculate entered daily proteins"
 	agenda-group "daily-nutrition"
 	no-loop
 	when 
-		$dayHistory: DayFact($meals: concreteMeals, submitted == false)
+		$dayHistory: Day($meals: concreteMeals, submitted == false)
 		accumulate(
-		 	ConcreteMealFact($grams: grams, $meal: meal, customMeal == false) from $meals,
+		 	ConcreteMeal($grams: grams, $meal: meal, customMeal == false) from $meals,
 		 	$totalNotCustom: sum(($grams * $meal.getProteins())/100)
 		 )
 		 accumulate(
-		 	ConcreteMealFact($ingredients: ingredients, customMeal == true) from $meals
-		 	and IngredientFact($quantity: grams, $grocery: grocery) from $ingredients,
+		 	ConcreteMeal($ingredients: ingredients, customMeal == true) from $meals
+		 	and Ingredient($quantity: grams, $grocery: grocery) from $ingredients,
 		 	$totalCustom: sum(($quantity * $grocery.getProteins())/100)
 		 )
-		 $nutrition: DailyNutritionFact()
+		 $nutrition: DailyNutrition()
 	then
 		myLogger.log("Daily proteins calculated");
+		modify ( $dayHistory ) { setProteins($totalNotCustom + $totalCustom); }
 		modify ( $nutrition ) { setProteins($totalNotCustom + $totalCustom); }		
+end
+
+rule "Notification Warning"
+	salience -Integer.MAX_VALUE
+	agenda-group "daily-nutrition"
+	no-loop
+	when
+		$user: RegisteredUser($id: id)
+		$week: Week(userId == $id, $goalCalories: goalCalories)
+		$day: Day(calories > $goalCalories)
+		$notification: Notification()
+	then
+		myLogger.log("Notification Warning");
+		modify ( $notification ) { setMessage("You exceeded goal calories for today!" ); }
+		modify ( $day ) { setExceed(true); }
+end
+
+rule "Notification on calories left"
+	salience -Integer.MAX_VALUE
+	agenda-group "daily-nutrition"
+	no-loop
+	when
+		$user: RegisteredUser($id: id)
+		$week: Week(userId == $id, $goalCalories: goalCalories)
+		$day: Day(calories < $goalCalories, $calories: calories)
+		$notification: Notification()
+	then
+		myLogger.log("Notification on calories left");
+		modify ( $notification ) { setMessage("Calories left: " + ($goalCalories - $calories) ); }
+		modify ( $day ) { setExceed(false); }
 end

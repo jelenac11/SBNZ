@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import better.me.model.User;
+import better.me.modelDB.UserDB;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -69,7 +69,7 @@ public class TokenUtils {
 
 	public boolean validateToken(String token, UserDetails userDetails) {
 		final String username = getUsernameFromToken(token);
-		return (username != null && username.equals(((User) userDetails).getEmail()));
+		return (username != null && username.equals(((UserDB) userDetails).getEmail()));
 	}
 
 	public String getUsernameFromToken(String token) {

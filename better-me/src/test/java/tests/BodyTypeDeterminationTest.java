@@ -12,10 +12,10 @@ import org.kie.api.runtime.KieSession;
 
 import better.me.dto.BodyInfoDTO;
 import better.me.enums.BodyType;
-import better.me.facts.Answers;
-import better.me.facts.BodyTypeFact;
-import better.me.facts.Constants;
-import better.me.facts.UserAnswers;
+import better.me.model.Answers;
+import better.me.model.BodyTypeFact;
+import better.me.model.Constants;
+import better.me.model.UserAnswers;
 import better.me.util.MyLogger;
 
 public class BodyTypeDeterminationTest {

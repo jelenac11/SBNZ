@@ -1,65 +1,37 @@
 package better.me.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-
-import better.me.enums.Goal;
-import better.me.facts.WeekFact;
+import better.me.modelDB.DayDB;
+import better.me.modelDB.WeekDB;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "weeks")
 public class Week {
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "week_id")
 	private Long id;
-	
-	@Column
-	private Goal goal;
-	
-	@Column
+	private String goal;
 	private double goalCalories;
-	
-	@Column
 	private double goalCarbs;
-	
-	@Column
 	private double goalProteins;
-	
-	@Column
 	private double goalFats;
-	
-	@Column
 	private boolean submitted;
+	private List<Day> days;
+	private Long userId;
 	
-	@OneToMany(mappedBy = "week")
-	private Set<Day> days;
-	
-	@OneToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER, optional = false)
-	@JoinColumn(name="user_id")
-	private RegisteredUser user;
-	
-	public Week(WeekFact fact, RegisteredUser rUser) {
-		this(null, Goal.valueOf(fact.getGoal()), fact.getGoalCalories(), fact.getGoalCarbs(), fact.getGoalProteins(), fact.getGoalFats(), false, new HashSet<Day>(), rUser);
+	public Week(WeekDB w) {
+		this(w.getId(), w.getGoal().toString(), w.getGoalCalories(), w.getGoalCarbs(), w.getGoalProteins(), w.getGoalFats(), w.isSubmitted(), (new ArrayList<DayDB>(w.getDays())).stream().map(Day::new).collect(Collectors.toList()), w.getUser().getId());
 	}
 
+	public Week() {
+		this.days = new ArrayList<Day>();
+		for (int i = 0; i <= 6; i++) 
+			this.days.add(new Day());
+	}
 }

@@ -1,4 +1,4 @@
-package better.me.facts;
+package better.me.model;
 
 import java.util.HashMap;
 import java.util.Map;

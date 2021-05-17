@@ -8,8 +8,8 @@ import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
-import better.me.facts.RegisteredUserFact;
-import better.me.facts.WeekFact;
+import better.me.model.RegisteredUser;
+import better.me.model.Week;
 import better.me.util.MyLogger;
 
 public class BmiTest {
@@ -31,9 +31,9 @@ public class BmiTest {
 
 	@Test
 	public void bmiRule_bmi15age15maleGiven_shouldDetermineGainWeight() {
-		RegisteredUserFact user = new RegisteredUserFact(15, "MALE", 190, 50, "ECTOMORPH", "INACTIVE", "VEGAN",
+		RegisteredUser user = new RegisteredUser(15, "MALE", 190, 50, "ECTOMORPH", "INACTIVE", "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 
 		kieSession.setGlobal("myLogger", myLogger);
 
@@ -47,9 +47,9 @@ public class BmiTest {
 
 	@Test
 	public void bmiRule_bmi30age15maleGiven_shouldDetermineLoseWeight() {
-		RegisteredUserFact user = new RegisteredUserFact(15, "MALE", 190, 110, "ECTOMORPH", "INACTIVE", "VEGAN",
+		RegisteredUser user = new RegisteredUser(15, "MALE", 190, 110, "ECTOMORPH", "INACTIVE", "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 
 		kieSession.setGlobal("myLogger", myLogger);
 
@@ -63,9 +63,9 @@ public class BmiTest {
 
 	@Test
 	public void bmiRule_bmi19age15maleGiven_shouldDetermineMaintainWeight() {
-		RegisteredUserFact user = new RegisteredUserFact(15, "MALE", 190, 70, "ECTOMORPH", "INACTIVE", "VEGAN",
+		RegisteredUser user = new RegisteredUser(15, "MALE", 190, 70, "ECTOMORPH", "INACTIVE", "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 
 		kieSession.setGlobal("myLogger", myLogger);
 
@@ -79,9 +79,9 @@ public class BmiTest {
 
 	@Test
 	public void bmiRule_bmi29age15femaleGiven_shouldDetermineLoseWeight() {
-		RegisteredUserFact user = new RegisteredUserFact(15, "FEMALE", 170, 85, "ECTOMORPH", "INACTIVE", "VEGAN",
+		RegisteredUser user = new RegisteredUser(15, "FEMALE", 170, 85, "ECTOMORPH", "INACTIVE", "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 
 		kieSession.setGlobal("myLogger", myLogger);
 
@@ -95,9 +95,9 @@ public class BmiTest {
 
 	@Test
 	public void bmiRule_bmi17age15femaleGiven_shouldDetermineGainWeight() {
-		RegisteredUserFact user = new RegisteredUserFact(15, "FEMALE", 190, 50, "ECTOMORPH", "INACTIVE", "VEGAN",
+		RegisteredUser user = new RegisteredUser(15, "FEMALE", 190, 50, "ECTOMORPH", "INACTIVE", "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 
 		kieSession.setGlobal("myLogger", myLogger);
 
@@ -111,9 +111,9 @@ public class BmiTest {
 
 	@Test
 	public void bmiRule_bmi20age15femaleGiven_shouldDetermineMaintainWeight() {
-		RegisteredUserFact user = new RegisteredUserFact(15, "FEMALE", 190, 65, "ECTOMORPH", "INACTIVE", "VEGAN",
+		RegisteredUser user = new RegisteredUser(15, "FEMALE", 190, 65, "ECTOMORPH", "INACTIVE", "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 
 		kieSession.setGlobal("myLogger", myLogger);
 
@@ -127,9 +127,9 @@ public class BmiTest {
 
 	@Test
 	public void bmiRule_bmi20age30maleGiven_shouldDetermineMaintainWeight() {
-		RegisteredUserFact user = new RegisteredUserFact(30, "MALE", 190, 75, "ECTOMORPH", "INACTIVE", "VEGAN",
+		RegisteredUser user = new RegisteredUser(30, "MALE", 190, 75, "ECTOMORPH", "INACTIVE", "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 
 		kieSession.setGlobal("myLogger", myLogger);
 
@@ -143,9 +143,9 @@ public class BmiTest {
 
 	@Test
 	public void bmiRule_bmi30age35femaleGiven_shouldDetermineLoseWeight() {
-		RegisteredUserFact user = new RegisteredUserFact(35, "FEMALE", 190, 110, "ECTOMORPH", "INACTIVE", "VEGAN",
+		RegisteredUser user = new RegisteredUser(35, "FEMALE", 190, 110, "ECTOMORPH", "INACTIVE", "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 
 		kieSession.setGlobal("myLogger", myLogger);
 
@@ -159,9 +159,9 @@ public class BmiTest {
 
 	@Test
 	public void bmiRule_bmi15age21femaleGiven_shouldDetermineGainWeight() {
-		RegisteredUserFact user = new RegisteredUserFact(21, "FEMALE", 190, 45, "ECTOMORPH", "INACTIVE", "VEGAN",
+		RegisteredUser user = new RegisteredUser(21, "FEMALE", 190, 45, "ECTOMORPH", "INACTIVE", "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 
 		kieSession.setGlobal("myLogger", myLogger);
 
@@ -175,9 +175,9 @@ public class BmiTest {
 
 	@Test
 	public void bmiRule_bmi32age19femaleGiven_shouldDetermineLoseWeight() {
-		RegisteredUserFact user = new RegisteredUserFact(19, "FEMALE", 180, 110, "ECTOMORPH", "INACTIVE", "VEGAN",
+		RegisteredUser user = new RegisteredUser(19, "FEMALE", 180, 110, "ECTOMORPH", "INACTIVE", "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 
 		kieSession.setGlobal("myLogger", myLogger);
 

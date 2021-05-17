@@ -1,4 +1,4 @@
-package better.me.model;
+package better.me.modelDB;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -12,23 +12,23 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Admin extends User {
+public class AdminDB extends UserDB {
 
 	private static final long serialVersionUID = 1L;
 	
-	public Admin(Long id) {
+	public AdminDB(Long id) {
 		super(id);
 	}
 
-	public Admin(String username, String email, String firstName, String lastName) {
+	public AdminDB(String username, String email, String firstName, String lastName) {
 		super(username, email, firstName, lastName);
 	}
 	
-	public Admin(String username, String email, String password, String firstName, String lastName) {
+	public AdminDB(String username, String email, String password, String firstName, String lastName) {
 		super(username, email, password, firstName, lastName);
 	}
 
-	public Admin(Long id, String username, String email, String password, String firstName, String lastName) {
+	public AdminDB(Long id, String username, String email, String password, String firstName, String lastName) {
 		super(id, username, email, password, firstName, lastName);
 	}
 

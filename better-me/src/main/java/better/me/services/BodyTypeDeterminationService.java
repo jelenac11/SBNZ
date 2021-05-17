@@ -14,12 +14,12 @@ import better.me.dto.BodyInfoDTO;
 import better.me.enums.BodyType;
 import better.me.exceptions.NotLoggedInException;
 import better.me.exceptions.RequestException;
-import better.me.facts.Answers;
-import better.me.facts.BodyTypeFact;
-import better.me.facts.Constants;
-import better.me.facts.UserAnswers;
-import better.me.model.RegisteredUser;
-import better.me.model.User;
+import better.me.model.Answers;
+import better.me.model.BodyTypeFact;
+import better.me.model.Constants;
+import better.me.model.UserAnswers;
+import better.me.modelDB.RegisteredUserDB;
+import better.me.modelDB.UserDB;
 import better.me.repositories.IRegisteredUser;
 import better.me.util.MyLogger;
 
@@ -33,10 +33,10 @@ public class BodyTypeDeterminationService {
 	private IRegisteredUser registeredUserRepository;
 
 	public String determine(BodyInfoDTO dto) throws NotLoggedInException, RequestException {
-		User current = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (current == null) throw new NotLoggedInException("You must login first. No logged in user found!");
 		
-		RegisteredUser rUser = registeredUserRepository.findByEmail(current.getEmail());
+		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
 		if (rUser == null) throw new NotLoggedInException("Registered user must be logged in!");
 		
 		KieSession kieSession = getBodyTypeKieSession();

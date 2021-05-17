@@ -2,10 +2,10 @@ package sbnz.integracija.rules
 
 import better.me.enums.*;
 import better.me.model.*;
+import better.me.modelDB.*;
 import better.me.dto.*;
-import better.me.facts.*;
 import better.me.util.*;
 
-query "Fetch week by user" (RegisteredUser $user)
-	$week: Week(user.equals($user))
+query "Fetch week by user" (RegisteredUserDB $user)
+	$week := WeekDB(user.equals($user))
 end

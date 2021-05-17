@@ -1,4 +1,4 @@
-package better.me.facts;
+package better.me.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DailyNutritionFact {
+public class DailyNutrition {
 
 	private int day;
 	private double calories;

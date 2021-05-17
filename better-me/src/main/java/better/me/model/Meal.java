@@ -1,61 +1,36 @@
 package better.me.model;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-
+import better.me.modelDB.IngredientDB;
+import better.me.modelDB.MealDB;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "meals")
 public class Meal {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "meal_id")
 	private Long id;
-	
-	@Column
 	private String name;
-	
-	@Column
 	private double calories;
-	
-	@Column
 	private double carbs;
-	
-	@Column
 	private double proteins;
-	
-	@Column
 	private double fats;
-	
-	@Column
-	private int time; //in minutes
-	
-	@Column
+	private int time;
 	private String description;
+	private List<Ingredient> ingredients;
 	
-	@ManyToMany(cascade=CascadeType.ALL)  
-    @JoinTable(name="meals_ingredients", joinColumns=@JoinColumn(name="meal_id", referencedColumnName = "meal_id"), inverseJoinColumns=@JoinColumn(name="ingredient_id", referencedColumnName = "ingredient_id"))  
-	private Set<Ingredient> ingredients;
+	public Meal(MealDB m) {
+		this(m.getId(), m.getName(), m.getCalories(), m.getCarbs(), m.getProteins(), m.getFats(), m.getTime(), m.getDescription(), (new ArrayList<IngredientDB>(m.getIngredients())).stream().map(Ingredient::new).collect(Collectors.toList()));
+	}
 	
-	@OneToMany(mappedBy = "meal")
-	private Set<ConcreteMeal> concreteMeals;
-	
+	public Meal() {
+		ingredients = new ArrayList<Ingredient>();
+	}
+
 }

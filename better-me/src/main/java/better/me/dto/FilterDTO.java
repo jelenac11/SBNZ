@@ -1,6 +1,5 @@
-package better.me.facts;
+package better.me.dto;
 
-import better.me.model.Allergen;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,13 +9,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AllergenFact {
+public class FilterDTO {
 
-	private Long id;
 	private String name;
-
-	public AllergenFact(Allergen a) {
-		this(a.getId(), a.getName());
-	}
-	
+	private int fromTime;
+	private int toTime;
+	private boolean descending;
 }

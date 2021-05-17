@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import better.me.dto.RegisteredUserDTO;
 import better.me.dto.UserResDTO;
 import better.me.helper.RegisteredUserMapper;
-import better.me.model.RegisteredUser;
+import better.me.modelDB.RegisteredUserDB;
 import better.me.services.RegisteredUserService;
 
 @RestController
@@ -35,7 +35,7 @@ public class RegisteredUserController {
 
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<UserResDTO> getRegisteredUser(@PathVariable Long id) {
-		RegisteredUser registeredUser = registeredUserService.getById(id);
+		RegisteredUserDB registeredUser = registeredUserService.getById(id);
 		if (registeredUser == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}

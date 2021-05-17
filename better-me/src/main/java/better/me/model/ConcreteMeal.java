@@ -1,51 +1,32 @@
 package better.me.model;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-
+import better.me.modelDB.ConcreteMealDB;
+import better.me.modelDB.IngredientDB;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "concrete_meals")
 public class ConcreteMeal {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "concrete_meal_id")
 	private Long id;
-	
-	@Column
 	private int grams;
-	
-	@Column
-	private boolean isCustomMeal;
-
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "meal_id")
+	private boolean customMeal;
 	private Meal meal;
+	private Long dayId;
+	private List<Ingredient> ingredients;
 	
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "day_id")
-	private Day day;
+	public ConcreteMeal(ConcreteMealDB cm) {
+		this(cm.getId(), cm.getGrams(), cm.isCustomMeal(), new Meal(cm.getMeal()), cm.getDay().getId(), (new ArrayList<IngredientDB>(cm.getIngredients())).stream().map(Ingredient::new).collect(Collectors.toList()));
+	}
 	
-	@ManyToMany(cascade=CascadeType.ALL)  
-    @JoinTable(name="concrete_meals_ingredients", joinColumns=@JoinColumn(name="concrete_meal_id", referencedColumnName = "concrete_meal_id"), inverseJoinColumns=@JoinColumn(name="ingredient_id", referencedColumnName = "ingredient_id"))  
-	private Set<Ingredient> ingredients;
+	public ConcreteMeal() {
+		ingredients = new ArrayList<Ingredient>();
+	}
 }

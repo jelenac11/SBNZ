@@ -3,11 +3,11 @@ package better.me.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import better.me.model.Meal;
+import better.me.modelDB.MealDB;
 
 @Repository
-public interface IMealRepository extends JpaRepository<Meal, Long>{
+public interface IMealRepository extends JpaRepository<MealDB, Long>{
 
-	Meal findByName(String name);
+	MealDB findByName(String name);
 
 }

@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import better.me.model.User;
+import better.me.modelDB.UserDB;
 import better.me.repositories.IUserRepository;
 
 @Service
@@ -17,7 +17,7 @@ public class UserService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		User user = userRepository.findByEmail(email);
+		UserDB user = userRepository.findByEmail(email);
 		if (user == null) {
 			throw new UsernameNotFoundException(String.format("No user found with email '%s'.", email));
 		} else {
@@ -25,15 +25,15 @@ public class UserService implements UserDetailsService {
 		}
 	}
 
-	public Iterable<User> getAll() {
+	public Iterable<UserDB> getAll() {
 		return null;
 	}
 
-	public User getById(Long id) {
+	public UserDB getById(Long id) {
 		return null;
 	}
 
-	public User create(User entity) throws Exception {
+	public UserDB create(UserDB entity) throws Exception {
 		return null;
 	}
 
@@ -41,15 +41,15 @@ public class UserService implements UserDetailsService {
 		return false;
 	}
 
-	public User update(Long id, User entity) throws Exception {
+	public UserDB update(Long id, UserDB entity) throws Exception {
 		return null;
 	}
 
-	public User findByEmail(String email) {
+	public UserDB findByEmail(String email) {
 		return userRepository.findByEmail(email);
 	}
 
-	public User findByUsername(String username) {
+	public UserDB findByUsername(String username) {
 		return userRepository.findByUsername(username);
 	}
 

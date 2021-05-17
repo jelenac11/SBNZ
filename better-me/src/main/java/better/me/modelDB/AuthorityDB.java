@@ -1,4 +1,4 @@
-package better.me.model;
+package better.me.modelDB;
 
 import org.springframework.security.core.GrantedAuthority;
 
@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Authority implements GrantedAuthority {
+public class AuthorityDB implements GrantedAuthority {
 
 	private static final long serialVersionUID = 1L;
 

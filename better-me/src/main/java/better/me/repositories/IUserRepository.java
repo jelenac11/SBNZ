@@ -3,13 +3,13 @@ package better.me.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import better.me.model.User;
+import better.me.modelDB.UserDB;
 
 @Repository
-public interface IUserRepository extends JpaRepository<User, Long> {
+public interface IUserRepository extends JpaRepository<UserDB, Long> {
 
-	User findByUsername(String username);
+	UserDB findByUsername(String username);
 
-	User findByEmail(String email);
+	UserDB findByEmail(String email);
 
 }

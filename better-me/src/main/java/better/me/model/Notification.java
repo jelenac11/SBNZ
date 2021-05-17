@@ -1,8 +1,5 @@
-package better.me.facts;
+package better.me.model;
 
-import java.util.Map;
-
-import better.me.enums.BodyType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Answers {
+public class Notification {
+	
+	private String message;
 
-	private BodyType bodyType;
-	private Map<String, String> answers;
 }

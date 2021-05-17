@@ -10,8 +10,8 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
 import better.me.enums.Goal;
-import better.me.facts.RegisteredUserFact;
-import better.me.facts.WeekFact;
+import better.me.model.RegisteredUser;
+import better.me.model.Week;
 import better.me.util.MyLogger;
 
 public class NutritionTest {
@@ -40,7 +40,7 @@ public class NutritionTest {
 		"VERY_ACTIVE, 1.725", 
 	})
 	public void activityCountRule_allValuesGiven_shouldSetActivityCount(String activityLevel, double activityCount) {
-		RegisteredUserFact user = new RegisteredUserFact(22, "MALE", 170, 70, "ECTOMORPH", activityLevel, "VEGAN",
+		RegisteredUser user = new RegisteredUser(22, "MALE", 170, 70, "ECTOMORPH", activityLevel, "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
 
 		kieSession.setGlobal("myLogger", myLogger);
@@ -63,9 +63,9 @@ public class NutritionTest {
 	})
 	public void calculateCaloriesRule_allValuesGiven_shouldSetGoalCalories(int age, String sex, double height,
 			double weight, String activityLevel, double goalCalories) {
-		RegisteredUserFact user = new RegisteredUserFact(age, sex, height, weight, "ECTOMORPH", activityLevel, "VEGAN",
+		RegisteredUser user = new RegisteredUser(age, sex, height, weight, "ECTOMORPH", activityLevel, "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 
 		kieSession.setGlobal("myLogger", myLogger);
 
@@ -88,9 +88,9 @@ public class NutritionTest {
 	})
 	public void calculateProteinsRule_allValuesGiven_shouldSetGoalProteins(double weight, Goal goal,
 			double goalProteins) {
-		RegisteredUserFact user = new RegisteredUserFact(22, "MALE", 175, weight, "ECTOMORPH", "INACTIVE", "VEGAN",
+		RegisteredUser user = new RegisteredUser(22, "MALE", 175, weight, "ECTOMORPH", "INACTIVE", "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 		week.setGoal(goal.toString());
 
 		kieSession.setGlobal("myLogger", myLogger);
@@ -111,9 +111,9 @@ public class NutritionTest {
 	})
 	public void calculateCarbsAndFatsRule_allValuesGiven_shouldSetGoalCarbsAndGoalFats(double weight, String bodyType, Goal goal,
 			double goalCarbs, double goalFats) {
-		RegisteredUserFact user = new RegisteredUserFact(22, "MALE", 170, weight, bodyType, "INACTIVE", "VEGAN",
+		RegisteredUser user = new RegisteredUser(22, "MALE", 170, weight, bodyType, "INACTIVE", "VEGAN",
 				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-		WeekFact week = new WeekFact();
+		Week week = new Week();
 		week.setGoal(goal.toString());
 
 		kieSession.setGlobal("myLogger", myLogger);

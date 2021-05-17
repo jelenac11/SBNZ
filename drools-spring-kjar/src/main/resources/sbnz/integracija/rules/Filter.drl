@@ -1,0 +1,95 @@
+package sbnz.integracija.rules;
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.modelDB.*;
+import better.me.dto.*;
+import better.me.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+global MyLogger myLogger;
+
+rule "Filter meals by allergens"
+	agenda-group "filter"
+	lock-on-active
+	when
+        $user: RegisteredUser($allergens:allergens, allergens != null)
+        $allMeals: List()
+		$meals : List() from accumulate ( 
+			$meal : Meal ($ingredients: ingredients) from $allMeals,
+			init( List<Meal> withAllergens = new ArrayList(); ),
+			action(  
+				for (Object ingredient : $ingredients) {
+					for (Object allergen : $allergens) {
+						if (((Allergen)allergen).getName().equals( ((Ingredient)ingredient).getGrocery().getName())) {
+							withAllergens.add($meal);
+						}
+					}
+				}
+			 ),
+			result ( withAllergens )
+		)
+	then 
+		myLogger.log("Filtering meals by allergens" + $allMeals.size());
+		modify ( $allMeals ) { removeAll($allMeals); }
+		modify ( $allMeals) { addAll($meals); }
+end
+
+rule "Filter meals by preparation time"
+	agenda-group "filter"
+	lock-on-active
+	when
+		$allMeals: List()
+		$filter: FilterDTO($fromTime:fromTime, $fromTime != 0, $toTime: toTime, $toTime != 0)
+		$meals : List () from collect ( 
+			Meal(time < $fromTime || time > $toTime) from $allMeals
+		)
+	then 
+		myLogger.log("Filtering meals by preparation time");
+		modify ( $allMeals ) { removeAll($meals); }
+end
+
+rule "Filter meals by name"
+	agenda-group "filter"
+	no-loop
+	when
+		$allMeals: List()
+		$filter: FilterDTO($name: name, $name != "")
+        $meals : List () from collect ( 
+        	Meal(name contains $name) from $allMeals
+        )
+	then
+		myLogger.log("Filtering meals by name");
+		modify ( $allMeals ) { removeAll($allMeals); }
+		modify ( $allMeals) { addAll($meals); }
+end
+
+
+rule "Sort meals by calories ascending"
+	salience -$cals
+	agenda-group "filter"
+	when
+		$filter: FilterDTO(descending == false)
+	    $sorted: SortedMeals( $sortedList: sortedList)
+	    $meal: Meal( $cals: calories)
+	    $allMeals: List(size > 0, this contains $meal)
+	then
+		myLogger.log("Sorting meals by calories ascending");
+		modify( $sorted ){ getSortedList().add( $meal ) }
+		delete($meal)
+end
+
+rule "Sort meals by calories descending"
+	salience -1000 + $cals 
+	agenda-group "filter"
+	when
+		$filter: FilterDTO(descending == true)
+		$sorted: SortedMeals( $sortedList: sortedList)
+		$meal: Meal( $cals: calories)
+	    $allMeals: List(size > 0, this contains $meal)
+	then
+		myLogger.log("Sorting meals by calories descending");
+		modify( $sorted ){ getSortedList().add( $meal ) }
+		delete($meal)
+end
