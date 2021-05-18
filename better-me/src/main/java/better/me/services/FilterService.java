@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import better.me.dto.FilterDTO;
+import better.me.dto.ResponseMealDTO;
+import better.me.dto.SortedMealsDTO;
 import better.me.exceptions.NotLoggedInException;
 import better.me.model.Meal;
 import better.me.model.RegisteredUser;
@@ -32,32 +34,20 @@ public class FilterService {
 	@Autowired
 	private IMealRepository mealRepository;
 	
-	public List<Meal> filterMealsByAllergens() throws NotLoggedInException {
-		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (current == null) throw new NotLoggedInException("You must login first. No logged in user found!");
-		
-		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
-		if (rUser == null) throw new NotLoggedInException("Registered user must be logged in!");
-		
-		List<MealDB> meals = mealRepository.findAll();
-		List<Meal> retval = meals.stream().map(Meal::new).collect(Collectors.toList());
-		KieSession kieSession = getKieSession();
-		kieSession.insert(retval);
-		kieSession.insert(new RegisteredUser(rUser));
-
-		kieSession.fireAllRules();
-		kieSession.dispose();
-		return retval;
-	}
-
-	private KieSession getKieSession() {
+	private KieSession getKieSession()  {
 		KieSession kieSession = kieContainer.newKieSession("session");
 		kieSession.getAgenda().getAgendaGroup("filter").setFocus();
 		kieSession.setGlobal("myLogger", new MyLogger());
         return kieSession;
     }
 
-	public List<Meal> filterMeals(FilterDTO filter) {
+	public SortedMealsDTO filterMeals(FilterDTO filter) throws NotLoggedInException {
+		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (current == null) throw new NotLoggedInException("You must login first. No logged in user found!");
+		
+		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
+		if (rUser == null) throw new NotLoggedInException("Registered user must be logged in!");
+		
 		List<MealDB> allMeals = mealRepository.findAll();
 		List<Meal> meals = allMeals.stream().map(Meal::new).collect(Collectors.toList());
 		
@@ -67,10 +57,22 @@ public class FilterService {
 		for (Meal m: meals) {
 			kieSession.insert(m);
 		}
+		List<Meal> withAllergens = new ArrayList<Meal>();
+		kieSession.insert(withAllergens);
+		kieSession.insert(new RegisteredUser(rUser));
+		
 		SortedMeals sorted = new SortedMeals();
 		kieSession.insert(sorted);
 		kieSession.fireAllRules();
 		kieSession.dispose();
-		return sorted.getSortedList();
+		
+		SortedMealsDTO retval = new SortedMealsDTO();
+		for (Meal m: sorted.getSortedList()) {
+			if (withAllergens.contains(m)) {
+				retval.getSorted().add(new ResponseMealDTO(m, true));
+			}
+			retval.getSorted().add(new ResponseMealDTO(m, false));
+		}
+		return retval;
 	}
 }

@@ -17,13 +17,11 @@ import org.kie.api.runtime.KieSession;
 import better.me.dto.FilterDTO;
 import better.me.enums.Diet;
 import better.me.model.Allergen;
-import better.me.model.DailyNutrition;
 import better.me.model.Grocery;
 import better.me.model.Ingredient;
 import better.me.model.Meal;
 import better.me.model.RegisteredUser;
 import better.me.model.SortedMeals;
-import better.me.model.Week;
 import better.me.util.MyLogger;
 
 public class FilterTest {
@@ -45,25 +43,25 @@ public class FilterTest {
 		kieSession.getAgenda().getAgendaGroup("filter").setFocus();
 		kieSession.setGlobal("myLogger", myLogger);
 		
-		Grocery pepper = new Grocery(1L, "pepper", Diet.OMNIVORE, 150, 9, 7, 1);
-    	Grocery banana = new Grocery(2L, "banana", Diet.OMNIVORE, 100, 10, 1, 1);
+		Grocery pepper = new Grocery(1L, "pepper", Diet.VEGAN, 150, 9, 7, 1);
+    	Grocery banana = new Grocery(2L, "banana", Diet.VEGAN, 100, 10, 1, 1);
     	List<Ingredient> ingredients = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, pepper));
     	ingredients.add(new Ingredient(2L, 200, banana));
     	Meal meal1 = new Meal(1L, "meal1", 350, 29, 9, 3, 10, "", ingredients);
     	
     	Grocery peanut = new Grocery(3L, "peanut", Diet.OMNIVORE, 100, 10, 10, 10);
-    	Grocery pineapple = new Grocery(4L, "pineapple", Diet.OMNIVORE, 100, 10, 1, 1);
+    	Grocery pineapple = new Grocery(4L, "pineapple", Diet.VEGAN, 100, 10, 1, 1);
     	List<Ingredient> ingredients2 = new ArrayList<Ingredient>();
-    	ingredients.add(new Ingredient(1L, 100, peanut));
-    	ingredients.add(new Ingredient(2L, 100, pineapple));
+    	ingredients2.add(new Ingredient(1L, 100, peanut));
+    	ingredients2.add(new Ingredient(2L, 100, pineapple));
     	Meal meal2 = new Meal(2L, "meal2", 200, 20, 11, 11, 40, "", ingredients2);
     	
     	Grocery milk = new Grocery(5L, "milk", Diet.OMNIVORE, 100, 10, 10, 10);
-    	Grocery apple = new Grocery(6L, "apple", Diet.OMNIVORE, 100, 10, 1, 1);
+    	Grocery apple = new Grocery(6L, "apple", Diet.VEGETARIAN, 100, 10, 1, 1);
     	List<Ingredient> ingredients3 = new ArrayList<Ingredient>();
-    	ingredients.add(new Ingredient(1L, 100, milk));
-    	ingredients.add(new Ingredient(2L, 200, apple));
+    	ingredients3.add(new Ingredient(1L, 100, milk));
+    	ingredients3.add(new Ingredient(2L, 200, apple));
     	Meal meal3 = new Meal(3L, "meal3", 300, 30, 12, 12, 20, "", ingredients3);
     	
     	allMeals = new ArrayList<Meal>();
@@ -77,38 +75,51 @@ public class FilterTest {
     	kieSession.insert(meal3);
 	}
     
-    @Test
+ 
+	@Test
     public void filterMealByAllergensRule_NoAllergensGiven_shouldReturnAllMeals() {
     	RegisteredUser user = new RegisteredUser();
     	user.setId(1L);
     	user.setFirstName("Jelena");
     	user.setLastName("Cupac");
+    	user.setDiet("OMNIVORE");
     	user.setAllergens(null);
+    	List<Meal> meals = new ArrayList<Meal>();
     	
+    	kieSession.insert(meals);
     	kieSession.insert(user);
     	
         int firedRules = kieSession.fireAllRules();
-        kieSession.dispose();
-        assertEquals(0, firedRules);
-        assertEquals(3, allMeals.size());
+        assertEquals(1, firedRules);
+       
+    	assertEquals(0, meals.size());
+    	kieSession.dispose();
     }
     
     @Test
-    public void filterMealByAllergensRule_OneAllergenGiven_shouldNotReturnAllMeals() {
+    public void filterMealByAllergensRule_OneAllergenGiven_shouldNotReturnAllMeals()  {
     	RegisteredUser user = new RegisteredUser();
     	user.setId(1L);
     	user.setFirstName("Jelena");
     	user.setLastName("Cupac");
+    	user.setDiet("OMNIVORE");
     	ArrayList<Allergen> a = new ArrayList<Allergen>();
     	a.add(new Allergen(1L, "peanut"));
+    	a.add(new Allergen(2L, "apple"));
     	user.setAllergens(a);
+    	List<Meal> meals = new ArrayList<Meal>();
     	
+    	kieSession.insert(meals);
     	kieSession.insert(user);
     	
         int firedRules = kieSession.fireAllRules();
+        assertEquals(2, firedRules);
+       
+    	assertEquals(2, meals.size());
+    	
+        assertEquals("meal2", meals.get(0).getName());
+        assertEquals("meal3", meals.get(1).getName());
         kieSession.dispose();
-        assertEquals(1, firedRules);
-        assertEquals(1, allMeals.size());
     }
     
     @ParameterizedTest
@@ -144,5 +155,87 @@ public class FilterTest {
              	assertEquals(meal3, sorted.getSortedList().get(2).getName());
              }
         }
+    }
+    
+    @ParameterizedTest
+	@CsvSource({ 
+		"VEGAN, 1, 1", 
+		"VEGETARIAN, 1, 1", 
+		"OMNIVORE, 1, 3", 
+	})
+    public void filterMealsByDietRule(String diet, int rules, int size) {
+    	RegisteredUser user = new RegisteredUser();
+    	user.setId(1L);
+    	user.setFirstName("Jelena");
+    	user.setLastName("Cupac");
+    	user.setDiet(diet);
+    	user.setAllergens(null);
+    	
+    	kieSession.insert(user);
+    	
+        int firedRules = kieSession.fireAllRules();
+        kieSession.dispose();
+        assertEquals(rules, firedRules);
+        assertEquals(size, allMeals.size());
+     
+    }
+    
+ 
+	@Test
+    public void testAll_NoAlergiesGiven() {
+    	RegisteredUser user = new RegisteredUser();
+    	user.setId(1L);
+    	user.setFirstName("Jelena");
+    	user.setLastName("Cupac");
+    	user.setDiet("VEGETARIAN");
+    	user.setAllergens(null);
+    	SortedMeals sorted = new SortedMeals();
+    	
+    	kieSession.insert(sorted);
+    	FilterDTO filter = new FilterDTO("", 10, 60, true);
+    	kieSession.insert(user);
+    	kieSession.insert(filter);
+    	List<Meal> meals = new ArrayList<Meal>();
+    	
+    	kieSession.insert(meals);
+    	int firedRules = kieSession.fireAllRules();
+    	
+        assertEquals(4, firedRules);
+        assertEquals(0, meals.size());
+        assertEquals(1, allMeals.size());
+        assertEquals(1, sorted.getSortedList().size());
+        assertEquals("meal1", sorted.getSortedList().get(0).getName());
+        kieSession.dispose();
+    }
+    
+ 
+	@Test
+    public void testAll_AlergiesGiven(){
+    	RegisteredUser user = new RegisteredUser();
+    	user.setId(1L);
+    	user.setFirstName("Jelena");
+    	user.setLastName("Cupac");
+    	user.setDiet("OMNIVORE");
+    	ArrayList<Allergen> a = new ArrayList<Allergen>();
+    	a.add(new Allergen(1L, "peanut"));
+    	user.setAllergens(a);
+    	FilterDTO filter = new FilterDTO("meal", 10, 60, false);
+    	SortedMeals sorted = new SortedMeals();
+    	List<Meal> meals = new ArrayList<Meal>();
+    	
+    	kieSession.insert(meals);
+    	kieSession.insert(sorted);
+    	kieSession.insert(user);
+    	kieSession.insert(filter);
+    	
+    	int firedRules = kieSession.fireAllRules();
+        kieSession.dispose();
+        assertEquals(9, firedRules);
+        assertEquals(1, meals.size());
+        assertEquals(3, allMeals.size());
+        assertEquals("meal2", sorted.getSortedList().get(0).getName());
+        assertEquals("meal3", sorted.getSortedList().get(1).getName());
+        assertEquals("meal1", sorted.getSortedList().get(2).getName());
+     
     }
 }

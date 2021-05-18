@@ -11,15 +11,17 @@ import java.util.List;
 global MyLogger myLogger;
 
 rule "Filter meals by allergens"
+	salience 10
 	agenda-group "filter"
 	lock-on-active
 	when
-        $user: RegisteredUser($allergens:allergens, allergens != null)
-        $allMeals: List()
+        $user: RegisteredUser($allergens:allergens, $allergens != null)
+        $allMeals: List(size > 0)
+        $notOkMeals: List(size == 0)
 		$meals : List() from accumulate ( 
-			$meal : Meal ($ingredients: ingredients) from $allMeals,
+			$meal: Meal($ingredients: ingredients) from $allMeals,
 			init( List<Meal> withAllergens = new ArrayList(); ),
-			action(  
+			action(
 				for (Object ingredient : $ingredients) {
 					for (Object allergen : $allergens) {
 						if (((Allergen)allergen).getName().equals( ((Ingredient)ingredient).getGrocery().getName())) {
@@ -32,14 +34,14 @@ rule "Filter meals by allergens"
 			result ( withAllergens )
 		)
 	then 
-		myLogger.log("Filtering meals by allergens" + $allMeals.size());
-		modify ( $allMeals ) { removeAll($allMeals); }
-		modify ( $allMeals) { addAll($meals); }
+		myLogger.log("Filtering meals by allergens");
+		modify ($notOkMeals) {addAll($meals);}
 end
 
 rule "Filter meals by preparation time"
 	agenda-group "filter"
 	lock-on-active
+	no-loop true
 	when
 		$allMeals: List()
 		$filter: FilterDTO($fromTime:fromTime, $fromTime != 0, $toTime: toTime, $toTime != 0)
@@ -53,7 +55,8 @@ end
 
 rule "Filter meals by name"
 	agenda-group "filter"
-	no-loop
+	no-loop true
+	lock-on-active
 	when
 		$allMeals: List()
 		$filter: FilterDTO($name: name, $name != "")
@@ -67,27 +70,29 @@ rule "Filter meals by name"
 end
 
 rule "Filter meals by diet"
+	salience 20
 	agenda-group "filter"
 	no-loop
+	lock-on-active
 	when
-		$allMeals: List()
+		$allMeals: List(size > 0)
 		$user: RegisteredUser($diet: diet)
         $meals: List ()  from accumulate ( 
-			$meal : Meal ($ingredients: ingredients) from $allMeals,
-			init( List<Meal> dietMeals = new ArrayList(); ),
+			Meal ($meal: this, $ingredients: ingredients) from $allMeals,
+			init( List<Meal> notDietMeals = new ArrayList(); ),
 			action(  
 				for (Object ingredient : $ingredients) {
-					if (((Allergen)allergen).getName().equals( ((Ingredient)ingredient).getGrocery().getName())) {
-						withAllergens.add($meal);
+					if (((Ingredient)ingredient).getGrocery().getDiet().compareTo(Diet.valueOf($diet)) > 0) {
+						notDietMeals.add($meal);
+						break;
 					}
 				}
 			 ),
-			result ( withAllergens )
+			result ( notDietMeals )
 		)
 	then
-		myLogger.log("Filtering meals by name");
-		modify ( $allMeals ) { removeAll($allMeals); }
-		modify ( $allMeals) { addAll($meals); }
+		myLogger.log("Filtering meals by diet");
+		modify ( $allMeals ) { removeAll($meals); }
 end		
 		
 rule "Sort meals by calories ascending"
@@ -105,7 +110,7 @@ rule "Sort meals by calories ascending"
 end
 
 rule "Sort meals by calories descending"
-	salience -1000 + $cals 
+	salience -1000000 + $cals 
 	agenda-group "filter"
 	when
 		$filter: FilterDTO(descending == true)
@@ -113,7 +118,7 @@ rule "Sort meals by calories descending"
 		$meal: Meal( $cals: calories)
 	    $allMeals: List(size > 0, this contains $meal)
 	then
-		myLogger.log("Sorting meals by calories descending");
+		myLogger.log("Sorting meals by calories descending" + $meal.getName());
 		modify( $sorted ){ getSortedList().add( $meal ) }
 		delete($meal)
 end
