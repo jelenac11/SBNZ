@@ -1,0 +1,103 @@
+package sbnz.integracija.rules;
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.modelDB.*;
+import better.me.dto.*;
+import better.me.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+global MyLogger myLogger;
+
+rule "Filter groceries by allergens"
+	salience 10
+	agenda-group "groceries"
+	lock-on-active
+	when
+        $user: RegisteredUser($allergens: allergens, $allergens != null)
+        $allGroceries: List(size > 0)
+        $notOkGroceries: List(size == 0)
+		$groceries : List() from accumulate ( 
+			$grocery: Grocery($groceryName: name) from $allGroceries,
+			init( List<Grocery> withAllergens = new ArrayList(); ),
+			action(
+				for (Object allergen : $allergens) {
+					if (((Allergen)allergen).getName().equals($groceryName)) {
+						withAllergens.add($grocery);
+					}
+				}
+			 ),
+			result ( withAllergens )
+		)
+	then 
+		myLogger.log("Filtering groceries by allergens");
+		modify ($notOkGroceries) {addAll($groceries);}
+end
+
+rule "Filter groceries by name"
+	agenda-group "groceries"
+	no-loop true
+	lock-on-active
+	when
+		$allGroceries: List()
+		$filter: FilterDTO($name: name, $name != "")
+        $groceries : List () from collect ( 
+        	Grocery(name contains $name) from $allGroceries
+        )
+	then
+		myLogger.log("Filtering groceries by name");
+		modify ( $allGroceries ) { removeAll($allGroceries); }
+		modify ( $allGroceries ) { addAll($groceries); }
+end
+
+rule "Filter groceries by diet"
+	salience 20
+	agenda-group "groceries"
+	no-loop
+	lock-on-active
+	when
+		$allGroceries: List(size > 0)
+		$user: RegisteredUser($diet: diet)
+        $groceries: List ()  from accumulate ( 
+			Grocery($grocery: this) from $allGroceries,
+			init( List<Grocery> notDietGrocery = new ArrayList(); ),
+			action(
+				if ($grocery.getDiet().compareTo(Diet.valueOf($diet)) > 0) {
+					notDietGrocery.add($grocery);
+				}
+			 ),
+			result ( notDietGrocery )
+		)
+	then
+		myLogger.log("Filtering groceries by diet");
+		modify ( $allGroceries ) { removeAll($groceries); }
+end
+		
+rule "Sort groceries by calories ascending"
+	salience -$cals
+	agenda-group "groceries"
+	when
+		$filter: FilterDTO(descending == false)
+	    $sorted: SortedGroceries( $sortedList: sortedList)
+	    $grocery: Grocery( $cals: calories)
+	    $allGroceries: List(size > 0, this contains $grocery)
+	then
+		myLogger.log("Sorting groceries by calories ascending");
+		modify( $sorted ){ getSortedList().add( $grocery ) }
+		delete($grocery)
+end
+
+rule "Sort groceries by calories descending"
+	salience -1000000 + $cals 
+	agenda-group "groceries"
+	when
+		$filter: FilterDTO(descending == true)
+		$sorted: SortedGroceries( $sortedList: sortedList)
+		$grocery: Grocery( $cals: calories)
+	    $allGroceries: List(size > 0, this contains $grocery)
+	then
+		myLogger.log("Sorting groceries by calories descending");
+		modify( $sorted ){ getSortedList().add( $grocery ) }
+		delete($grocery)
+end
