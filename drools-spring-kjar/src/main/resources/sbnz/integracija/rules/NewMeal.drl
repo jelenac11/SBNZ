@@ -1,0 +1,61 @@
+package sbnz.integracija.rules;
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.dto.*;
+import better.me.modelDB.*;
+import better.me.util.*;
+
+global MyLogger myLogger;
+
+rule "Calculate calories for created meal"
+	agenda-group "new-meal"
+    when
+    	$meal: Meal(calories == 0, $ingredients: ingredients)
+        Number( $value: doubleValue)  from accumulate ( 
+			Ingredient($grams: grams, $grocery: grocery) from $ingredients,
+			sum(($grocery.getCalories() * $grams) / 100)
+		)
+    then
+        myLogger.log("Calculating calories for created meal");
+        modify ($meal) {setCalories($value);}
+end
+
+rule "Calculate fats for created meal"
+	agenda-group "new-meal"
+    when
+    	$meal: Meal(fats == 0, $ingredients: ingredients)
+        Number( $value: doubleValue) from accumulate ( 
+			Ingredient($grams: grams, $grocery: grocery) from $ingredients,
+			sum(($grocery.getFats() * $grams) / 100)
+		)
+    then
+        myLogger.log("Calculating fats for created meal");
+        modify ($meal) {setFats($value);}
+end
+
+rule "Calculate proteins for created meal"
+	agenda-group "new-meal"
+    when
+    	$meal: Meal(proteins == 0, $ingredients: ingredients)
+        Number( $value: doubleValue) from accumulate ( 
+			Ingredient($grams: grams, $grocery: grocery) from $ingredients,
+			sum(($grocery.getProteins() * $grams) / 100)
+		)
+    then
+        myLogger.log("Calculating proteins for created meal");
+        modify ($meal) {setProteins($value);}
+end
+
+rule "Calculate carbs for created meal"
+	agenda-group "new-meal"
+    when
+    	$meal: Meal(carbs == 0, $ingredients: ingredients)
+        Number( $value: doubleValue) from accumulate ( 
+			Ingredient($grams: grams, $grocery: grocery) from $ingredients,
+			sum(($grocery.getCarbs() * $grams) / 100)
+		)
+    then
+        myLogger.log("Calculating carbs for created meal");
+        modify ($meal) {setCarbs($value);}
+end
