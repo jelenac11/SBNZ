@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import better.me.enums.Diet;
+import better.me.model.Grocery;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,5 +51,16 @@ public class GroceryDB {
 	
 	@OneToMany(mappedBy = "grocery")
 	private Set<IngredientDB> ingredients;
+	
+	public GroceryDB(Grocery g) {
+		this.id = g.getId();
+		this.name = g.getName();
+		this.diet = g.getDiet();
+		this.calories = g.getCalories();
+		this.carbs = g.getCarbs();
+		this.proteins = g.getProteins();
+		this.fats = g.getFats();
+		this.ingredients = null;
+	}
 
 }

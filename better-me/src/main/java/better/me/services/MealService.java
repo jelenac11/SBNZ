@@ -1,6 +1,9 @@
 package better.me.services;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
@@ -11,14 +14,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import better.me.dto.EatenMealDTO;
+import better.me.dto.NewMealDTO;
 import better.me.exceptions.NotLoggedInException;
 import better.me.exceptions.RequestException;
 import better.me.model.DailyNutrition;
 import better.me.model.Day;
+import better.me.model.Ingredient;
+import better.me.model.Meal;
 import better.me.model.RegisteredUser;
 import better.me.model.Week;
 import better.me.modelDB.ConcreteMealDB;
 import better.me.modelDB.DayDB;
+import better.me.modelDB.GroceryDB;
+import better.me.modelDB.IngredientDB;
 import better.me.modelDB.MealDB;
 import better.me.modelDB.RegisteredUserDB;
 import better.me.modelDB.UserDB;
@@ -124,4 +132,26 @@ public class MealService {
 	private KieSession getKieSession() {
         return kieContainer.newKieSession("session");
     }
+
+	public String create(NewMealDTO dto) {
+		Meal m = new Meal();
+		m.setName(dto.getName());
+		m.setTime(dto.getTime());
+		m.setIngredients(dto.getIngredients());
+		m.setDescription(dto.getDescription());
+		
+		KieSession kieSession = getKieSession();
+		kieSession.getAgenda().getAgendaGroup("new-meal").setFocus();
+		kieSession.setGlobal("myLogger", new MyLogger());
+		kieSession.insert(m);
+		kieSession.fireAllRules();
+		kieSession.dispose();
+		
+		Set<IngredientDB> ingredients = new HashSet<IngredientDB>();
+		for (Ingredient i: dto.getIngredients()) {
+			ingredients.add(new IngredientDB(i.getId(), i.getGrams(), new GroceryDB(i.getGrocery())));
+		}
+		mealRepository.save(new MealDB(null, dto.getName(), m.getCalories(), m.getCarbs(), m.getProteins(), m.getFats(), m.getTime(), m.getDescription(), ingredients, null));
+		return "Meal " + dto.getName() + " added!";
+	}
 }

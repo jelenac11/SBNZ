@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import better.me.dto.EatenMealDTO;
+import better.me.dto.NewMealDTO;
 import better.me.services.MealService;
 
 @RestController
@@ -24,6 +25,15 @@ public class MealController {
 	public ResponseEntity<?> determine(@RequestBody EatenMealDTO dto){
 		try {
 			return new ResponseEntity<>(mealService.calculateNutritions(dto), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping
+	public ResponseEntity<?> create(@RequestBody NewMealDTO dto){
+		try {
+			return new ResponseEntity<>(mealService.create(dto), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
