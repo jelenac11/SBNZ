@@ -4,13 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import better.me.dto.EatenMealDTO;
 import better.me.dto.FilterDTO;
 import better.me.services.FilterService;
 
@@ -22,21 +20,13 @@ public class FilterController {
 	@Autowired
 	private FilterService filterService;
 	
-	@GetMapping("/allergens")
-	public ResponseEntity<?> filterMealsByAllergens(){
-		try {
-			return new ResponseEntity<>(filterService.filterMealsByAllergens(), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
-	}
-	
 	@PostMapping("/meals")
-	public ResponseEntity<?> filterMeals(FilterDTO filter){
+	public ResponseEntity<?> filterMeals(@RequestBody FilterDTO filter){
 		try {
 			return new ResponseEntity<>(filterService.filterMeals(filter), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
+	
 }
