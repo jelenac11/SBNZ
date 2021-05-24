@@ -100,9 +100,11 @@ public class ScoreTest {
     	kieSession.insert(week);
     	
         int firedRules = kieSession.fireAllRules();
-        assertEquals(1, firedRules);
+        assertEquals(2, firedRules);
        
     	assertEquals(100 + 70 + 3*3*7, user.getScore());
+    	assertEquals("BEGINNER", user.getPreviousCategory());
+    	assertEquals("INTERMEDIATE", user.getCategory());
     	kieSession.dispose();
     }
     
@@ -137,9 +139,11 @@ public class ScoreTest {
     	kieSession.insert(week);
     	
         int firedRules = kieSession.fireAllRules();
-        assertEquals(1, firedRules);
+        assertEquals(2, firedRules);
        
     	assertEquals(100 + 30 + 3*3*7, user.getScore());
+    	assertEquals("BEGINNER", user.getPreviousCategory());
+    	assertEquals("BEGINNER", user.getCategory());
     	kieSession.dispose();
     }
     
@@ -174,9 +178,11 @@ public class ScoreTest {
     	kieSession.insert(week);
     	
         int firedRules = kieSession.fireAllRules();
-        assertEquals(1, firedRules);
+        assertEquals(2, firedRules);
        
     	assertEquals(100 + 70 + 3*13, user.getScore());
+    	assertEquals("BEGINNER", user.getPreviousCategory());
+    	assertEquals("INTERMEDIATE", user.getCategory());
     	kieSession.dispose();
     }
     

@@ -44,4 +44,6 @@ rule "Calculating score for previous week"
     then
         myLogger.log("Calculating score for previous week");
         modify ($user) {setScore($score + $daysCaloriesOK.intValue() * 10 + $daysMacroOK.intValue() * 3);}
+        myLogger.log("Changed agenda-group from score to category");
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("category").setFocus();
 end

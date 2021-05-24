@@ -1,0 +1,45 @@
+package sbnz.integracija.rules;
+
+import better.me.enums.*;
+import better.me.model.*;
+
+
+rule "Classify User By Age CHILD"
+	agenda-group "age"
+	when
+	    $user: RegisteredUser( age >= 0 && age < 13  ) @Watch(!ageCategory)
+	then
+	    modify($user){ setAgeCategory("CHILD"); }
+end
+
+rule "Classify User By Age TEEN"
+	agenda-group "age"
+	when
+	    $user: RegisteredUser( age >= 13 && age < 20  ) @Watch(!ageCategory)
+	then
+	    modify($user){ setAgeCategory("TEEN"); }
+end
+
+rule "Classify User By Age YOUNG_ADULT"
+	agenda-group "age"
+	when
+	    $user: RegisteredUser( age >= 20 && age < 30  ) @Watch(!ageCategory)
+	then
+	    modify($user){ setAgeCategory("YOUNG_ADULT"); }
+end
+
+rule "Classify User By Age ADULT"
+	agenda-group "age"
+	when
+	    $user: RegisteredUser( age >= 30 && age < 50  ) @Watch(!ageCategory)
+	then
+	    modify($user){ setAgeCategory("ADULT"); }
+end
+
+rule "Classify User By Age ELDER"
+	agenda-group "age"
+	when
+	    $user: RegisteredUser( age >= 50 && age < Integer.MAX_VALUE) @Watch(!ageCategory)
+	then
+	    modify($user){ setAgeCategory("ELDER"); }
+end

@@ -41,7 +41,7 @@ public class BmiTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(7, firedRules);
+		assertEquals(9, firedRules);
 		assertEquals("GAIN_WEIGHT", week.getGoal());
 	}
 
@@ -57,7 +57,7 @@ public class BmiTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(7, firedRules);
+		assertEquals(9, firedRules);
 		assertEquals("LOSE_WEIGHT", week.getGoal());
 	}
 
@@ -73,7 +73,7 @@ public class BmiTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(7, firedRules);
+		assertEquals(9, firedRules);
 		assertEquals("MAINTAIN_WEIGHT", week.getGoal());
 	}
 
@@ -89,7 +89,7 @@ public class BmiTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(7, firedRules);
+		assertEquals(9, firedRules);
 		assertEquals("LOSE_WEIGHT", week.getGoal());
 	}
 
@@ -105,7 +105,7 @@ public class BmiTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(7, firedRules);
+		assertEquals(9, firedRules);
 		assertEquals("GAIN_WEIGHT", week.getGoal());
 	}
 
@@ -121,7 +121,7 @@ public class BmiTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(7, firedRules);
+		assertEquals(9, firedRules);
 		assertEquals("MAINTAIN_WEIGHT", week.getGoal());
 	}
 
@@ -137,7 +137,7 @@ public class BmiTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(7, firedRules);
+		assertEquals(9, firedRules);
 		assertEquals("MAINTAIN_WEIGHT", week.getGoal());
 	}
 
@@ -153,7 +153,7 @@ public class BmiTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(7, firedRules);
+		assertEquals(9, firedRules);
 		assertEquals("LOSE_WEIGHT", week.getGoal());
 	}
 
@@ -169,7 +169,7 @@ public class BmiTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(7, firedRules);
+		assertEquals(9, firedRules);
 		assertEquals("GAIN_WEIGHT", week.getGoal());
 	}
 
@@ -185,7 +185,7 @@ public class BmiTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(7, firedRules);
+		assertEquals(9, firedRules);
 		assertEquals("LOSE_WEIGHT", week.getGoal());
 	}
 

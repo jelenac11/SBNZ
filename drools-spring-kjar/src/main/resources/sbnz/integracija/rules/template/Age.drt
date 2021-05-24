@@ -1,0 +1,21 @@
+template header
+startAge
+endAge
+ageCategory
+
+package sbnz.integracija.rules;
+
+import better.me.enums.*;
+import better.me.model.*;
+
+template "Classify user by age"
+
+rule "Classify User By Age @{ageCategory}"
+	agenda-group "age"
+	when
+	    $user: RegisteredUser( age >= @{startAge} && age < @{endAge} ) @Watch(!ageCategory)
+	then
+	    modify($user){ setAgeCategory("@{ageCategory}"); }
+	end
+
+end template

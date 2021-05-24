@@ -70,7 +70,7 @@ public class NutritionTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(2, firedRules);
+		assertEquals(4, firedRules);
 		assertEquals(goalCalories, week.getGoalCalories(), 0.0);
 	}
 
@@ -94,7 +94,7 @@ public class NutritionTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(4, firedRules);
+		assertEquals(6, firedRules);
 		assertEquals(goalProteins, week.getGoalProteins(), 0.0);
 	}
 
@@ -115,7 +115,7 @@ public class NutritionTest {
 		kieSession.insert(week);
 
 		int firedRules = kieSession.fireAllRules();
-		assertEquals(4, firedRules);
+		assertEquals(6, firedRules);
 		assertEquals(goalCarbs, week.getGoalCarbs(), 0.1);
 		assertEquals(goalFats, week.getGoalFats(), 0.1);
 	}

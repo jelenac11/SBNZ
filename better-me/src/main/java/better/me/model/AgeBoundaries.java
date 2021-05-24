@@ -9,10 +9,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryBoundaries {
+public class AgeBoundaries {
 
-	private String newCategory;
-	private int from;
-	private int to;
+	private int startAge;
+	private int endAge;
+	private String ageCategory;
 	
 }
