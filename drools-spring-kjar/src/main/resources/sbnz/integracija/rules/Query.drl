@@ -6,6 +6,16 @@ import better.me.modelDB.*;
 import better.me.dto.*;
 import better.me.util.*;
 
-query "Fetch week by user" (RegisteredUserDB $user)
-	$week := WeekDB(user.equals($user))
+query checkIfWholeWeekIsSubmitted(Week $week)
+	 $num := Number(intValue == 7) from accumulate(
+		Day($t:this, submitted == true) from $week.getDays(),
+		count($t)
+ 	 )
+end
+
+query "Get number of days submitted"(Week $week)
+	 $num := Number(intValue >= 0) from accumulate(
+		Day($t:this, submitted == true) from $week.getDays(),
+		count($t)
+ 	 )
 end

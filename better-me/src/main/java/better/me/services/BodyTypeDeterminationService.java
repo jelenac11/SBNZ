@@ -4,7 +4,6 @@ package better.me.services;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,13 +20,12 @@ import better.me.model.UserAnswers;
 import better.me.modelDB.RegisteredUserDB;
 import better.me.modelDB.UserDB;
 import better.me.repositories.IRegisteredUser;
-import better.me.util.MyLogger;
 
 @Service
 public class BodyTypeDeterminationService {
 
 	@Autowired
-	private KieContainer kieContainer;
+	private KieSession kieSession;
 
 	@Autowired
 	private IRegisteredUser registeredUserRepository;
@@ -39,10 +37,7 @@ public class BodyTypeDeterminationService {
 		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
 		if (rUser == null) throw new NotLoggedInException("Registered user must be logged in!");
 		
-		KieSession kieSession = getBodyTypeKieSession();
 		kieSession.getAgenda().getAgendaGroup("body-type").setFocus();
-		
-		kieSession.setGlobal("myLogger", new MyLogger());
 	
 		Map<String, String> userAnswers = new HashMap<String, String>() {
 			private static final long serialVersionUID = 1L;
@@ -76,8 +71,5 @@ public class BodyTypeDeterminationService {
 		return bodyType.getBodyType().toString();
 	}
 
-	private KieSession getBodyTypeKieSession() {
-        return kieContainer.newKieSession("session");
-    }
 
 }

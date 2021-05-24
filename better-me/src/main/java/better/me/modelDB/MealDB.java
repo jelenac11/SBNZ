@@ -29,33 +29,39 @@ public class MealDB {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "meal_id")
 	private Long id;
-	
+
 	@Column
 	private String name;
-	
+
 	@Column
 	private double calories;
-	
+
 	@Column
 	private double carbs;
-	
+
 	@Column
 	private double proteins;
-	
+
 	@Column
 	private double fats;
-	
+
 	@Column
-	private int time; //in minutes
-	
+	private int time;
+
 	@Column
 	private String description;
-	
-	@ManyToMany(cascade=CascadeType.ALL)  
-    @JoinTable(name="meals_ingredients", joinColumns=@JoinColumn(name="meal_id", referencedColumnName = "meal_id"), inverseJoinColumns=@JoinColumn(name="ingredient_id", referencedColumnName = "ingredient_id"))  
+
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name = "meals_ingredients", joinColumns = @JoinColumn(name = "meal_id", referencedColumnName = "meal_id"), inverseJoinColumns = @JoinColumn(name = "ingredient_id", referencedColumnName = "ingredient_id"))
 	private Set<IngredientDB> ingredients;
-	
+
 	@OneToMany(mappedBy = "meal")
 	private Set<ConcreteMealDB> concreteMeals;
-	
+
+	@OneToMany(mappedBy = "meal")
+	private Set<GradeDB> grades;
+
+	@Column
+	private double averageGrade;
+
 }

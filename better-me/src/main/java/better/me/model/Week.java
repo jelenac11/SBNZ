@@ -23,10 +23,9 @@ public class Week {
 	private double goalFats;
 	private boolean submitted;
 	private List<Day> days;
-	private Long userId;
 	
 	public Week(WeekDB w) {
-		this(w.getId(), w.getGoal().toString(), w.getGoalCalories(), w.getGoalCarbs(), w.getGoalProteins(), w.getGoalFats(), w.isSubmitted(), (new ArrayList<DayDB>(w.getDays())).stream().map(Day::new).collect(Collectors.toList()), w.getUser().getId());
+		this(w.getId(), w.getGoal().toString(), w.getGoalCalories(), w.getGoalCarbs(), w.getGoalProteins(), w.getGoalFats(), w.isSubmitted(), (new ArrayList<DayDB>(w.getDays())).stream().map(Day::new).collect(Collectors.toList()));
 	}
 
 	public Week() {

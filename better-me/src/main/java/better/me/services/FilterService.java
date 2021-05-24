@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,25 +20,17 @@ import better.me.modelDB.RegisteredUserDB;
 import better.me.modelDB.UserDB;
 import better.me.repositories.IMealRepository;
 import better.me.repositories.IRegisteredUser;
-import better.me.util.MyLogger;
 
 public class FilterService {
 
 	@Autowired
-	private KieContainer kieContainer;
+	private KieSession kieSession;
 
 	@Autowired
 	private IRegisteredUser registeredUserRepository;
 	
 	@Autowired
 	private IMealRepository mealRepository;
-	
-	private KieSession getKieSession()  {
-		KieSession kieSession = kieContainer.newKieSession("session");
-		kieSession.getAgenda().getAgendaGroup("filter").setFocus();
-		kieSession.setGlobal("myLogger", new MyLogger());
-        return kieSession;
-    }
 
 	public SortedMealsDTO filterMeals(FilterDTO filter) throws NotLoggedInException {
 		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -50,18 +41,17 @@ public class FilterService {
 		
 		List<MealDB> allMeals = mealRepository.findAll();
 		List<Meal> meals = allMeals.stream().map(Meal::new).collect(Collectors.toList());
+		List<Meal> withAllergens = new ArrayList<Meal>();
+		SortedMeals sorted = new SortedMeals();
 		
-		KieSession kieSession = getKieSession();
+		kieSession.getAgenda().getAgendaGroup("filter").setFocus();
 		kieSession.insert(filter);
 		kieSession.insert(meals);
 		for (Meal m: meals) {
 			kieSession.insert(m);
 		}
-		List<Meal> withAllergens = new ArrayList<Meal>();
 		kieSession.insert(withAllergens);
 		kieSession.insert(new RegisteredUser(rUser));
-		
-		SortedMeals sorted = new SortedMeals();
 		kieSession.insert(sorted);
 		kieSession.fireAllRules();
 		kieSession.dispose();

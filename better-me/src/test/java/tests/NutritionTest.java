@@ -29,6 +29,7 @@ public class NutritionTest {
 				.newKieContainer(ks.newReleaseId("sbnz.integracija", "drools-spring-kjar", "0.0.1-SNAPSHOT"));
 		kieSession = kContainer.newKieSession("session");
 		kieSession.getAgenda().getAgendaGroup("nutrition").setFocus();
+		kieSession.setGlobal("myLogger", myLogger);
 	}
 
 	@ParameterizedTest
@@ -41,9 +42,7 @@ public class NutritionTest {
 	})
 	public void activityCountRule_allValuesGiven_shouldSetActivityCount(String activityLevel, double activityCount) {
 		RegisteredUser user = new RegisteredUser(22, "MALE", 170, 70, "ECTOMORPH", activityLevel, "VEGAN",
-				"BEGINNER", "BEGINNER", null, 0, 0, 0);
-
-		kieSession.setGlobal("myLogger", myLogger);
+				"BEGINNER", "BEGINNER", null, 0, 0, 0, null, null, "CHILD");
 
 		kieSession.insert(user);
 
@@ -64,10 +63,8 @@ public class NutritionTest {
 	public void calculateCaloriesRule_allValuesGiven_shouldSetGoalCalories(int age, String sex, double height,
 			double weight, String activityLevel, double goalCalories) {
 		RegisteredUser user = new RegisteredUser(age, sex, height, weight, "ECTOMORPH", activityLevel, "VEGAN",
-				"BEGINNER", "BEGINNER", null, 0, 0, 0);
+				"BEGINNER", "BEGINNER", null, 0, 0, 0, null, null, "CHILD");
 		Week week = new Week();
-
-		kieSession.setGlobal("myLogger", myLogger);
 
 		kieSession.insert(user);
 		kieSession.insert(week);
@@ -89,11 +86,9 @@ public class NutritionTest {
 	public void calculateProteinsRule_allValuesGiven_shouldSetGoalProteins(double weight, Goal goal,
 			double goalProteins) {
 		RegisteredUser user = new RegisteredUser(22, "MALE", 175, weight, "ECTOMORPH", "INACTIVE", "VEGAN",
-				"BEGINNER", "BEGINNER", null, 0, 0, 0);
+				"BEGINNER", "BEGINNER", null, 0, 0, 0, null, null, "CHILD");
 		Week week = new Week();
 		week.setGoal(goal.toString());
-
-		kieSession.setGlobal("myLogger", myLogger);
 
 		kieSession.insert(user);
 		kieSession.insert(week);
@@ -112,11 +107,9 @@ public class NutritionTest {
 	public void calculateCarbsAndFatsRule_allValuesGiven_shouldSetGoalCarbsAndGoalFats(double weight, String bodyType, Goal goal,
 			double goalCarbs, double goalFats) {
 		RegisteredUser user = new RegisteredUser(22, "MALE", 170, weight, bodyType, "INACTIVE", "VEGAN",
-				"BEGINNER", "BEGINNER", null, 0, 0, 0);
+				"BEGINNER", "BEGINNER", null, 0, 0, 0, null, null, "CHILD");
 		Week week = new Week();
 		week.setGoal(goal.toString());
-
-		kieSession.setGlobal("myLogger", myLogger);
 
 		kieSession.insert(user);
 		kieSession.insert(week);

@@ -24,11 +24,16 @@ public class Meal {
 	private int time;
 	private String description;
 	private List<Ingredient> ingredients;
-	
+	private double averageGrade;
+
 	public Meal(MealDB m) {
-		this(m.getId(), m.getName(), m.getCalories(), m.getCarbs(), m.getProteins(), m.getFats(), m.getTime(), m.getDescription(), (new ArrayList<IngredientDB>(m.getIngredients())).stream().map(Ingredient::new).collect(Collectors.toList()));
+		this(m.getId(), m.getName(), m.getCalories(), m.getCarbs(), m.getProteins(), m.getFats(), m.getTime(),
+				m.getDescription(),
+				(new ArrayList<IngredientDB>(m.getIngredients())).stream().map(Ingredient::new)
+						.collect(Collectors.toList()),
+				m.getAverageGrade());
 	}
-	
+
 	public Meal() {
 		ingredients = new ArrayList<Ingredient>();
 	}

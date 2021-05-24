@@ -11,7 +11,7 @@ import java.util.List;
 global MyLogger myLogger;
 
 rule "Filter meals by allergens"
-	salience 10
+	salience 100
 	agenda-group "filter"
 	lock-on-active
 	when
@@ -70,7 +70,7 @@ rule "Filter meals by name"
 end
 
 rule "Filter meals by diet"
-	salience 20
+	salience Integer.MAX_VALUE
 	agenda-group "filter"
 	no-loop
 	lock-on-active
@@ -110,7 +110,7 @@ rule "Sort meals by calories ascending"
 end
 
 rule "Sort meals by calories descending"
-	salience -1000000 + $cals 
+	salience -Integer.MAX_VALUE + $cals 
 	agenda-group "filter"
 	when
 		$filter: FilterDTO(descending == true)

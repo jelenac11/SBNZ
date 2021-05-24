@@ -8,23 +8,6 @@ import better.me.util.*;
 
 global MyLogger myLogger;
 
-
-rule "Number of submitted days"
-	agenda-group "daily-nutrition"
-	no-loop
-    when
-    	$user: RegisteredUser($id: id)
-    	$week: Week($days: days, userId == $id)
-        $nutrition: DailyNutrition(day == 0)
-        $value: Number(intValue >= 0) from accumulate (
-        	Day($t:this, submitted == true) from $days,
-        	count($t)
-        )
-    then
-        myLogger.log("Number of submitted days determined");
-        modify ($nutrition) {setDay($value.intValue());}
-end
-
 rule "Calculate entered daily calories"
 	agenda-group "daily-nutrition"
 	no-loop
@@ -114,8 +97,8 @@ rule "Notification Warning"
 	agenda-group "daily-nutrition"
 	no-loop
 	when
-		$user: RegisteredUser($id: id)
-		$week: Week(userId == $id, $goalCalories: goalCalories)
+		$user: RegisteredUser()
+		$week: Week($goalCalories: goalCalories)
 		$day: Day(calories > $goalCalories)
 		$notification: Notification()
 	then
@@ -129,8 +112,8 @@ rule "Notification on calories left"
 	agenda-group "daily-nutrition"
 	no-loop
 	when
-		$user: RegisteredUser($id: id)
-		$week: Week(userId == $id, $goalCalories: goalCalories)
+		$user: RegisteredUser()
+		$week: Week($goalCalories: goalCalories)
 		$day: Day(calories < $goalCalories, $calories: calories)
 		$notification: Notification()
 	then

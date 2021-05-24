@@ -227,3 +227,13 @@ rule "age 20+, bmi >= 18.5, bmi < 15 MAINTAIN_WEIGHT"
         myLogger.log("age 20+, bmi >= 18.5, bmi < 25 MAINTAIN_WEIGHT");
         modify ($week) {setGoal("MAINTAIN_WEIGHT");}
 end
+
+rule "Change agenda-group to nutrition"
+	agenda-group "bmi"
+	salience -Integer.MAX_VALUE
+	when
+		Week()
+	then
+		myLogger.log("Changed agenda-group from bmi to nutrition");
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("nutrition").setFocus();
+end

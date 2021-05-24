@@ -20,6 +20,6 @@ rule "Determine body type"
         )
         $bodyType: BodyTypeFact(bodyType == null)
     then
-        myLogger.log("User has endomorph body type");
+        myLogger.log("Body type determined: " + $a.getBodyType());
         modify ($bodyType) {setBodyType($a.getBodyType());}
 end

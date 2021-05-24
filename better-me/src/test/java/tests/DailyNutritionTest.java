@@ -41,7 +41,6 @@ public class DailyNutritionTest {
 		
 		Week week = new Week();
     	week.setId(1L);
-    	week.setUserId(1L);
     	week.getDays().get(0).setSubmitted(true);
     	week.getDays().get(1).setSubmitted(true);
     	week.setGoalCalories(1500);
@@ -70,7 +69,7 @@ public class DailyNutritionTest {
     	List<Ingredient> ingredients = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, pepper));
     	ingredients.add(new Ingredient(2L, 200, banana));
-    	Meal meal = new Meal(1L, "meal1", 350, 29, 9, 3, 10, "", ingredients);
+    	Meal meal = new Meal(1L, "meal1", 350, 29, 9, 3, 10, "", ingredients, 0);
     	concreteMeals.add(new ConcreteMeal(1L, 200, false, meal, 1L, null));
     	concreteMeals.add(new ConcreteMeal(2L, 0, true, null, 1L, ingredients));
     	Day day = new Day(1L, false, 0, 0, 0, 0, false, concreteMeals);
@@ -118,7 +117,7 @@ public class DailyNutritionTest {
     	List<Ingredient> ingredients = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, pepper));
     	ingredients.add(new Ingredient(2L, 200, banana));
-    	Meal meal = new Meal(1L, "meal1", 350, 29, 9, 3, 10, "", ingredients);
+    	Meal meal = new Meal(1L, "meal1", 350, 29, 9, 3, 10, "", ingredients, 0);
     	concreteMeals.add(new ConcreteMeal(1L, 200, false, meal, 1L, null));
     	Day day = new Day(1L, false, 0, 0, 0, 0, false, concreteMeals);
     	
@@ -142,7 +141,7 @@ public class DailyNutritionTest {
     	List<Ingredient> ingredients = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, pepper));
     	ingredients.add(new Ingredient(2L, 200, banana));
-    	Meal meal = new Meal(1L, "meal1", 350, 29, 9, 3, 10, "", ingredients);
+    	Meal meal = new Meal(1L, "meal1", 350, 29, 9, 3, 10, "", ingredients, 0);
     	concreteMeals.add(new ConcreteMeal(1L, 600, false, meal, 1L, null));
     	Day day = new Day(1L, false, 0, 0, 0, 0, false, concreteMeals);
     	Notification n = new Notification();
@@ -169,7 +168,7 @@ public class DailyNutritionTest {
     	List<Ingredient> ingredients = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, pepper));
     	ingredients.add(new Ingredient(2L, 200, banana));
-    	Meal meal = new Meal(1L, "meal1", 350, 29, 9, 3, 10, "", ingredients);
+    	Meal meal = new Meal(1L, "meal1", 350, 29, 9, 3, 10, "", ingredients, 0);
     	concreteMeals.add(new ConcreteMeal(1L, 200, false, meal, 1L, null));
     	Day day = new Day(1L, false, 0, 0, 0, 0, false, concreteMeals);
     	Notification n = new Notification();

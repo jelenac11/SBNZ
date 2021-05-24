@@ -1,12 +1,10 @@
 package better.me.services;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,14 +22,11 @@ import better.me.model.RegisteredUser;
 import better.me.model.Week;
 import better.me.modelDB.AllergenDB;
 import better.me.modelDB.AuthorityDB;
-import better.me.modelDB.DayDB;
 import better.me.modelDB.RegisteredUserDB;
 import better.me.modelDB.UserDB;
 import better.me.modelDB.WeekDB;
 import better.me.repositories.IRegisteredUser;
 import better.me.repositories.IUserRepository;
-import better.me.repositories.IWeekRepository;
-import better.me.util.MyLogger;
 
 @Service
 public class RegisteredUserService {
@@ -41,19 +36,57 @@ public class RegisteredUserService {
 
 	@Autowired
 	private IUserRepository userRepository;
-	
-	@Autowired
-	private IWeekRepository weekRepository;
 
 	@Autowired
 	private AuthorityService authService;
 	
 	@Autowired
-	private KieContainer kieContainer;
+	private KieSession kieSession;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	public RegisteredUserDTO fillInfo(RegisteredUserDTO user) throws NotLoggedInException, RequestException {
+		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (current == null) throw new NotLoggedInException("You must login first. No logged in user found!");
+		
+		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
+		if (rUser == null) throw new NotLoggedInException("Registered user must be logged in!");
+		
+		rUser.setAge(user.getAge());
+		rUser.setSex(Sex.valueOf(user.getSex()));
+		rUser.setHeight(user.getHeight());
+		rUser.setWeight(user.getWeight());
+		rUser.setBodyType(BodyType.valueOf(user.getBodyType()));
+		rUser.setActivityLevel(ActivityLevel.valueOf(user.getActivityLevel()));
+		rUser.setDiet(Diet.valueOf(user.getDiet()));
+		rUser.setAllergens(new HashSet<AllergenDB>(user.getAllergens()));
+		registeredUserRepository.save(rUser);
+		
+		RegisteredUserDB modifiedUser = determineBmiAndNutrition(rUser);
+		registeredUserRepository.save(modifiedUser);
+		return new RegisteredUserDTO(rUser);
+	}
+	
+	public RegisteredUserDB determineBmiAndNutrition(RegisteredUserDB rUser) throws RequestException {
+		kieSession.getAgenda().getAgendaGroup("bmi").setFocus();
+		RegisteredUser userFact = new RegisteredUser(rUser);
+		Week weekFact = new Week();
+
+		kieSession.insert(userFact);
+		kieSession.insert(weekFact);
+		
+		kieSession.fireAllRules();
+		
+		kieSession.dispose();
+		
+		rUser.setBmi(userFact.getBmi());
+		rUser.setActivityCount(userFact.getActivityCount());
+		rUser.getWeeks().add(new WeekDB(weekFact, rUser));
+		
+		return rUser;
+	}
+	
 	public RegisteredUserDB getById(Long id) {
 		Optional<RegisteredUserDB> user = registeredUserRepository.findById(id);
 		if (!user.isPresent()) {
@@ -84,83 +117,6 @@ public class RegisteredUserService {
 
 	public RegisteredUserDB findByUsername(String username) {
 		return registeredUserRepository.findByUsername(username);
-	}
-	
-	public Week determineBmi() throws RequestException {
-		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
-		
-		KieSession kieSession = kieContainer.newKieSession("session");
-		kieSession.getAgenda().getAgendaGroup("bmi").setFocus();
-
-		kieSession.setGlobal("myLogger", new MyLogger());
-	
-		RegisteredUser userFact = new RegisteredUser(rUser);
-		Week weekFact = new Week();
-
-		kieSession.insert(userFact);
-		kieSession.insert(weekFact);
-		
-		kieSession.fireAllRules();
-		kieSession.dispose();
-		
-		rUser.setBmi(userFact.getBmi());
-		registeredUserRepository.save(rUser);
-		
-		return weekFact;
-	}
-	
-	public Week determineNutrition(Week weekFact) throws RequestException {
-		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
-
-		KieSession kieSession = kieContainer.newKieSession("session");
-		kieSession.getAgenda().getAgendaGroup("nutrition").setFocus();
-
-		kieSession.setGlobal("myLogger", new MyLogger());
-
-		RegisteredUser userFact = new RegisteredUser(rUser);
-
-		kieSession.insert(userFact);
-		kieSession.insert(weekFact);
-
-		kieSession.fireAllRules();
-		kieSession.dispose();
-		
-		rUser.setActivityCount(userFact.getActivityCount());
-		registeredUserRepository.save(rUser);
-		
-		return weekFact;
-	}
-	
-	public RegisteredUserDTO fillInfo(RegisteredUserDTO user) throws NotLoggedInException, RequestException {
-		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (current == null) throw new NotLoggedInException("You must login first. No logged in user found!");
-		
-		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
-		if (rUser == null) throw new NotLoggedInException("Registered user must be logged in!");
-		
-		rUser.setAge(user.getAge());
-		rUser.setSex(Sex.valueOf(user.getSex()));
-		rUser.setHeight(user.getHeight());
-		rUser.setWeight(user.getWeight());
-		rUser.setBodyType(BodyType.valueOf(user.getBodyType()));
-		rUser.setActivityLevel(ActivityLevel.valueOf(user.getActivityLevel()));
-		rUser.setDiet(Diet.valueOf(user.getDiet()));
-		rUser.setAllergens(new HashSet<AllergenDB>(user.getAllergens()));
-		registeredUserRepository.save(rUser);
-		
-		Week weekFact = determineBmi();
-		Week weekNutritionFact = determineNutrition(weekFact);
-		WeekDB week = new WeekDB(weekNutritionFact, rUser);
-		ArrayList<DayDB> days = new ArrayList<DayDB>();
-		for (int i = 0; i < 7; i++) {
-			days.add(new DayDB());
-		}
-		week.setDays(new HashSet<DayDB>(days));
-		weekRepository.save(week);
-		
-		return new RegisteredUserDTO(rUser);
 	}
 
 }

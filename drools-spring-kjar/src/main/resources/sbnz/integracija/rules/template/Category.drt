@@ -1,0 +1,27 @@
+template header
+ruleName
+newCategory
+from
+to
+
+package sbnz.integracija.rules.templates;
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.dto.*;
+import better.me.modelDB.*;
+import better.me.util.*;
+
+template "Category template"
+
+rule "Rule @{ruleName}"
+   when 
+		$user : RegisteredUser($score: score, $previousCategory : previousCategory, $score >= @{from}, $score < @{to}, $category: category) @Watch (score)
+	then
+		if (!($category.equals(@{newCategory}))) {
+			modify($user){ setPreviousCategory($category); }
+		}
+		modify($user){ setCategory(@{newCategory}); }
+	end
+	
+end template
