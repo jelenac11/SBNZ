@@ -149,3 +149,14 @@ rule "Calculate goal fats and carbs for ENDOMORPH"
         modify ($week) {setGoalCarbs(($goalCalories - ($goalProteins * 4)) * 0.5 * 0.25);}
         modify ($week) {setGoalFats(($goalCalories - ($goalProteins * 4)) * 0.5 * 0.111);}
 end
+
+rule "Change agenda-group to age"
+	agenda-group "nutrition"
+	salience -Integer.MAX_VALUE
+	when
+		RegisteredUser()
+		Week()
+	then
+		myLogger.log("Changed agenda-group from nutrition to age");
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("age").setFocus();
+end

@@ -11,13 +11,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryBoundariesDTO {
+public class AgeBoundariesDTO {
 
 	@Min(1)
-	private int intermediateFrom;
+	private int teenFrom;
 	@Min(1)
-	private int advancedFrom;
+	private int youngAdultFrom;
 	@Min(1)
-	private int proFrom;
+	private int adultFrom;
+	@Min(1)
+	private int elderFrom;
 	
 }

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 import better.me.dto.FilterDTO;
 import better.me.dto.ResponseMealDTO;
@@ -21,6 +22,7 @@ import better.me.modelDB.UserDB;
 import better.me.repositories.IMealRepository;
 import better.me.repositories.IRegisteredUser;
 
+@Service
 public class FilterService {
 
 	@Autowired
