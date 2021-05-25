@@ -1,0 +1,211 @@
+package sbnz.integracija.rules;
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.modelDB.*;
+import better.me.dto.*;
+import better.me.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+global MyLogger myLogger;
+
+declare GroceryFlag
+	grocery: Grocery
+	rate: double
+	rateNum: int
+	eaten: int
+end
+
+declare RecommendedPoints
+	points: double
+	meal: Meal
+end
+
+declare ActivatedAgeDietRecommendation
+	activated:boolean
+end
+
+rule "Collect informations about groceries"
+	agenda-group "grocery-flags"
+	lock-on-active
+    when
+    	$grocery : Grocery( $id : id );
+    	$user : RegisteredUser( $grades : grades, $weeks : weeks);
+    	Number($eatenInMeals : intValue) from accumulate (
+			$week: Week($days: days) from $weeks 
+			and $day: Day($meals: concreteMeals) from $days 
+			and ConcreteMeal($meal: meal, customMeal == false) from $meals
+			and Ingredient($id == grocery.getId(), $t:this) from $meal.getIngredients(),
+	 		count($t)
+		);
+        Number($eatenInCustomMeals : intValue) from accumulate (
+    		accumulate (
+    			$week: Week($days: days) from $weeks,
+    			accumulate (
+    				$day: Day($meals: concreteMeals) from $days,
+    				accumulate(
+					 	$concrete: ConcreteMeal($grocery memberOf ingredients, customMeal == true) from $meals,
+						count($concrete)
+					)
+    			)
+    		)
+        );
+		Number( $rate : doubleValue ) from accumulate (
+		 	$grade : Grade( $value : value, value > 0, $grocery memberOf meal.getIngredients()) from $grades,
+		 	average( $value ) 
+	    );
+        Number( $ratesNum : intValue, $ratesNum + $rate + $eatenInCustomMeals + $eatenInMeals > 0) from accumulate (
+         	$rated : Grade( $value : value, value > 0, $grocery memberOf meal.getIngredients()) from $grades,
+		 	count( $rated ) 
+        );
+    then
+    	myLogger.log("Creating grocery flag for: " + $grocery.getName() + ", average rate: " + $rate + ", rateNum: " + $ratesNum + ", eatenInMeals: " + $eatenInMeals + ", eatenInCustomMeals: " + $eatenInCustomMeals);
+    	insert(new GroceryFlag($grocery, $rate, $rateNum, $eatenInMeals + $eatenInCustomMeals));
+end
+
+
+rule "Remove all eaten meals"
+	agenda-group "meal-recommendation"
+	salience Integer.MAX_VALUE
+	no-loop
+	when
+        $user: RegisteredUser($weeks:weeks)
+        $allMeals: List(size > 0)
+		$meals : List() from accumulate ( 
+			$meal: Meal() from $allMeals,
+			init( List<Meal> alreadyEaten = new ArrayList(); ),
+			action(
+				outerloop: for (Object week : $weeks) {
+					for (Object day : ((Week)week).getDays()) {
+						for (Object meal: ((Day)day).getConcreteMeals()) {
+							if (((ConcreteMeal)meal).getMeal() != null) {
+								if (((ConcreteMeal)meal).getMeal().getName().equals($meal.getName())) {
+									alreadyEaten.add($meal);
+									break outerloop;	
+								}	
+							}
+						}
+					}
+				}
+			 ),
+			result ( alreadyEaten )
+		)
+	then 
+		myLogger.log("Removing all eaten meals");
+		modify ($allMeals) {removeAll($meals);}
+end
+
+rule "Reward good rated grocery"
+	agenda-group "meal-recommendation"
+	lock-on-active
+    when
+        $meal : Meal($ingredients: ingredients, $grocery memberOf ingredients);
+        $allMeals: List($meal memberOf this);
+        $flags : List() from collect(GroceryFlag());
+        GroceryFlag($grocery: grocery, rate >= 3, $rate : rate, $ratesNum : ratesNum) from $flags;
+    then
+        insert(new RecommendedPoints($rate*$ratesNum, $meal));
+        myLogger.log("Rewarded good rated grocery")
+end
+
+rule "Punish bad rated grocery"
+	agenda-group "meal-recommendation"
+	lock-on-active
+    when
+        $meal : Meal($ingredients: ingredients, $grocery memberOf ingredients);
+        $allMeals: List($meal memberOf this);
+        $flags : List() from collect(GroceryFlag());
+        GroceryFlag($grocery: grocery, rate != 0, rate < 3, $rate : rate, $ratesNum : ratesNum) from $flags;
+    then
+        insert(new RecommendedPoints((-0.5/$rate)*$ratesNum), $meal));
+        myLogger.log("Punished bad rated grocery")
+end
+
+
+rule "Reward most eaten grocery"
+	agenda-group "meal-recommendation"
+	lock-on-active
+    when
+    	$user : RegisteredUser($weeks : weeks);
+        $meal : Meal($ingredients: ingredients, $grocery memberOf ingredients);
+        $allMeals: List($meal memberOf this);
+        $flags : List() from collect(GroceryFlag());
+        GroceryFlag($grocery: grocery, $numEaten: eaten, eaten >= $weeks.size() * 3) from $flags;
+    then
+        insert(new RecommendedPoints($numEaten * 1.5, $meal));
+        myLogger.log("Rewarded most eaten grocery")
+end
+
+rule "Punish least eaten grocery"
+	agenda-group "meal-recommendation"
+	lock-on-active
+    when
+    	$user : RegisteredUser($weeks : weeks);
+        $meal : Meal($ingredients: ingredients, $grocery memberOf ingredients);
+        $allMeals: List($meal memberOf this);
+        $flags : List() from collect(GroceryFlag());
+        GroceryFlag($grocery: grocery, eaten != 0, $numEaten: eaten, eaten < $weeks.size()*3) from $flags;
+    then
+        insert(new RecommendedPoints((-1/$numEaten )* 1.5), $meal));
+        myLogger.log("Punished least eaten grocery")
+end
+
+rule "Collect all points of one meal into one recommendation"
+	agenda-group "meal-recommendation"
+	salience -100
+	lock-on-active
+    when
+    	$meal: Meal(  );
+        Number ($points:doubleValue) from accumulate(
+        	RecommendedPoints(meal.getId() == $meal.getId(), $p:Double.valueOf(points)),
+        	sum($p)
+        );
+    then
+    	insert(new RecommendedMeal($meal, $points));
+    	myLogger.log("Collecting all points for " + $meal.getName());
+end
+
+rule "Delete points when RecommendedMeal inserted"
+	agenda-group "meal-recommendation"
+	salience -Integer.MAX_VALUE
+	when
+		$rm: RecommendedMeal($meal: meal);
+		$rp: RecommendedPoints(meal.getId() == $meal.getId());
+	then
+		delete($rp);
+		update($rm);
+end
+
+rule "Unsuccessfully recommendation"
+	agenda-group "meal-recommendation"
+	salience -200
+	no-loop
+    when
+    	Number(intValue < 3) from accumulate(
+        	$rm: RecommendedMeal(points > 0),
+        	count($rm)
+        );
+        not ActivatedAgeDietRecommendation();
+    then
+    	myLogger.log("Unsuccessfully recommendation");
+    	insert(new ActivatedAgeGenderRecommendation(true));
+        kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("age-diet-recommendation").setFocus();
+end
+
+rule "Points for highly rated meals by users of same age and diet"
+	agenda-group "age-diet-recommendation"
+	lock-on-active
+    when
+    	ActivatedAgeDietRecommendation();
+        $recommendation : RecommendedMeal($points: points, $meal : meal, $grades: grades);
+        $user : RegisteredUser($ageCategory : ageCategory, $diet : diet);
+        Number(doubleValue >= 3, $rating: doubleValue) from accumulate(
+        	Grade( value > 0, $value : rate, user.getAgeCategory() == $ageCategory, user.getDiet() == $diet ) from $grades,
+        	average($value) 
+        );
+    then
+        $recommendation.setPoints($points+$rating*50);
+        myLogger.log("Points for highly rated meals by users of same age and diet");
+        update($recommendation);
+end
