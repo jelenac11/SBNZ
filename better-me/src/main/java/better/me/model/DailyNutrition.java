@@ -17,4 +17,5 @@ public class DailyNutrition {
 	private double proteins;
 	private double carbs;
 	private boolean exceed;
+	private Notification notification;
 }

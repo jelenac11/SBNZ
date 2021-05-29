@@ -19,6 +19,7 @@ import better.me.model.DailyNutrition;
 import better.me.model.Day;
 import better.me.model.Ingredient;
 import better.me.model.Meal;
+import better.me.model.Notification;
 import better.me.model.Week;
 import better.me.modelDB.ConcreteMealDB;
 import better.me.modelDB.DayDB;
@@ -33,7 +34,6 @@ import better.me.repositories.IConcreteMealRepository;
 import better.me.repositories.IDayRepository;
 import better.me.repositories.IMealRepository;
 import better.me.repositories.IRegisteredUser;
-import better.me.repositories.IWeekRepository;
 
 @Service
 public class MealService {
@@ -43,9 +43,6 @@ public class MealService {
 
 	@Autowired
 	private IRegisteredUser registeredUserRepository;
-	
-	@Autowired
-	private IWeekRepository weekRepository;
 	
 	@Autowired
 	private IMealRepository mealRepository;
@@ -80,11 +77,13 @@ public class MealService {
 		
 		DailyNutrition nutrition = new DailyNutrition();
 		Day day = new Day(dayDB);
+		Notification notification = new Notification();
 		
 		kieSession.getAgenda().getAgendaGroup("daily-nutrition").setFocus();
 		kieSession.insert(day);
 		kieSession.insert(nutrition);
 		kieSession.insert(week);
+		kieSession.insert(notification);
 		
 		dayDB.setCalories(day.getCalories());
 		dayDB.setFats(day.getFats());
@@ -95,6 +94,8 @@ public class MealService {
 		dayRepository.save(dayDB);
 		kieSession.fireAllRules();
 		kieSession.dispose();
+		
+		nutrition.setNotification(notification);
 		return nutrition;
 	}
 

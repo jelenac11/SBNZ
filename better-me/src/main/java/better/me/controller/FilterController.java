@@ -29,4 +29,13 @@ public class FilterController {
 		}
 	}
 	
+	@PostMapping("/groceries")
+	public ResponseEntity<?> filterGroceries(@RequestBody FilterDTO filter){
+		try {
+			return new ResponseEntity<>(filterService.filterGroceries(filter), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 }

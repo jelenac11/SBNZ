@@ -48,21 +48,21 @@ public class FilterTest {
     	List<Ingredient> ingredients = new ArrayList<Ingredient>();
     	ingredients.add(new Ingredient(1L, 100, pepper));
     	ingredients.add(new Ingredient(2L, 200, banana));
-    	Meal meal1 = new Meal(1L, "meal1", 350, 29, 9, 3, 10, "", ingredients, 0);
+    	Meal meal1 = new Meal(1L, "meal1", 350, 29, 9, 3, 10, "", ingredients, null, 0);
     	
     	Grocery peanut = new Grocery(3L, "peanut", Diet.OMNIVORE, 100, 10, 10, 10);
     	Grocery pineapple = new Grocery(4L, "pineapple", Diet.VEGAN, 100, 10, 1, 1);
     	List<Ingredient> ingredients2 = new ArrayList<Ingredient>();
     	ingredients2.add(new Ingredient(1L, 100, peanut));
     	ingredients2.add(new Ingredient(2L, 100, pineapple));
-    	Meal meal2 = new Meal(2L, "meal2", 200, 20, 11, 11, 40, "", ingredients2, 0);
+    	Meal meal2 = new Meal(2L, "meal2", 200, 20, 11, 11, 40, "", ingredients2, null, 0);
     	
     	Grocery milk = new Grocery(5L, "milk", Diet.OMNIVORE, 100, 10, 10, 10);
     	Grocery apple = new Grocery(6L, "apple", Diet.VEGETARIAN, 100, 10, 1, 1);
     	List<Ingredient> ingredients3 = new ArrayList<Ingredient>();
     	ingredients3.add(new Ingredient(1L, 100, milk));
     	ingredients3.add(new Ingredient(2L, 200, apple));
-    	Meal meal3 = new Meal(3L, "meal3", 300, 30, 12, 12, 20, "", ingredients3, 0);
+    	Meal meal3 = new Meal(3L, "meal3", 300, 30, 12, 12, 20, "", ingredients3, null, 0);
     	
     	allMeals = new ArrayList<Meal>();
     	allMeals.add(meal1);
