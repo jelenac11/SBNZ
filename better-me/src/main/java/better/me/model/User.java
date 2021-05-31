@@ -17,9 +17,10 @@ public class User {
 	protected String email;
 	protected String firstName;
 	protected String lastName;
+	protected boolean allowedToLogin;
 	
 	public User (UserDB u) {
-		this(u.getId(), u.getUsername(), u.getEmail(), u.getFirstName(), u.getLastName());
+		this(u.getId(), u.getUsername(), u.getEmail(), u.getFirstName(), u.getLastName(), u.isAllowedToLogin());
 	}
 
 }

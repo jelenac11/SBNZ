@@ -3,11 +3,15 @@ package better.me.controller;
 import java.util.List;
 import javax.validation.Valid;
 
+import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,8 +26,10 @@ import better.me.dto.UserDTO;
 import better.me.dto.UserLoginDTO;
 import better.me.dto.UserResDTO;
 import better.me.dto.UserTokenStateDTO;
+import better.me.events.LoginEvent;
 import better.me.helper.RegisteredUserMapper;
 import better.me.helper.UserMapper;
+import better.me.model.User;
 import better.me.modelDB.AuthorityDB;
 import better.me.modelDB.RegisteredUserDB;
 import better.me.modelDB.UserDB;
@@ -53,30 +59,57 @@ public class AuthenticationController {
 
 	private UserMapper userMapper;
 
+	@Autowired
+	@Qualifier(value = "cepLoginSession")
+	private KieSession cepLoginSession;
+	
 	public AuthenticationController() {
 		userMapper = new UserMapper();
 	}
 
+	@SuppressWarnings("null")
 	@PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody UserLoginDTO authenticationRequest) {
 		Authentication authentication = null;
+		UserDB user = null;
 		try {
 			authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
 					authenticationRequest.getEmail(), authenticationRequest.getPassword()));
-		} catch (Exception e) {
+		} catch (BadCredentialsException e) {
+			user = userDetailsService.findByUsername(authenticationRequest.getEmail());
+			if (user != null) {
+				LoginEvent loginEvent = new LoginEvent(new User(user), false);
+				cepLoginSession.insert(loginEvent);
+				cepLoginSession.fireAllRules();
+				user.setAllowedToLogin(loginEvent.getUser().isAllowedToLogin());
+				userDetailsService.save(user);
+				if(!user.isAllowedToLogin()) {
+					return new ResponseEntity<>("You can not login after three failed attempts. Try again after 5 minutes.", HttpStatus.FORBIDDEN);
+				}
+			}
 			return new ResponseEntity<>("Incorrect email or password.", HttpStatus.UNAUTHORIZED);
+		} catch (DisabledException e) {
+			return new ResponseEntity<>("Account is not verified. Check your email.", HttpStatus.FORBIDDEN);
 		}
 
-		UserDB user = (UserDB) authentication.getPrincipal();
-		@SuppressWarnings("unchecked")
-		List<AuthorityDB> auth = (List<AuthorityDB>) user.getAuthorities();
+		LoginEvent loginEvent = new LoginEvent(new User(user), false);
+		cepLoginSession.insert(loginEvent);
+		cepLoginSession.fireAllRules();	
+		user.setAllowedToLogin(loginEvent.getUser().isAllowedToLogin());
+		userDetailsService.save(user);
+		if(user.isAllowedToLogin()) {
+			@SuppressWarnings("unchecked")
+			List<AuthorityDB> auth = (List<AuthorityDB>) user.getAuthorities();
 
-		SecurityContextHolder.getContext().setAuthentication(authentication);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		String jwt = tokenUtils.generateToken(user.getEmail(), auth.get(0).getName());
-		int expiresIn = tokenUtils.getExpiredIn();
+			String jwt = tokenUtils.generateToken(user.getEmail(), auth.get(0).getName());
+			int expiresIn = tokenUtils.getExpiredIn();
 
-		return ResponseEntity.ok(new UserTokenStateDTO(jwt, (long) expiresIn));
+			return ResponseEntity.ok(new UserTokenStateDTO(jwt, (long) expiresIn));
+		} else {
+			return new ResponseEntity<>("You can not login after three failed attempts. Try again after 5 minutes.", HttpStatus.FORBIDDEN);
+		}
 	}
 
 	@PostMapping(value = "/sign-up", consumes = MediaType.APPLICATION_JSON_VALUE)

@@ -11,10 +11,12 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 
+import better.me.events.LoginEvent;
 import better.me.events.MealEatenEvent;
 import better.me.events.MealRatedEvent;
 import better.me.model.AdminReport;
 import better.me.model.Meal;
+import better.me.model.User;
 import better.me.util.MyLogger;
 
 public class CepTest {
@@ -108,6 +110,11 @@ public class CepTest {
 		assertEquals(0, r2.getMostPopularMeals().size());
 	}
 
+	/*
+	 * Testira se kreiranje izvestaja koji prikazuje top 5 najbolje 
+	 * ocenjenih jela u poslednjih 30 dana 
+	 * 
+	 */
 	@Test
 	public void test_cepReportRulesTestTop5RatedMeals() {
 		KieServices ks = KieServices.Factory.get();
@@ -180,6 +187,79 @@ public class CepTest {
 		ksession.fireAllRules();
 
 		assertEquals(0, r2.getMostRatedMeals().size());
+	}
+	
+	/*
+	 * Testira se da nakon tri neuspesna logina u roku od 5 minuta,
+	 * korisnik vise ne moze da se loguje i privremeno se blokira
+	 * Napomena: korisniku je prethodno dozvoljeno logovanje
+	 */
+	@Test
+	public void testUnsuccessfulLoginAfterThreeAttempts() {
+		KieServices ks = KieServices.Factory.get();
+		KieContainer kc = ks.newKieClasspathContainer();
+		KieSession ksession = kc.newKieSession("cepLoginSession");
+		ksession.setGlobal("myLogger", myLogger);
+		
+		User u = new User(1L, "aleksag12", "aleksa.g.98@gmail.com", "Aleksa", "Goljovic", true);
+
+		ksession.insert(new LoginEvent(u, false));
+		ksession.insert(new LoginEvent(u, false));
+		ksession.insert(new LoginEvent(u, false));
+		ksession.fireAllRules();
+		
+		assertEquals(false, u.isAllowedToLogin());
+	}
+
+	/*
+	 * Testira se da se korisniku omogucava login
+	 * jer u radnoj memoriji ne postoji event-ovi koji signaliziraju da je 
+	 * korisnik pogresio sifru tri puta u prethodnih 5 minuta
+	 * Napomena: korisniku je prethodno onemoguceno logovanje
+	 */
+	@Test
+	public void testSuccessfulLoginWhenNoUnsuccessfulLogingEventsInWorkingMemory() {
+		KieServices ks = KieServices.Factory.get();
+		KieContainer kc = ks.newKieClasspathContainer();
+		KieSession ksession = kc.newKieSession("cepLoginSession");
+		ksession.setGlobal("myLogger", myLogger);
+
+		User u = new User(1L, "aleksag12", "aleksa.g.98@gmail.com", "Aleksa", "Goljovic", true);
+
+		ksession.insert(new LoginEvent(u, true));
+		ksession.fireAllRules();
+		
+		assertEquals(true, u.isAllowedToLogin());
+	}
+	
+	/*
+	 * Testira se da se korisniku omogucava login
+	 * nakon 5 minuta od trenutka njegovog blokiranja 
+	 * 
+	 */
+	@Test
+	public void testSuccessfulLoginAfter5MinutesOfBlocking() {
+		KieServices ks = KieServices.Factory.get();
+		KieContainer kc = ks.newKieClasspathContainer();
+		KieSession ksession = kc.newKieSession("cepLoginSessionPseudoClock");
+		SessionPseudoClock clock = ksession.getSessionClock();
+		ksession.setGlobal("myLogger", myLogger);
+
+		User u = new User(1L, "aleksag12", "aleksa.g.98@gmail.com", "Aleksa", "Goljovic", true);
+
+		ksession.insert(new LoginEvent(u, false));
+		ksession.insert(new LoginEvent(u, false));
+		ksession.insert(new LoginEvent(u, false));
+		ksession.fireAllRules();
+		
+		assertEquals(false, u.isAllowedToLogin());
+		
+		clock.advanceTime(5, TimeUnit.MINUTES);
+		
+		ksession.insert(new LoginEvent(u, true));
+		ksession.fireAllRules();
+		
+		assertEquals(true, u.isAllowedToLogin());
 	}
 
 }

@@ -55,6 +55,9 @@ public class UserDB implements UserDetails {
 
 	@Column(unique = false, nullable = false)
 	private String lastName;
+	
+	@Column
+	private boolean allowedToLogin;
 
 	@Column(name = "last_password_reset_date")
 	private Long lastPasswordResetDate;
@@ -68,7 +71,7 @@ public class UserDB implements UserDetails {
 		this.id = id;
 	}
 
-	public UserDB(String username, String email, String password, String firstName, String lastName) {
+	public UserDB(String username, String email, String password, String firstName, String lastName, boolean allowedToLogin) {
 		super();
 		this.username = username;
 		this.email = email;
@@ -76,18 +79,20 @@ public class UserDB implements UserDetails {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.lastPasswordResetDate = System.currentTimeMillis();
+		this.allowedToLogin = allowedToLogin;
 	}
 
-	public UserDB(String username, String email, String firstName, String lastName) {
+	public UserDB(String username, String email, String firstName, String lastName, boolean allowedToLogin) {
 		super();
 		this.username = username;
 		this.email = email;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.lastPasswordResetDate = System.currentTimeMillis();
+		this.allowedToLogin = allowedToLogin;
 	}
 
-	public UserDB(Long id, String username, String email, String password, String firstName, String lastName) {
+	public UserDB(Long id, String username, String email, String password, String firstName, String lastName, boolean allowedToLogin) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -96,6 +101,7 @@ public class UserDB implements UserDetails {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.lastPasswordResetDate = System.currentTimeMillis();
+		this.allowedToLogin = allowedToLogin;
 	}
 
 	@Override

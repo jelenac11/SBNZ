@@ -10,7 +10,7 @@ import better.me.modelDB.UserDB;
 public class UserMapper {
 
 	public UserDB toEntity(UserDTO dto) {
-		return new UserDB(dto.getUsername(), dto.getEmail(), dto.getPassword(), dto.getFirstName(), dto.getLastName());
+		return new UserDB(dto.getUsername(), dto.getEmail(), dto.getPassword(), dto.getFirstName(), dto.getLastName(), true);
 	}
 
 	public UserDTO toDto(UserDB entity) {

@@ -51,6 +51,7 @@ public class RegisteredUser extends User {
 		this.email = ru.getEmail();
 		this.firstName = ru.getFirstName();
 		this.lastName = ru.getLastName();
+		this.allowedToLogin = ru.isAllowedToLogin();
 	}
 
 	public RegisteredUser() {
