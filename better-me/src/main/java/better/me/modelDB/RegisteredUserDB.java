@@ -94,12 +94,12 @@ public class RegisteredUserDB extends UserDB {
 	}
 
 	public RegisteredUserDB(Long id, String username, String email, String password, String firstName,
-			String lastName) {
-		super(id, username, email, password, firstName, lastName);
+			String lastName, boolean allowedToLogin) {
+		super(id, username, email, password, firstName, lastName, allowedToLogin);
 	}
 
-	public RegisteredUserDB(String username, String email, String password, String firstName, String lastName) {
-		super(username, email, password, firstName, lastName);
+	public RegisteredUserDB(String username, String email, String password, String firstName, String lastName, boolean allowedToLogin) {
+		super(username, email, password, firstName, lastName, allowedToLogin);
 	}
 
 }

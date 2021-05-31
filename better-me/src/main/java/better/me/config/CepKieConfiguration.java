@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import better.me.util.MyLogger;
+
 @Configuration
 public class CepKieConfiguration {
 
@@ -13,8 +15,17 @@ public class CepKieConfiguration {
 	private KieContainer kieContainer;
 	
 	@Bean(name = "cepReportSession")
-	public KieSession cepConfigKsessionRealtimeClock() {
-		return kieContainer.newKieSession("cepReportSession");
+	public KieSession cepReportSessionRealtimeClock() {
+		KieSession kieSession = kieContainer.newKieSession("cepReportSession");
+		kieSession.setGlobal("myLogger", new MyLogger());
+		return kieSession;
+	}
+	
+	@Bean(name = "cepLoginSession")
+	public KieSession cepLoginSessionRealtimeClock() {
+		KieSession kieSession = kieContainer.newKieSession("cepLoginSession");
+		kieSession.setGlobal("myLogger", new MyLogger());
+		return kieSession;
 	}
 	
 	

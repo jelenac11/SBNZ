@@ -1,0 +1,45 @@
+package sbnz.integracija.rules.cepReport;
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.events.*;
+import better.me.util.*;
+
+global MyLogger myLogger;
+
+declare SuspiciousUserEvent
+    @role(event)
+    user: User
+end
+
+declare window numberOfLogins
+	@doc("Number of failed login attempts in the last 5 minutes")
+	LoginEvent() over window:time(5m)
+end
+
+rule "More than 3 unsuccessful login attempts in 5 minutes from one user"
+    when
+        $event: LoginEvent($user : user)
+        Number(intValue >= 3) from accumulate (
+			$le: LoginEvent(user.getId() == $user.getId(), successfulLogin == false) from window numberOfLogins,
+			count($le)
+		)
+		not (SuspiciousUserEvent(user.getId() == $user.getId()))
+    then
+    	myLogger.log("Many unsuccessful login attempts from same username " + $user.getEmail());
+    	$user.setAllowedToLogin(false);
+    	insert(new SuspiciousUserEvent($user));    
+end
+
+rule "Successful login"
+    when
+        $event: LoginEvent($userId: user.getId(), $user: user)
+		Number(intValue < 3) from accumulate (
+			$le: LoginEvent(user.getId() == $user.getId(), successfulLogin == false) from window numberOfLogins,
+			count($le)
+		)
+		not (SuspiciousUserEvent(user.getId() == $user.getId()) over window:time(5m))
+    then
+    	myLogger.log("User can login " + $user.getEmail());
+    	$user.setAllowedToLogin(true); 
+end

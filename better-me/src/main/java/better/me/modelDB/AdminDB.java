@@ -20,16 +20,16 @@ public class AdminDB extends UserDB {
 		super(id);
 	}
 
-	public AdminDB(String username, String email, String firstName, String lastName) {
-		super(username, email, firstName, lastName);
+	public AdminDB(String username, String email, String firstName, String lastName, boolean allowedToLogin) {
+		super(username, email, firstName, lastName, allowedToLogin);
 	}
 	
-	public AdminDB(String username, String email, String password, String firstName, String lastName) {
-		super(username, email, password, firstName, lastName);
+	public AdminDB(String username, String email, String password, String firstName, String lastName, boolean allowedToLogin) {
+		super(username, email, password, firstName, lastName, allowedToLogin);
 	}
 
-	public AdminDB(Long id, String username, String email, String password, String firstName, String lastName) {
-		super(id, username, email, password, firstName, lastName);
+	public AdminDB(Long id, String username, String email, String password, String firstName, String lastName, boolean allowedToLogin) {
+		super(id, username, email, password, firstName, lastName, allowedToLogin);
 	}
 
 }

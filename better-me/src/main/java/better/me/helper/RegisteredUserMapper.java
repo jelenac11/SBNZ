@@ -15,7 +15,7 @@ public class RegisteredUserMapper {
 
 	public RegisteredUserDB toEntity(UserDTO user) {
 		return new RegisteredUserDB(user.getUsername(), user.getEmail(), user.getPassword(), user.getFirstName(),
-				user.getLastName());
+				user.getLastName(), true);
 	}
 
 	public RegisteredUserDTO toDto(RegisteredUserDB entity) {
