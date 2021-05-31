@@ -1,0 +1,48 @@
+package sbnz.integracija.rules.cepReport;
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.events.*;
+import better.me.util.*;
+
+global MyLogger myLogger;
+
+declare MealRatingStatisticsEvent
+	@role(event)
+    @expires(30d)
+    meal: MealPopularity
+    numRated: int
+end
+
+rule "New meal rated event added, create Meal rating statistics event"
+	salience Integer.MAX_VALUE - 1
+	when
+		$event : MealRatedEvent($meal: meal);
+		not MealRatingStatisticsEvent($meal.getName() == meal.getMeal());
+	then
+		myLogger.log("New meal rated event added: " + $meal.getName());
+		insert(new MealRatingStatisticsEvent(new MealPopularity($meal.getName(), 0.0, 0), 0));
+end
+
+rule "Meal already rated and meal rating statistics event exists in the memory"
+	salience Integer.MAX_VALUE
+	when
+		$event : MealRatedEvent($meal: meal, $value: value);
+		$mealStats: MealRatingStatisticsEvent($meal.getName() == meal.getMeal(), $average: meal.getRate());
+	then
+		myLogger.log("Rated meal already exists: " + $meal.getName());
+		$mealStats.setNumRated($mealStats.getNumRated() + 1);
+		$mealStats.getMeal().setRate(((($mealStats.getNumRated() - 1.0)*$average) + $value)/$mealStats.getNumRated());
+end
+
+rule "Get 5 most rated meals in the last 30 days"
+	salience -Integer.MAX_VALUE
+	when
+		$r: AdminReport($meals: mostRatedMeals, mostRatedMeals.size() < 5);
+		$allMealStats: List($allMealStats.size() > 0) from collect(MealRatingStatisticsEvent() over window:time(30d));
+		MealRatingStatisticsEvent($meal: meal, meal not memberOf $meals, $rate: meal.getRate()) from $allMealStats;
+		not MealRatingStatisticsEvent(meal not memberOf $meals, meal.getRate() > $rate) from $allMealStats;
+	then
+		myLogger.log("Most rated meal added: " + $meal.getMeal() + ", average rate: " + $rate);
+		modify ($r) {getMostRatedMeals().add($meal);}
+end

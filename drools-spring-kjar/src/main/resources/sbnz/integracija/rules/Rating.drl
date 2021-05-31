@@ -1,0 +1,17 @@
+package sbnz.integracija.rules;
+
+import better.me.enums.*;
+import better.me.model.*;
+
+rule "Rate meal"
+	agenda-group "rate-meal"
+	when
+	    $newGrade: Grade($newValue: value, $mealId: meal.getId());
+	    $meal: Meal(id == $mealId, $grades: grades);
+	    Number($gradesSum : intValue) from accumulate (
+			$grade: Grade($value: value) from $grades,
+			sum($value)
+		)
+	then
+	    modify($meal){ setAverageGrade(($gradesSum + $newValue)/($meal.getGrades.size() + 1.0)); }
+end

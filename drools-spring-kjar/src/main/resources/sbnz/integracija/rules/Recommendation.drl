@@ -155,6 +155,20 @@ rule "Punish least eaten grocery"
         myLogger.log("Punished least eaten(" + $numEaten + ") grocery: " + $grocery.getName() + " for meal " + $meal.getName() + " with " + (-1.0/$numEaten )*1.5 + " points.");
 end
 
+rule "Punish meal with allergens"
+	agenda-group "meal-recommendation"
+	salience Integer.MAX_VALUE - 1
+	lock-on-active
+    when
+    	$allMeals: List();
+    	$user : RegisteredUser($allergens : allergens);
+        $meal : Meal($ingredients: ingredients) from $allMeals;
+        mealContainsAllergens($meal, $allergens;)
+    then
+        insert(new RecommendedPoints(-3, $meal));
+        myLogger.log("Punished meal " +  $meal.getName() + " with allergens.");
+end
+
 rule "Collect all points of one meal into one recommendation"
 	agenda-group "meal-recommendation"
 	salience -100

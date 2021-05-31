@@ -11,6 +11,7 @@ import better.me.dto.RegisteredUserDTO;
 import better.me.enums.Category;
 import better.me.exceptions.NotLoggedInException;
 import better.me.model.RegisteredUser;
+import better.me.model.Report;
 import better.me.model.Week;
 import better.me.modelDB.DayDB;
 import better.me.modelDB.RegisteredUserDB;
@@ -53,6 +54,24 @@ public class NutritionService {
 		rUser.setPreviousCategory(Category.valueOf(user.getPreviousCategory()));
 		registeredUserRepository.save(rUser);
 		return new RegisteredUserDTO(user);
+	}
+
+	public Report getReport() throws NotLoggedInException {
+		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (current == null) throw new NotLoggedInException("You must login first. No logged in user found!");
+		
+		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
+		if (rUser == null) throw new NotLoggedInException("Registered user must be logged in!");
+		RegisteredUser user = new RegisteredUser(rUser);
+		Report report = new Report();
+		
+		kieSession.getAgenda().getAgendaGroup("user-report").setFocus();
+		kieSession.insert(user);
+		kieSession.insert(report);
+		kieSession.fireAllRules();
+		kieSession.dispose();
+		
+		return report;
 	}
 
 	

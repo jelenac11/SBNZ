@@ -1,0 +1,28 @@
+package sbnz.integracija.rules
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+global MyLogger myLogger;
+
+rule "User report - see if user achieved goals by weeks"
+	agenda-group "user-report"
+	no-loop
+    when
+    	$user: RegisteredUser($weeks: weeks);
+        $report: Report();
+        $successfulWeeks : List() from accumulate (
+        	$week: Week($weeks.indexOf(this) != ($weeks.size() - 1)) from $weeks,
+			init( List<Boolean> successful = new ArrayList<Boolean>(); ),
+			action(
+				successful.add(((Week)$weeks.get($weeks.indexOf($week) + 1)).getGoal().equals("MAINTAIN_WEIGHT"));	
+			 ),
+			result ( successful )
+		)
+    then
+        myLogger.log("User report created: " + $user.getUsername());
+        modify ($report) {setSuccessfulWeeks($successfulWeeks);}
+end
