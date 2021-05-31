@@ -28,4 +28,13 @@ public class NutritionController {
 		}
 	}
 	
+	@GetMapping(value = "/user-report")
+	public ResponseEntity<?> getReport() {
+		try {
+			return new ResponseEntity<>(nutritionService.getReport(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 }

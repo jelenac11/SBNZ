@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,22 +22,32 @@ public class MealController {
 
 	@Autowired
 	private MealService mealService;
-	
+
 	@PostMapping("/eaten-meal")
-	public ResponseEntity<?> determine(@RequestBody EatenMealDTO dto){
+	public ResponseEntity<?> determine(@RequestBody EatenMealDTO dto) {
 		try {
 			return new ResponseEntity<>(mealService.calculateNutritions(dto), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<?> create(@RequestBody NewMealDTO dto){
+	public ResponseEntity<?> create(@RequestBody NewMealDTO dto) {
 		try {
 			return new ResponseEntity<>(mealService.create(dto), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
+
+	@GetMapping(value = "/{name}/{value}")
+	public ResponseEntity<?> rateMeal(@PathVariable(value = "name") String name, @PathVariable(value = "value") Integer value) {
+		try {
+			return new ResponseEntity<>(mealService.rate(name, value), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
 }

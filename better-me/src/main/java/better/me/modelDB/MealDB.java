@@ -57,7 +57,7 @@ public class MealDB {
 
 	@OneToMany(mappedBy = "meal")
 	private Set<ConcreteMealDB> concreteMeals;
-
+	
 	@OneToMany(mappedBy = "meal")
 	private Set<GradeDB> grades;
 

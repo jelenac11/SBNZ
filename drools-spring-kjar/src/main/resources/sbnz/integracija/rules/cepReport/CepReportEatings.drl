@@ -1,0 +1,64 @@
+package sbnz.integracija.rules.cepReport;
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.events.*;
+import better.me.util.*;
+import java.util.List;
+
+global MyLogger myLogger;
+
+declare MealStatisticsEvent
+	@role(event)
+    @expires(30d)
+    meal: MealPopularity
+end
+
+declare window numberOfEatings
+	@doc("Number of eatings in the last 30 days")
+	MealEatenEvent() over window:time(30d)
+end
+
+rule "New meal eaten event added, create Meal statistics event"
+	salience Integer.MAX_VALUE - 1
+	when
+		$event : MealEatenEvent($meal: meal);
+		not MealStatisticsEvent($meal.getName() == meal.getMeal());
+	then
+		myLogger.log("New meal eaten event added: " + $meal.getName());
+		insert(new MealStatisticsEvent(new MealPopularity($meal.getName(), $meal.getAverageGrade(), 0)));
+end
+
+rule "Meal already eaten and meal statistics event exists in the memory"
+	salience Integer.MAX_VALUE
+	when
+		$event : MealEatenEvent($meal: meal);
+		$mealStats: MealStatisticsEvent($meal.getName() == meal.getMeal());
+	then
+		myLogger.log("Eaten meal already exists: " + $meal.getName());
+		$mealStats.getMeal().setEaten($mealStats.getMeal().getEaten() + 1);
+end
+
+rule "Number of all meals eaten in the last 30 days"
+	when
+		$r: AdminReport();
+		accumulate(
+			MealEatenEvent() from window numberOfEatings,
+			$cnt: count(1)
+		)
+	then
+		myLogger.log("All meals eaten times: " + $cnt);
+		modify ($r) {setEatings($cnt.intValue());}
+end
+
+rule "Get 5 most eaten meals in the last 30 days"
+	salience -Integer.MAX_VALUE
+	when
+		$r: AdminReport($meals: mostPopularMeals, mostPopularMeals.size() < 5);
+		$allMealStats: List($allMealStats.size() > 0) from collect(MealStatisticsEvent() over window:time(30d));
+		MealStatisticsEvent($meal: meal, meal not memberOf $meals, $numTimesEaten: meal.getEaten()) from $allMealStats;
+		not MealStatisticsEvent(meal not memberOf $meals, meal.getEaten() > $numTimesEaten) from $allMealStats;
+	then
+		myLogger.log("Most eaten meal added: " + $meal.getMeal() + ", times eaten: " + $numTimesEaten);
+		modify ($r) {getMostPopularMeals().add($meal);}
+end
