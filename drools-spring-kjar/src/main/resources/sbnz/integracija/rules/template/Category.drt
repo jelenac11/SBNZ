@@ -7,21 +7,27 @@ package sbnz.integracija.rules;
 
 import better.me.enums.*;
 import better.me.model.*;
-import better.me.dto.*;
-import better.me.modelDB.*;
 import better.me.util.*;
+import better.me.events.*;
 
 template "Category template"
 
 rule "Rule @{newCategory} Rule"
-    agenda-group "category"
-    when 
-		$user : RegisteredUser($score: score, $previousCategory : previousCategory, $score >= @{from}, $score < @{to}, $category: category) @Watch(!category, !previousCategory)
+	agenda-group "category"
+	when 
+		$user : RegisteredUser($score: score, $score >= @{from}, $score < @{to}, category.equals("@{newCategory}")) @Watch(!category, !previousCategory)
 	then
-		if (!($category.equals("@{newCategory}"))) {
-			modify($user){ setPreviousCategory($category); }
-		}
 		modify($user){ setCategory("@{newCategory}"); }
+	end
+	
+rule "Rule @{newCategory} Rule if category changes"
+	agenda-group "category"
+	when 
+		$user : RegisteredUser($score: score, $score >= @{from}, $score < @{to}, $category: category, !category.equals("@{newCategory}")) @Watch(!category, !previousCategory)
+	then
+		modify($user){ setPreviousCategory($category); }
+		modify($user){ setCategory("@{newCategory}"); }
+		insert(new CategoryChangedEvent($user));
 	end
 	
 end template

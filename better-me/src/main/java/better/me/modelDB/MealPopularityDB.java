@@ -31,11 +31,11 @@ public class MealPopularityDB {
 	private String meal;
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "admin_report_id")
+	@JoinColumn(name = "admin_report_most_popular_id", referencedColumnName = "admin_report_id")
 	private AdminReportDB reportMostPopular;
 	
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "admin_report_id")
+	@JoinColumn(name = "admin_report_most_rated_id", referencedColumnName = "admin_report_id")
 	private AdminReportDB reportMostRated;
 
 	@Column

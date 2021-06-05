@@ -34,10 +34,6 @@ end
 rule "Successful login"
     when
         $event: LoginEvent($userId: user.getId(), $user: user)
-		Number(intValue < 3) from accumulate (
-			$le: LoginEvent(user.getId() == $user.getId(), successfulLogin == false) from window numberOfLogins,
-			count($le)
-		)
 		not (SuspiciousUserEvent(user.getId() == $user.getId()) over window:time(5m))
     then
     	myLogger.log("User can login " + $user.getEmail());

@@ -1,0 +1,59 @@
+package sbnz.integracija.rules.cepMidnight;
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.util.*;
+import better.me.events.*;
+
+rule "Rule PRO Rule if category changes"
+	agenda-group "category"
+	when 
+		$user : RegisteredUser($score: score, $score >= 1050, $score < 2147483647, $category: category, !category.equals("PRO")) @Watch(!category, !previousCategory)
+	then
+		modify($user){ setPreviousCategory($category); }
+		modify($user){ setCategory("PRO"); }
+		System.out.println("Category changed");
+		insert(new CategoryChangedEvent($user));
+	end
+	
+rule "Rule ADVANCED Rule if category changes"
+	agenda-group "category"
+	when 
+		$user : RegisteredUser($score: score, $score >= 500, $score < 1050, $category: category, !category.equals("ADVANCED")) @Watch(!category, !previousCategory)
+	then
+		System.out.println("Category changed");
+		modify($user){ setPreviousCategory($category); }
+		modify($user){ setCategory("ADVANCED"); }
+		insert(new CategoryChangedEvent($user));
+	end
+
+rule "Rule INTERMEDIATE Rule if category changes"
+	agenda-group "category"
+	when 
+		$user : RegisteredUser($score: score, $score >= 200, $score < 500, $category: category, !category.equals("INTERMEDIATE")) @Watch(!category, !previousCategory)
+	then
+		System.out.println("Category changed");
+		modify($user){ setPreviousCategory($category); }
+		modify($user){ setCategory("INTERMEDIATE"); }
+		insert(new CategoryChangedEvent($user));
+	end
+
+rule "Rule BEGINNER Rule if category changes"
+	agenda-group "category"
+	when 
+		$user : RegisteredUser($score: score, $score >= 0, $score < 200, $category: category, !category.equals("BEGINNER")) @Watch(!category, !previousCategory)
+	then
+		System.out.println("Category changed");
+		modify($user){ setPreviousCategory($category); }
+		modify($user){ setCategory("BEGINNER"); }
+		insert(new CategoryChangedEvent($user));
+	end
+
+rule "Change agenda-group to new-week"
+	salience -Integer.MAX_VALUE
+	agenda-group "category"
+	when
+		eval(true)
+	then
+		System.out.println("Changed agenda-group from category to new-week");
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("new-week").setFocus();
+end

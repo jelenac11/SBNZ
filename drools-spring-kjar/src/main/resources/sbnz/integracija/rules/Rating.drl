@@ -13,5 +13,5 @@ rule "Rate meal"
 			sum($value)
 		)
 	then
-	    modify($meal){ setAverageGrade(($gradesSum + $newValue)/($meal.getGrades.size() + 1.0)); }
+	    modify($meal){ setAverageGrade(($gradesSum + $newValue)/($meal.getGrades().size() + 1.0)); }
 end

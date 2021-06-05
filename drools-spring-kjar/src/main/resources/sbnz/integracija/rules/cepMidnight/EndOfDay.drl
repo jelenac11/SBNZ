@@ -1,0 +1,92 @@
+package sbnz.integracija.rules.cepMidnight;
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.util.*;
+import better.me.events.*;
+import java.util.List;
+
+global MyLogger myLogger;
+
+declare window progress
+	@doc("user changed category at the end of a week event")
+	CategoryChangedEvent() over window:time(5m)
+end
+
+declare window midnightEvents
+	@doc("number of midnight events in the last 7 days")
+	MidnightEvent() over window:time(8d)
+end
+
+rule "When midnight event appears, set submit to true for current day"
+	agenda-group "end-day"
+	salience Integer.MAX_VALUE
+	no-loop
+    when
+    	$user: RegisteredUser($weeks: weeks)
+    	$day: Number(intValue > 0) from accumulate (
+			$me: MidnightEvent(user.getId() == $user.getId(), numOfWeek == $weeks.size(), $week: numOfWeek) from window midnightEvents,
+			count($me)
+		)
+    then
+    	myLogger.log("Submitting day, midnight event appeared: " + $day);
+        modify ($user) {getWeeks().get($weeks.size() - 1).getDays().get($day.intValue() - 1).setSubmitted(true);}
+end
+
+rule "Punish user if he failed today and yesterday - more/less than 10% calories intake, other days"
+	salience Integer.MAX_VALUE - 1
+	agenda-group "end-day"
+	no-loop
+    when
+    	$user: RegisteredUser($weeks: weeks, $week: weeks.get(weeks.size() - 1), $days: weeks.get(weeks.size() - 1).getDays())
+    	$day: Number(intValue > 1) from accumulate (
+			$me: MidnightEvent(user.getId() == $user.getId(), numOfWeek == $weeks.size()) from window midnightEvents,
+			count($me)
+		)
+		$today: Day($days.indexOf(this) == ($day - 1)) from $days
+		$yesterday: Day($days.indexOf(this) == ($day - 2)) from $days
+		eval($today.getCalories() < $week.getGoalCalories() * 0.9 || $today.getCalories() > $week.getGoalCalories() * 1.1)
+		eval($yesterday.getCalories() < $week.getGoalCalories() * 0.9 || $yesterday.getCalories() > $week.getGoalCalories() * 1.1)
+		eval(!($week.isCheat() == true && $day.intValue() == 2))
+		not(Alarm(user.getId() == $user.getId()))
+    then
+    	System.out.println("CALORIES - User failed other two days in a row: " + $user.getUsername());
+    	modify($user) {setScore($user.getScore() - 30);}
+        insert(new Alarm($user, "You failed to follow your nutrition plan in the last two days. Be more careful in following days."));
+end
+
+rule "Punish user if he failed today and yesterday - more/less than 10% proteins/carbs/fats intake"
+	salience Integer.MAX_VALUE - 2
+	agenda-group "end-day"
+	no-loop
+    when
+    	$user: RegisteredUser($weeks: weeks, $week: weeks.get(weeks.size() - 1), $days: weeks.get(weeks.size() - 1).getDays())
+    	$day: Number(intValue > 1) from accumulate (
+			$me: MidnightEvent(user.getId() == $user.getId(), numOfWeek == $weeks.size()) from window midnightEvents,
+			count($me)
+		)
+		$today: Day($days.indexOf(this) == ($day - 1)) from $days
+		$yesterday: Day($days.indexOf(this) == ($day - 2)) from $days
+		eval($today.getProteins() < $week.getGoalProteins() * 0.9 || $today.getProteins() > $week.getGoalProteins() * 1.1)
+		eval($yesterday.getProteins() < $week.getGoalProteins() * 0.9 || $yesterday.getProteins() > $week.getGoalProteins() * 1.1)
+		eval($today.getCarbs() < $week.getGoalCarbs() * 0.9 || $today.getCarbs() > $week.getGoalCarbs() * 1.1)
+		eval($yesterday.getCarbs() < $week.getGoalCarbs() * 0.9 || $yesterday.getCarbs() > $week.getGoalCarbs() * 1.1)
+		eval($today.getFats() < $week.getGoalFats() * 0.9 || $today.getFats() > $week.getGoalFats() * 1.1)
+		eval($yesterday.getFats() < $week.getGoalFats() * 0.9 || $yesterday.getFats() > $week.getGoalFats() * 1.1)
+		not(Alarm(user.getId() == $user.getId()))
+		eval(!($week.isCheat() == true && $day.intValue() == 2))
+    then
+    	System.out.println("CALORIES - User failed two days in a row: " + $user.getUsername());
+    	modify($user) {setScore($user.getScore() - 30);}
+        insert(new Alarm($user, "You failed to follow your nutrition plan in the last two days. Be more careful in following days."));
+end
+
+rule "Change agenda-group to score"
+	agenda-group "end-day"
+	salience -Integer.MAX_VALUE
+	when
+		MidnightEvent()
+	then
+		myLogger.log("Changed agenda-group from end-day to score");
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("score").setFocus();
+end

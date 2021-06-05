@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import better.me.dto.RegisteredUserDTO;
 import better.me.enums.ActivityLevel;
 import better.me.enums.BodyType;
+import better.me.enums.Category;
 import better.me.enums.Diet;
 import better.me.enums.Sex;
 import better.me.exceptions.NotLoggedInException;
@@ -84,6 +86,7 @@ public class RegisteredUserService {
 		rUser.setActivityCount(userFact.getActivityCount());
 		rUser.getWeeks().add(new WeekDB(weekFact, rUser));
 		
+		registeredUserRepository.save(rUser);
 		return rUser;
 	}
 	
@@ -115,6 +118,21 @@ public class RegisteredUserService {
 		return registeredUserRepository.findByEmail(email);
 	}
 
+	public RegisteredUserDB save(RegisteredUser user) {
+		RegisteredUserDB rUser = findByEmail(user.getEmail());
+		rUser.setCategory(Category.valueOf(user.getCategory()));
+		rUser.setPreviousCategory(Category.valueOf(user.getPreviousCategory()));
+		rUser.setScore(user.getScore());
+		if (user.getWeeks().size() != rUser.getWeeks().size()) {
+			rUser.getWeeks().add(new WeekDB(user.getWeeks().get(user.getWeeks().size() - 1), rUser));
+		}
+		return registeredUserRepository.save(rUser);
+	}
+
+	
+	public List<RegisteredUser> findAll() {
+		return registeredUserRepository.findAll().stream().map(RegisteredUser::new).collect(Collectors.toList());
+	}
 	public RegisteredUserDB findByUsername(String username) {
 		return registeredUserRepository.findByUsername(username);
 	}

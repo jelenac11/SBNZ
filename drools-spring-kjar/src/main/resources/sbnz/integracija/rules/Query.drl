@@ -8,13 +8,6 @@ import better.me.util.*;
 import java.util.ArrayList;
 import java.util.List;
 
-query checkIfWholeWeekIsSubmitted(Week $week)
-	 $num := Number(intValue == 7) from accumulate(
-		Day($t:this, submitted == true) from $week.getDays(),
-		count($t)
- 	 )
-end
-
 query mealContainsAllergens(Meal $meal, List $allergens)
 	 $num := Number(intValue > 0) from accumulate(
 		$ingredient: Ingredient($grocery: grocery, $t: this) from $meal.getIngredients()

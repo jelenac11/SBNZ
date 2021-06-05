@@ -36,6 +36,7 @@ public class RegisteredUser extends User {
 	private List<Grade> grades;
 	private List<Week> weeks;
 	private String ageCategory;
+	private boolean allowedToEat;
 
 	public RegisteredUser(RegisteredUserDB ru) {
 		this(ru.getAge(), ru.getSex().toString(), ru.getHeight(), ru.getWeight(), ru.getBodyType().toString(),
@@ -45,7 +46,7 @@ public class RegisteredUser extends User {
 				ru.getBmi(), ru.getActivityCount(), ru.getScore(),
 				(new ArrayList<GradeDB>(ru.getGrades())).stream().map(Grade::new).collect(Collectors.toList()),
 				(new ArrayList<WeekDB>(ru.getWeeks())).stream().map(Week::new).collect(Collectors.toList()),
-				ru.getAgeCategory().toString());
+				ru.getAgeCategory().toString(), ru.isAllowedToEat());
 		this.id = ru.getId();
 		this.username = ru.getUsername();
 		this.email = ru.getEmail();

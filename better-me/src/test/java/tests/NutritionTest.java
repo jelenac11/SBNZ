@@ -42,7 +42,7 @@ public class NutritionTest {
 	})
 	public void activityCountRule_allValuesGiven_shouldSetActivityCount(String activityLevel, double activityCount) {
 		RegisteredUser user = new RegisteredUser(22, "MALE", 170, 70, "ECTOMORPH", activityLevel, "VEGAN",
-				"BEGINNER", "BEGINNER", null, 0, 0, 0, null, null, "CHILD");
+				"BEGINNER", "BEGINNER", null, 0, 0, 0, null, null, "CHILD", true);
 
 		kieSession.insert(user);
 
@@ -63,7 +63,7 @@ public class NutritionTest {
 	public void calculateCaloriesRule_allValuesGiven_shouldSetGoalCalories(int age, String sex, double height,
 			double weight, String activityLevel, double goalCalories) {
 		RegisteredUser user = new RegisteredUser(age, sex, height, weight, "ECTOMORPH", activityLevel, "VEGAN",
-				"BEGINNER", "BEGINNER", null, 0, 0, 0, null, null, "CHILD");
+				"BEGINNER", "BEGINNER", null, 0, 0, 0, null, null, "CHILD", true);
 		Week week = new Week();
 
 		kieSession.insert(user);
@@ -86,7 +86,7 @@ public class NutritionTest {
 	public void calculateProteinsRule_allValuesGiven_shouldSetGoalProteins(double weight, Goal goal,
 			double goalProteins) {
 		RegisteredUser user = new RegisteredUser(22, "MALE", 175, weight, "ECTOMORPH", "INACTIVE", "VEGAN",
-				"BEGINNER", "BEGINNER", null, 0, 0, 0, null, null, "CHILD");
+				"BEGINNER", "BEGINNER", null, 0, 0, 0, null, null, "CHILD", true);
 		Week week = new Week();
 		week.setGoal(goal.toString());
 
@@ -107,7 +107,7 @@ public class NutritionTest {
 	public void calculateCarbsAndFatsRule_allValuesGiven_shouldSetGoalCarbsAndGoalFats(double weight, String bodyType, Goal goal,
 			double goalCarbs, double goalFats) {
 		RegisteredUser user = new RegisteredUser(22, "MALE", 170, weight, bodyType, "INACTIVE", "VEGAN",
-				"BEGINNER", "BEGINNER", null, 0, 0, 0, null, null, "CHILD");
+				"BEGINNER", "BEGINNER", null, 0, 0, 0, null, null, "CHILD", true);
 		Week week = new Week();
 		week.setGoal(goal.toString());
 
