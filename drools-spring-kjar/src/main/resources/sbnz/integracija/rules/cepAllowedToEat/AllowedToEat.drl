@@ -1,0 +1,39 @@
+package sbnz.integracija.rules.cepAllowedToEat;
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.events.*;
+import better.me.util.*;
+
+global MyLogger myLogger;
+
+declare NotAllowedToEatEvent
+    @role(event)
+    user: RegisteredUser
+end
+
+declare window timesEating
+	@doc("eaten meals events from users in last 6 hours")
+	UserAteMealEvent() over window:time(6h)
+end
+
+rule "More than 3 meals in 6 hours from same user"
+    when
+        $event: UserAteMealEvent($user : user)
+        Number(intValue >= 3) from accumulate (
+			$le: UserAteMealEvent(user.getId() == $user.getId()) from window timesEating,
+			count($le)
+		)
+		not (NotAllowedToEatEvent(user.getId() == $user.getId()))
+    then
+    	$user.setAllowedToEat(false);
+    	insert(new NotAllowedToEatEvent($user));
+end
+
+rule "Less than 3 meals in 6 hours from same user"
+    when
+       $event: UserAteMealEvent($user : user)
+       not (NotAllowedToEatEvent(user.getId() == $user.getId()) over window:time(6h))
+    then
+    	$user.setAllowedToEat(true);
+end

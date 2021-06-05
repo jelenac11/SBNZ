@@ -25,46 +25,50 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity(name = "weeks")
 public class WeekDB {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "week_id")
 	private Long id;
-	
+
 	@Column
 	private Goal goal;
-	
+
 	@Column
 	private double goalCalories;
-	
+
 	@Column
 	private double goalCarbs;
-	
+
 	@Column
 	private double goalProteins;
-	
+
 	@Column
 	private double goalFats;
-	
+
 	@Column
 	private boolean submitted;
-	
+
+	@Column
+	private boolean cheat;
+
 	@OneToMany(mappedBy = "week")
 	private Set<DayDB> days;
-	
+
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "user_id")
 	private UserDB user;
-	
+
 	public WeekDB(Week fact, RegisteredUserDB rUser) {
-		this(null, Goal.valueOf(fact.getGoal()), fact.getGoalCalories(), fact.getGoalCarbs(), fact.getGoalProteins(), fact.getGoalFats(), false, new HashSet<DayDB>(), rUser);
+		this(null, Goal.valueOf(fact.getGoal()), fact.getGoalCalories(), fact.getGoalCarbs(), fact.getGoalProteins(),
+				fact.getGoalFats(), false, fact.isCheat(), new HashSet<DayDB>(), rUser);
 		ArrayList<DayDB> days = new ArrayList<DayDB>();
 		for (int i = 0; i < 7; i++) {
 			days.add(new DayDB());
 		}
 		this.days = new HashSet<DayDB>(days);
 	}
-	
+
 	public WeekDB() {
 		ArrayList<DayDB> days = new ArrayList<DayDB>();
 		for (int i = 0; i < 7; i++) {

@@ -88,6 +88,9 @@ public class RegisteredUserDB extends UserDB {
 	@Column
 	@Enumerated(EnumType.STRING)
 	private AgeCategory ageCategory;
+	
+	@Column
+	private boolean allowedToEat;
 
 	public RegisteredUserDB(Long id) {
 		super(id);

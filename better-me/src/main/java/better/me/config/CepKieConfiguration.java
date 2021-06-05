@@ -28,5 +28,17 @@ public class CepKieConfiguration {
 		return kieSession;
 	}
 	
+	@Bean(name = "cepMidnightSession")
+	public KieSession cepMidnightSessionRealtimeClock() {
+		KieSession kieSession = kieContainer.newKieSession("cepMidnightSession");
+		kieSession.setGlobal("myLogger", new MyLogger());
+		return kieSession;
+	}
 	
+	@Bean(name = "cepAllowedToEatSession")
+	public KieSession cepAllowedToEatSessionRealtimeClock() {
+		KieSession kieSession = kieContainer.newKieSession("cepAllowedToEatSession");
+		kieSession.setGlobal("myLogger", new MyLogger());
+		return kieSession;
+	}
 }

@@ -1,7 +1,7 @@
 package better.me.enums;
 
 public enum Category {
-	BEGINNER("BEGINNER"), INTERMADIATE("INTERMEDIATE"), ADVANCED("ADVANCED"), PRO("PRO");
+	BEGINNER("BEGINNER"), INTERMEDIATE("INTERMEDIATE"), ADVANCED("ADVANCED"), PRO("PRO");
 	
 	private String value;
 

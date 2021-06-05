@@ -31,7 +31,7 @@ public class ScoreTest {
 		kieSession.getAgenda().getAgendaGroup("score").setFocus();
 		kieSession.setGlobal("myLogger", myLogger);
 	}
- 
+    
     @Test
     public void calculateScoreRule_NotAllDaysSubmitted_shouldNotCalculateScore() {
     	RegisteredUser user = new RegisteredUser();

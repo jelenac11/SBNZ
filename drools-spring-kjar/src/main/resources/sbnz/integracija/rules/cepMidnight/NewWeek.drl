@@ -1,0 +1,44 @@
+package sbnz.integracija.rules.cepMidnight;
+
+import better.me.enums.*;
+import better.me.model.*;
+import better.me.util.*;
+import better.me.events.*;
+
+declare window progress
+	@doc("user changed category at the end of a week event")
+	CategoryChangedEvent() over window:time(5m)
+end
+
+declare window midnightEvents
+	@doc("number of midnight events in the last 7 days")
+	MidnightEvent() over window:time(8d)
+end
+
+rule "Add cheat day if user made a progress"
+	agenda-group "new-week"
+	no-loop
+    when
+    	$user: RegisteredUser($previous: previousCategory, $category: category)
+    	eval(Category.valueOf($previous).compareTo(Category.valueOf($category)) < 0)
+    	CategoryChangedEvent(user.getId() == $user.getId()) from window progress
+    then
+    	System.out.println("User made progress: " + $user.getUsername());
+        modify ($user) {getWeeks().add(new Week(true));}
+end
+
+rule "User did not make progress, no cheat day"
+	salience -Integer.MAX_VALUE
+	agenda-group "new-week"
+	no-loop
+    when
+    	$user: RegisteredUser($previous: previousCategory, $category: category, $weeks: weeks)
+    	eval(Category.valueOf($previous).compareTo(Category.valueOf($category)) > 0 || Category.valueOf($previous).compareTo(Category.valueOf($category)) == 0)
+    	$day: Number(intValue == 7) from accumulate (
+			$me: MidnightEvent(user.getId() == $user.getId(), numOfWeek == $weeks.size()) from window midnightEvents,
+			count($me)
+		)
+    then
+    	System.out.println("User did not make progress: " + $user.getUsername());
+        modify ($user) {getWeeks().add(new Week(false));}
+end
