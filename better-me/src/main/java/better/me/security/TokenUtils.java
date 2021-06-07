@@ -62,9 +62,7 @@ public class TokenUtils {
 	}
 
 	public boolean canTokenBeRefreshed(String token, Date lastPasswordReset) {
-		final Date created = this.getIssuedAtDateFromToken(token);
-		return (!(this.isCreatedBeforeLastPasswordReset(created, lastPasswordReset))
-				&& (!(this.isTokenExpired(token)) || this.ignoreTokenExpiration(token)));
+		return (!(this.isTokenExpired(token)) || this.ignoreTokenExpiration(token));
 	}
 
 	public boolean validateToken(String token, UserDetails userDetails) {
@@ -132,10 +130,6 @@ public class TokenUtils {
 
 	public String getAuthHeaderFromHeader(HttpServletRequest request) {
 		return request.getHeader(AUTH_HEADER);
-	}
-
-	private Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
-		return true;
 	}
 
 	private Boolean isTokenExpired(String token) {

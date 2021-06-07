@@ -105,15 +105,11 @@
         }),
         methods : {
             register : function () {
-                this.axios
-                .post('http://localhost:8081/auth/sign-up', this.user)
-                .then(response => {
-                    this.conflict = false;
-                    console.log(response.data);
-                    this.$refs.formRegister.reset();
-                })
-                .catch(error => {
-                    console.log(error);
+                let newUser = this.user;
+                this.$store.dispatch('register', newUser)
+                .then(() => this.$router.push('/login'))
+                .catch(err => {
+                    console.log(err);
                     this.conflict = true;
                 });
             },

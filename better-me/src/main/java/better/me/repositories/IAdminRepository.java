@@ -8,4 +8,6 @@ import better.me.modelDB.AdminDB;
 @Repository
 public interface IAdminRepository extends JpaRepository<AdminDB, Long> {
 
+	AdminDB findByEmail(String email);
+
 }

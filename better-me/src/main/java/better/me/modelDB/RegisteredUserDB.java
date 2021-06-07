@@ -1,5 +1,6 @@
 package better.me.modelDB;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -103,6 +104,15 @@ public class RegisteredUserDB extends UserDB {
 
 	public RegisteredUserDB(String username, String email, String password, String firstName, String lastName, boolean allowedToLogin) {
 		super(username, email, password, firstName, lastName, allowedToLogin);
+		this.sex = Sex.MALE;
+		this.bodyType = BodyType.ECTOMORPH;
+		this.activityLevel = ActivityLevel.INACTIVE;
+		this.diet = Diet.OMNIVORE;
+		this.category = Category.BEGINNER;
+		this.previousCategory = Category.BEGINNER;
+		this.ageCategory = AgeCategory.CHILD;
+		this.allowedToEat = true;
+		this.allergens = new HashSet<AllergenDB>();
 	}
 
 }

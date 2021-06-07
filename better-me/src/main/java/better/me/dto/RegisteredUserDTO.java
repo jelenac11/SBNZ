@@ -8,14 +8,12 @@ import better.me.modelDB.AllergenDB;
 import better.me.modelDB.RegisteredUserDB;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class RegisteredUserDTO {
+public class RegisteredUserDTO extends ResponseUserDTO {
 
 	private String username;
 	private String email;
@@ -36,11 +34,12 @@ public class RegisteredUserDTO {
 	private int score;
 
 	public RegisteredUserDTO(RegisteredUserDB user) {
-		this(user.getUsername(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getAge(),
+		this(user.getRealUsername(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getAge(),
 				user.getSex().getValue(), user.getHeight(), user.getWeight(), user.getBodyType().getValue(),
 				user.getActivityLevel().getValue(), user.getDiet().getValue(), user.getCategory().getValue(),
 				user.getPreviousCategory().getValue(), user.getBmi(), new ArrayList<AllergenDB>(user.getAllergens()),
 				user.getActivityCount(), user.getScore());
+		this.role = "ROLE_REGISTERED_USER";
 	}
 
 	public RegisteredUserDTO(RegisteredUser user) {
@@ -48,5 +47,10 @@ public class RegisteredUserDTO {
 				user.getHeight(), user.getWeight(), user.getBodyType(), user.getActivityLevel(), user.getDiet(),
 				user.getCategory(), user.getPreviousCategory(), user.getBmi(), null, user.getActivityCount(),
 				user.getScore());
+		this.role = "ROLE_REGISTERED_USER";
+	}
+	
+	public RegisteredUserDTO() {
+		this.role = "ROLE_REGISTERED_USER";
 	}
 }

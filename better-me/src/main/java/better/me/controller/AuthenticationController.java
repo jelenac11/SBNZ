@@ -22,18 +22,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import better.me.dto.AdminDTO;
+import better.me.dto.RegisteredUserDTO;
+import better.me.dto.ResponseLoginDTO;
+import better.me.dto.ResponseUserDTO;
 import better.me.dto.UserDTO;
 import better.me.dto.UserLoginDTO;
-import better.me.dto.UserResDTO;
-import better.me.dto.UserTokenStateDTO;
 import better.me.events.LoginEvent;
 import better.me.helper.RegisteredUserMapper;
-import better.me.helper.UserMapper;
 import better.me.model.User;
 import better.me.modelDB.AuthorityDB;
 import better.me.modelDB.RegisteredUserDB;
 import better.me.modelDB.UserDB;
 import better.me.security.TokenUtils;
+import better.me.services.AdminService;
 import better.me.services.RegisteredUserService;
 import better.me.services.UserService;
 
@@ -53,18 +55,20 @@ public class AuthenticationController {
 
 	@Autowired
 	private RegisteredUserService registeredUserService;
+	
+	@Autowired
+	private AdminService adminService;
 
 	@Autowired
 	private RegisteredUserMapper registeredUserMapper;
 
-	private UserMapper userMapper;
 
 	@Autowired
 	@Qualifier(value = "cepLoginSession")
 	private KieSession cepLoginSession;
 	
 	public AuthenticationController() {
-		userMapper = new UserMapper();
+		
 	}
 
 	@SuppressWarnings("null")
@@ -76,7 +80,7 @@ public class AuthenticationController {
 			authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
 					authenticationRequest.getEmail(), authenticationRequest.getPassword()));
 		} catch (BadCredentialsException e) {
-			user = userDetailsService.findByUsername(authenticationRequest.getEmail());
+			user = userDetailsService.findByEmail(authenticationRequest.getEmail());
 			if (user != null) {
 				LoginEvent loginEvent = new LoginEvent(new User(user), false);
 				cepLoginSession.insert(loginEvent);
@@ -91,22 +95,29 @@ public class AuthenticationController {
 		} catch (DisabledException e) {
 			return new ResponseEntity<>("Account is not verified. Check your email.", HttpStatus.FORBIDDEN);
 		}
-
+		
+		user = userDetailsService.findByEmail(authenticationRequest.getEmail());
 		LoginEvent loginEvent = new LoginEvent(new User(user), false);
 		cepLoginSession.insert(loginEvent);
 		cepLoginSession.fireAllRules();	
 		user.setAllowedToLogin(loginEvent.getUser().isAllowedToLogin());
 		userDetailsService.save(user);
-		if(user.isAllowedToLogin()) {
+		if (user.isAllowedToLogin()) {
 			@SuppressWarnings("unchecked")
 			List<AuthorityDB> auth = (List<AuthorityDB>) user.getAuthorities();
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 
 			String jwt = tokenUtils.generateToken(user.getEmail(), auth.get(0).getName());
-			int expiresIn = tokenUtils.getExpiredIn();
 
-			return ResponseEntity.ok(new UserTokenStateDTO(jwt, (long) expiresIn));
+			ResponseUserDTO responseUser = null;
+			if (auth.get(0).getName().equals("ROLE_REGISTERED_USER")) {
+				responseUser = new RegisteredUserDTO(this.registeredUserService.findByEmail(user.getEmail()));
+			} else {
+				responseUser = new AdminDTO(this.adminService.findByEmail(user.getEmail()));
+			}
+			ResponseLoginDTO loginResponse = new ResponseLoginDTO(responseUser, jwt);
+			return new ResponseEntity<>(loginResponse, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>("You can not login after three failed attempts. Try again after 5 minutes.", HttpStatus.FORBIDDEN);
 		}
@@ -132,9 +143,20 @@ public class AuthenticationController {
 	}
 
 	@GetMapping(value = "/current-user")
-	public ResponseEntity<UserResDTO> currentUser() {
+	public ResponseEntity<?> currentUser() {
+		if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals("anonymousUser")) {
+			return new ResponseEntity<>("Session expired.", HttpStatus.UNAUTHORIZED);
+		}
 		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return new ResponseEntity<>(userMapper.toResDTO(current), HttpStatus.OK);
+		@SuppressWarnings("unchecked")
+		List<AuthorityDB> auth = (List<AuthorityDB>) current.getAuthorities();
+		ResponseUserDTO responseUser = null;
+		if (auth.get(0).getName().equals("ROLE_REGISTERED_USER")) {
+			responseUser = new RegisteredUserDTO(this.registeredUserService.findByEmail(current.getEmail()));
+		} else {
+			responseUser = new AdminDTO(this.adminService.findByEmail(current.getEmail()));
+		}
+		return new ResponseEntity<>(responseUser, HttpStatus.OK);
 	}
 
 }
