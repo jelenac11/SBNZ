@@ -68,22 +68,12 @@
 	},
     methods : {
 		login : function () {
-            this.axios
-            .post('http://localhost:8081/auth/login', this.userLogin)
-            .then(response => {
-                this.wrong = false;
-                this.token = response.data.accessToken;
-                localStorage.setItem("token", this.token);
-                this.axios
-                .get('http://localhost:8081/auth/current-user', { headers: { Authorization: 'Bearer ' + this.token }} )
-                .then(response => {
-                    console.log(response.data);
-                    this.$router.replace({ name: 'Home' });
-                })
-                .catch(error => { console.log(error); });
-            })
-            .catch(error => {
-                console.log(error);
+            let email = this.userLogin.email;
+            let password = this.userLogin.password;
+            this.$store.dispatch('login', { email, password })
+            .then(() => this.$router.push('/'))
+            .catch(err => {
+                console.log(err);
                 this.wrong = true;
             });
 		},
@@ -92,6 +82,6 @@
 </script>
 <style scoped>
     .login-container {
-        background-image: url(../assets/222.png);
+        background-image: url(../assets/666.png);
     }
 </style>

@@ -56,7 +56,7 @@ public class UserDB implements UserDetails {
 	@Column(unique = false, nullable = false)
 	private String lastName;
 	
-	@Column
+	@Column(nullable = false)
 	private boolean allowedToLogin;
 
 	@Column(name = "last_password_reset_date")
@@ -137,6 +137,10 @@ public class UserDB implements UserDetails {
 	@Override
 	public String getUsername() {
 		return this.email;
+	}
+	
+	public String getRealUsername() {
+		return this.username;
 	}
 
 	public Long getId() {

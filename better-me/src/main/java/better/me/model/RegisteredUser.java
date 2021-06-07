@@ -48,7 +48,7 @@ public class RegisteredUser extends User {
 				(new ArrayList<WeekDB>(ru.getWeeks())).stream().map(Week::new).collect(Collectors.toList()),
 				ru.getAgeCategory().toString(), ru.isAllowedToEat());
 		this.id = ru.getId();
-		this.username = ru.getUsername();
+		this.username = ru.getRealUsername();
 		this.email = ru.getEmail();
 		this.firstName = ru.getFirstName();
 		this.lastName = ru.getLastName();

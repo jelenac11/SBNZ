@@ -22,4 +22,8 @@ public class AdminService {
 		return a.get();
 	}
 
+	public AdminDB findByEmail(String email) {
+		return adminRepository.findByEmail(email);
+	}
+
 }
