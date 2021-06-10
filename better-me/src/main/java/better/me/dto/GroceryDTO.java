@@ -1,6 +1,7 @@
 package better.me.dto;
 
 import better.me.model.Grocery;
+import better.me.modelDB.GroceryDB;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,15 @@ public class GroceryDTO {
 	private double fats;
 	
 	public GroceryDTO(Grocery g) {
+		this.name = g.getName();
+		this.diet = g.getDiet().getValue();
+		this.calories = g.getCalories();
+		this.carbs = g.getCarbs();
+		this.proteins = g.getProteins();
+		this.fats = g.getFats();
+	}
+	
+	public GroceryDTO(GroceryDB g) {
 		this.name = g.getName();
 		this.diet = g.getDiet().getValue();
 		this.calories = g.getCalories();

@@ -17,12 +17,10 @@ import better.me.enums.Diet;
 import better.me.model.Grocery;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "groceries")
 public class GroceryDB {
@@ -72,6 +70,10 @@ public class GroceryDB {
 		this.carbs = g.getCarbs();
 		this.proteins = g.getProteins();
 		this.fats = g.getFats();
+		this.ingredients = new HashSet<IngredientDB>();
+	}
+	
+	public GroceryDB() {
 		this.ingredients = new HashSet<IngredientDB>();
 	}
 

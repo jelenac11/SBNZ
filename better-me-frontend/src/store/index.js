@@ -166,6 +166,19 @@ export default new Vuex.Store({
             });
         },
 
+        addNewMeal({ commit }, meal) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/meals', data: meal, method: 'POST' })
+                .then(resp => {
+                    commit('setAllergens', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
         addNewAgeTemplate({ commit }, ageBoundaries) {
             return new Promise((resolve, reject) => {
                 axios({url: 'http://localhost:8081/api/age/change-age-boundaries', data: ageBoundaries, method: 'POST' })

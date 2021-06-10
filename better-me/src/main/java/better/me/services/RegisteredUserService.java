@@ -69,7 +69,8 @@ public class RegisteredUserService {
 		rUser.setDiet(Diet.valueOf(user.getDiet()));
 		ArrayList<AllergenDB> allergs = new ArrayList<AllergenDB>();
 		for (AllergenDB allergen : user.getAllergens()) {
-			allergs.add(allergenRepository.findById(allergen.getId()).get());
+			AllergenDB a = allergenRepository.findByName(allergen.getName()).get();
+			allergs.add(a);
 		}
 		rUser.setAllergens(new HashSet<AllergenDB>(allergs));
 		registeredUserRepository.save(rUser);

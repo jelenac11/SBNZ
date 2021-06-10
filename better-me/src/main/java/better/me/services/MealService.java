@@ -118,12 +118,17 @@ public class MealService {
 		return meal;
 	}
 
-	public String create(NewMealDTO dto) {
+	public String create(NewMealDTO dto) throws RequestException {
+		MealDB existName = mealRepository.findByName(dto.getName());
+		if (existName != null) {
+			throw new RequestException("Meal with given name already exists");
+		}
 		Meal m = new Meal();
 		m.setName(dto.getName());
 		m.setTime(dto.getTime());
 		m.setIngredients(dto.getIngredients());
 		m.setDescription(dto.getDescription());
+		System.out.println(m.getIngredients().size());
 
 		kieSession.getAgenda().getAgendaGroup("new-meal").setFocus();
 

@@ -1,6 +1,7 @@
 package better.me.services;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,15 @@ public class NutritionService {
 
 	public Object getAllAllergens() {
 		return allergenRepository.findAll();
+	}
+	
+	public List<GroceryDTO> getAllGroceries() {
+		List<GroceryDTO> forReturn = new ArrayList<GroceryDTO>();
+		List<GroceryDB> groceries = groceryRepository.findAll();
+		for (GroceryDB groceryDB : groceries) {
+			forReturn.add(new GroceryDTO(groceryDB));
+		}
+		return forReturn;
 	}
 
 	public ResponseEntity<?> createGrocery(GroceryDTO dto) {

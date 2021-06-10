@@ -135,14 +135,14 @@
                                             label="Select Allergens"
                                             multiple
                                         >
-                                        <template v-slot:selection="{ item, index }">
-                                            <v-chip v-if="index === 0">
-                                                <span>{{ item }}</span>
-                                            </v-chip>
-                                            <span v-if="index === 1" class="grey--text text-caption">
-                                                (+{{ userInfo.allergens.length - 1 }} others)
-                                            </span>
-                                        </template>
+                                            <template v-slot:selection="{ item, index }">
+                                                <v-chip v-if="index === 0">
+                                                    <span>{{ item }}</span>
+                                                </v-chip>
+                                                <span v-if="index === 1" class="grey--text text-caption">
+                                                    (+{{ userInfo.allergens.length - 1 }} others)
+                                                </span>
+                                            </template>
                                         </v-select>
                                     </v-col>
                                 </v-row>
@@ -227,7 +227,8 @@
         methods : {
             fillInfo : function () {
                 const userInfo = JSON.parse(JSON.stringify(this.currentUser));
-                let allergs = this.userInfo.allergens.map((a, index) => this.allergens[index]);
+                let allergs = this.userInfo.allergens.map((a) => this.allergens[this.allergenNames.indexOf(a)]);
+                console.log(allergs);
                 userInfo.allergens = allergs;
                 userInfo.height = this.userInfo.height;
                 userInfo.weight = this.userInfo.weight;
