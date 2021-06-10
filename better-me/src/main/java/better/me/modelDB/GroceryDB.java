@@ -1,5 +1,6 @@
 package better.me.modelDB;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -11,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import better.me.dto.GroceryDTO;
 import better.me.enums.Diet;
 import better.me.model.Grocery;
 import lombok.AllArgsConstructor;
@@ -60,7 +62,17 @@ public class GroceryDB {
 		this.carbs = g.getCarbs();
 		this.proteins = g.getProteins();
 		this.fats = g.getFats();
-		this.ingredients = null;
+		this.ingredients = new HashSet<IngredientDB>();
+	}
+	
+	public GroceryDB(GroceryDTO g) {
+		this.name = g.getName();
+		this.diet = Diet.valueOf(g.getDiet());
+		this.calories = g.getCalories();
+		this.carbs = g.getCarbs();
+		this.proteins = g.getProteins();
+		this.fats = g.getFats();
+		this.ingredients = new HashSet<IngredientDB>();
 	}
 
 }

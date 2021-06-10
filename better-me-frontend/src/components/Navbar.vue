@@ -39,56 +39,54 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+    import { mapState } from 'vuex'
 
-export default {
-
-    name: 'Navbar',
-
-    data: () => ({
-    
-    }),
-    methods: {
-        logOut: function() {
-            this.$store.dispatch('logout')
-            .then(() => {
-                this.$router.push('/login')
-            });
-        },
-        goToHome: function() {
-            let path = '/';
-            if (this.$route.path !== path) this.$router.push(path);
-        },
-        goToRecipes: function() {
-            let path = '/recipes';
-            if (this.$route.path !== path) this.$router.push(path);
-        },
-        goToAddMeal: function() {
-            let path = '/add-meal';
-            if (this.$route.path !== path) this.$router.push(path);
-        },
-        goToAddGrocery: function() {
-            let path = '/add-grocery';
-            if (this.$route.path !== path) this.$router.push(path);
-        },
-        goToAgeTemplate: function() {
-            let path = '/age-template';
-            if (this.$route.path !== path) this.$router.push(path);
-        },
-        goToCategoryTemplate: function() {
-            let path = '/category-template';
-            if (this.$route.path !== path) this.$router.push(path);
-        },
-    },
-    computed: {
-        ...mapState({
-            currentUser: state => state.user
+    export default {
+        name: 'Navbar',
+        data: () => ({
+        
         }),
-    },
-    created: function () {
-        this.$store.dispatch('getCurrentUser');
-    }
-};
+        methods: {
+            logOut: function() {
+                this.$store.dispatch('logout')
+                .then(() => {
+                    this.$router.push('/login')
+                });
+            },
+            goToHome: function() {
+                let path = '/';
+                if (this.$route.path !== path) this.$router.push(path);
+            },
+            goToRecipes: function() {
+                let path = '/recipes';
+                if (this.$route.path !== path) this.$router.push(path);
+            },
+            goToAddMeal: function() {
+                let path = '/add-meal';
+                if (this.$route.path !== path) this.$router.push(path);
+            },
+            goToAddGrocery: function() {
+                let path = '/add-grocery';
+                if (this.$route.path !== path) this.$router.push(path);
+            },
+            goToAgeTemplate: function() {
+                let path = '/age-template';
+                if (this.$route.path !== path) this.$router.push(path);
+            },
+            goToCategoryTemplate: function() {
+                let path = '/category-template';
+                if (this.$route.path !== path) this.$router.push(path);
+            },
+        },
+        computed: {
+            ...mapState({
+                currentUser: state => state.user
+            }),
+        },
+        created: function () {
+            this.$store.dispatch('getCurrentUser');
+        }
+    };
 </script>
 
 <style scoped>

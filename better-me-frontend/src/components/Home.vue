@@ -2,7 +2,7 @@
     <div class="home-container">
         <Navbar></Navbar>
         <v-layout align-center justify-center>
-            <v-flex xs12 sm8 md10 v-if="currentUser.height !== 0">
+            <v-flex xs12 sm8 md10 v-if="fillInfoCompleted === true">
                 <v-card class="elevation-12" style="padding: 20px; margin-top: 40px;">
                     <v-card-text>
                         <h1 style="color: #4CAF50; margin-bottom: 30px; margin-top: 10px">My Nutrition Plan</h1>
@@ -13,7 +13,7 @@
                 </v-card>
             </v-flex>
 
-            <v-flex xs12 sm8 md6 v-else>
+            <v-flex xs12 sm8 md6 v-if="fillInfoCompleted === false">
                 <v-card class="elevation-12" style="padding: 20px; margin-top: 40px;">
                     <v-card-text>
                         <h1 style="color: #4CAF50; margin-bottom: 30px; margin-top: 10px">Fill Information About Yourself</h1>
@@ -23,7 +23,7 @@
                                     <v-col cols="12" sm="6" md="6">
                                         <v-select
                                             color="green"
-                                            prepend-icon="person"
+                                            prepend-icon="transgender"
                                             v-model="userInfo.sex"
                                             :items="genderItems"
                                             label="Gender"
@@ -35,7 +35,7 @@
                                     <v-col cols="12" sm="6" md="6">
                                         <v-text-field
                                             color="green"
-                                            prepend-icon="person"
+                                            prepend-icon="elderly"
                                             name="age"
                                             label="Age"
                                             type="number"
@@ -50,7 +50,7 @@
                                     <v-col cols="12" sm="6" md="6" class="mt-n7">
                                         <v-text-field
                                             color="green"
-                                            prepend-icon="person"
+                                            prepend-icon="height"
                                             name="height"
                                             label="Height"
                                             type="number"
@@ -64,7 +64,7 @@
                                     <v-col cols="12" sm="6" md="6" class="mt-n7">
                                         <v-text-field
                                             color="green"
-                                            prepend-icon="person"
+                                            prepend-icon="monitor_weight"
                                             name="weight"
                                             label="Weight"
                                             type="number"
@@ -78,13 +78,22 @@
                                 </v-row>
                                 <v-row>
                                     <v-col cols="12" sm="6" md="6" class="mt-n7">
-                                        <v-select
+                                        <v-text-field
+                                            v-if="bodyTypeCompleted"
                                             color="green"
-                                            prepend-icon="person"
+                                            prepend-icon="accessibility"
+                                            label="Body Type"
+                                            type="text"
+                                            v-model="bodyType"
+                                            disabled
+                                        ></v-text-field>
+                                        <v-select
+                                            v-else
+                                            color="green"
+                                            prepend-icon="accessibility"
                                             v-model="userInfo.bodyType"
                                             :items="bodyTypeItems"
                                             label="Body Type"
-                                            data-vv-name="bodyType"
                                             :rules="bodyTypeRules"
                                             :disabled="!bodyTypeDetermined"
                                             required
@@ -94,7 +103,7 @@
                                     <v-col cols="12" sm="6" md="6" class="mt-n7">
                                         <v-select
                                             color="green"
-                                            prepend-icon="person"
+                                            prepend-icon="directions_run"
                                             v-model="userInfo.activityLevel"
                                             :items="activityLevelItems"
                                             label="Activity Level"
@@ -108,7 +117,7 @@
                                     <v-col cols="12" sm="6" md="6" class="mt-n7">
                                         <v-select
                                             color="green"
-                                            prepend-icon="person"
+                                            prepend-icon="restaurant"
                                             v-model="userInfo.diet"
                                             :items="dietItems"
                                             label="Diet"
@@ -118,7 +127,23 @@
                                         ></v-select>
                                     </v-col>
                                     <v-col cols="12" sm="6" md="6" class="mt-n7">
-                                        
+                                        <v-select
+                                            color="green"
+                                            prepend-icon="no_food"
+                                            v-model="userInfo.allergens"
+                                            :items="allergenNames"
+                                            label="Select Allergens"
+                                            multiple
+                                        >
+                                        <template v-slot:selection="{ item, index }">
+                                            <v-chip v-if="index === 0">
+                                                <span>{{ item }}</span>
+                                            </v-chip>
+                                            <span v-if="index === 1" class="grey--text text-caption">
+                                                (+{{ userInfo.allergens.length - 1 }} others)
+                                            </span>
+                                        </template>
+                                        </v-select>
                                     </v-col>
                                 </v-row>
                             </v-container>
@@ -136,34 +161,43 @@
                 </v-card>
             </v-flex>
         </v-layout>
+        <BodyTypeDialog v-model="showBodyTypeDialog"></BodyTypeDialog>
     </div>
 </template>
 
 <script>
     import Navbar from './Navbar.vue'
+    import BodyTypeDialog from './BodyTypeDialog.vue'
     import { mapState } from 'vuex'
 
     export default {
         name: 'Home',
         components: {
-            Navbar
+            Navbar,
+            BodyTypeDialog
         },
         data: () => ({
             userInfo: {
                 sex: null,
-                age: null,
                 height: null,
                 weight: null,
+                age: null,
                 bodyType: null,
                 activityLevel: null,
                 diet: null,
-                allergens: null,
+                allergens: []
             },
+            showBodyTypeDialog: false,
             bodyTypeDetermined: true,
-            genderItems: ['MALE', 'FEMALE'],
-            bodyTypeItems: ['ECTOMORPH', 'MESOMORPH', 'ENDOMORPH', 'I am not sure'],
-            activityLevelItems: ['INACTIVE', 'SEDENTARY', 'LIGHTLY_ACTIVE', 'MODERATELY_ACTIVE', 'VERY_ACTIVE'],
-            dietItems: ['VEGAN', 'VEGETARIAN', 'OMNIVORE'],
+            fillInfoCompleted: null,
+            genderItems: ['Male', 'Female'],
+            realGenderItems: ['MALE', 'FEMALE'],
+            bodyTypeItems: ['Ectomorph', 'Mesomorph', 'Endomorph', 'I am not sure'],
+            realBodyTypeItems: ['ECTOMORPH', 'MESOMORPH', 'ENDOMORPH', 'I am not sure'],
+            activityLevelItems: ['Inactive', 'Sedentary', 'Lightly active', 'Moderately active', 'Very active'],
+            realActivityLevelItems: ['INACTIVE', 'SEDENTARY', 'LIGHTLY_ACTIVE', 'MODERATELY_ACTIVE', 'VERY_ACTIVE'],
+            dietItems: ['Vegan', 'Vegetarian', 'Omnivore'],
+            realDietItems: ['VEGAN', 'VEGETARIAN', 'OMNIVORE'],
             isValid: true,
             genderRules: [ 
                 v => !!v || 'Gender is required!',
@@ -192,22 +226,49 @@
         }),
         methods : {
             fillInfo : function () {
-                console.log(this.userInfo);
+                const userInfo = JSON.parse(JSON.stringify(this.currentUser));
+                let allergs = this.userInfo.allergens.map((a, index) => this.allergens[index]);
+                userInfo.allergens = allergs;
+                userInfo.height = this.userInfo.height;
+                userInfo.weight = this.userInfo.weight;
+                userInfo.age = this.userInfo.age;
+                userInfo.sex = this.realGenderItems[this.genderItems.indexOf(this.userInfo.sex)];
+                userInfo.bodyType = this.realBodyTypeItems[this.bodyTypeItems.indexOf(this.userInfo.bodyType)];
+                if (this.bodyType !== '') {
+                    userInfo.bodyType = this.bodyType;
+                }
+                userInfo.activityLevel = this.realActivityLevelItems[this.activityLevelItems.indexOf(this.userInfo.activityLevel)];
+                userInfo.diet = this.realDietItems[this.dietItems.indexOf(this.userInfo.diet)];
+                this.$store.dispatch('fillInfo', userInfo)
+                .then(resp => {
+                    console.log(resp.data);
+                    this.fillInfoCompleted = true;
+                })
+                .catch(err => {
+                    console.log(err);
+                });
             },
             bodyTypeChanged : function () {
                 if (this.userInfo.bodyType === 'I am not sure') {
                     this.bodyTypeDetermined = false;
-                    console.log("Determine");
+                    this.showBodyTypeDialog = true;
                 }
             },
         },
         computed: {
             ...mapState({
-                currentUser: state => state.user
+                currentUser: state => state.user,
+                allergens: state => state.allergens,
+                allergenNames: state => state.allergens.map(a => a.name),
+                bodyType: state => state.bodyType,
+                bodyTypeCompleted: state => state.bodyType !== '',
             }),
         },
-        created: function () {
-            this.$store.dispatch('getCurrentUser');
+        mounted: function () {
+            this.$store.dispatch('getCurrentUser').then((resp) => {
+                this.fillInfoCompleted = resp.data.age !== 0;
+            });
+            this.$store.dispatch('getAllergens');
         }
     }
 </script>

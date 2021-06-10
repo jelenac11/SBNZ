@@ -4,19 +4,26 @@ import java.util.ArrayList;
 
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import better.me.dto.GroceryDTO;
 import better.me.dto.RegisteredUserDTO;
 import better.me.enums.Category;
 import better.me.exceptions.NotLoggedInException;
 import better.me.model.RegisteredUser;
 import better.me.model.Report;
 import better.me.model.Week;
+import better.me.modelDB.AllergenDB;
 import better.me.modelDB.DayDB;
+import better.me.modelDB.GroceryDB;
 import better.me.modelDB.RegisteredUserDB;
 import better.me.modelDB.UserDB;
 import better.me.modelDB.WeekDB;
+import better.me.repositories.IAllergenRepository;
+import better.me.repositories.IGroceryRepository;
 import better.me.repositories.IRegisteredUser;
 
 @Service
@@ -24,6 +31,12 @@ public class NutritionService {
 
 	@Autowired
 	private IRegisteredUser registeredUserRepository;
+	
+	@Autowired
+	private IAllergenRepository allergenRepository;
+	
+	@Autowired
+	private IGroceryRepository groceryRepository;
 	
 	@Autowired
 	private KieSession kieSession;
@@ -72,6 +85,22 @@ public class NutritionService {
 		kieSession.dispose();
 		
 		return report;
+	}
+
+	public Object getAllAllergens() {
+		return allergenRepository.findAll();
+	}
+
+	public ResponseEntity<?> createGrocery(GroceryDTO dto) {
+		GroceryDB existName = groceryRepository.findByName(dto.getName());
+		if (existName != null) {
+			return new ResponseEntity<>("Grocery with name " + dto.getName() + " already exists.", HttpStatus.CONFLICT);
+		}
+		AllergenDB allergen = new AllergenDB();
+		allergen.setName(dto.getName());
+		groceryRepository.save(new GroceryDB(dto));
+		allergenRepository.save(allergen);
+		return new ResponseEntity<>("Grocery " + dto.getName() + " added.", HttpStatus.OK);
 	}
 
 	

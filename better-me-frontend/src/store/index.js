@@ -1,4 +1,3 @@
-import simulator from "./simulator";
 import Vue from 'vue'
 import Vuex from "vuex";
 import axios from 'axios'
@@ -19,6 +18,8 @@ export default new Vuex.Store({
         user: {},
         allMeals: [],
         allGroceries: [],
+        allergens: [],
+        bodyType: '',
     },
     getters : {
         authenticated: state => !!state.token,
@@ -29,11 +30,23 @@ export default new Vuex.Store({
             state.allMeals = meals;
         },
 
+        setAllergens (state, allergens) {
+            state.allergens = allergens;
+        },
+
+        setGroceries (state, groceries) {
+            state.allGroceries = groceries;
+        },
+
+        setBodyType (state, bodyType) {
+            state.bodyType = bodyType;
+        },
+
         auth_success_token(state, token) {
             state.token = token;
         },
 
-        auth_success_user(state, user) {
+        setCurrentUser(state, user) {
             state.user = user;
         },
 
@@ -45,8 +58,54 @@ export default new Vuex.Store({
     },
     actions: {
         getAllMeals ({ commit }) {
-            simulator.getMeals(meals => {
-              commit('setMeals', meals);
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/filter/meals', data: { name: '', fromTime: 0, toTime: 0, descending: false }, method: 'POST' })
+                .then(resp => {
+                    commit('setMeals', resp.data.sorted);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        getAllergens ({ commit }) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/nutrition/all-allergens', method: 'GET' })
+                .then(resp => {
+                    commit('setAllergens', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        getAllGroceriesAdmin ({ commit }) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/nutrition/all-groceries', method: 'GET' })
+                .then(resp => {
+                    commit('setGroceries', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        determineBodyType({ commit }, bodyType) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/body-type/determine', data: bodyType, method: 'POST' })
+                .then(resp => {
+                    commit('setBodyType', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
             });
         },
 
@@ -59,7 +118,7 @@ export default new Vuex.Store({
                     localStorage.setItem('token', token);
                     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
                     commit('auth_success_token', token);
-                    commit('auth_success_user', user);
+                    commit('setCurrentUser', user);
                     resolve(resp);
                 })
                 .catch(err => {
@@ -80,6 +139,59 @@ export default new Vuex.Store({
             });
         },
 
+        fillInfo({ commit }, user) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/registered-users/fill-info', data: user, method: 'POST' })
+                .then(resp => {
+                    const user = resp.data;
+                    commit('setCurrentUser', user);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        addNewGrocery({ commit }, grocery) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/nutrition/new-grocery', data: grocery, method: 'POST' })
+                .then(resp => {
+                    commit('setGroceries', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        addNewAgeTemplate({ commit }, ageBoundaries) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/age/change-age-boundaries', data: ageBoundaries, method: 'POST' })
+                .then(resp => {
+                    commit('setGroceries', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        addNewCategoryTemplate({ commit }, categoryBoundaries) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/categories/change-boundaries', data: categoryBoundaries, method: 'POST' })
+                .then(resp => {
+                    commit('setGroceries', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
         logout({ commit }) {
             return new Promise((resolve) => {
                 commit('logout');
@@ -94,7 +206,7 @@ export default new Vuex.Store({
                 axios({url: 'http://localhost:8081/auth/current-user', method: 'GET' })
                 .then(resp => {
                     const user = resp.data;
-                    commit('auth_success_user', user);
+                    commit('setCurrentUser', user);
                     resolve(resp);
                 })
                 .catch(err => {
