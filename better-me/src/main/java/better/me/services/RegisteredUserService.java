@@ -1,5 +1,6 @@
 package better.me.services;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,7 @@ import better.me.modelDB.AuthorityDB;
 import better.me.modelDB.RegisteredUserDB;
 import better.me.modelDB.UserDB;
 import better.me.modelDB.WeekDB;
+import better.me.repositories.IAllergenRepository;
 import better.me.repositories.IRegisteredUser;
 import better.me.repositories.IUserRepository;
 
@@ -35,6 +37,9 @@ public class RegisteredUserService {
 
 	@Autowired
 	private IRegisteredUser registeredUserRepository;
+	
+	@Autowired
+	private IAllergenRepository allergenRepository;
 
 	@Autowired
 	private IUserRepository userRepository;
@@ -62,7 +67,11 @@ public class RegisteredUserService {
 		rUser.setBodyType(BodyType.valueOf(user.getBodyType()));
 		rUser.setActivityLevel(ActivityLevel.valueOf(user.getActivityLevel()));
 		rUser.setDiet(Diet.valueOf(user.getDiet()));
-		rUser.setAllergens(new HashSet<AllergenDB>(user.getAllergens()));
+		ArrayList<AllergenDB> allergs = new ArrayList<AllergenDB>();
+		for (AllergenDB allergen : user.getAllergens()) {
+			allergs.add(allergenRepository.findById(allergen.getId()).get());
+		}
+		rUser.setAllergens(new HashSet<AllergenDB>(allergs));
 		registeredUserRepository.save(rUser);
 		
 		RegisteredUserDB modifiedUser = determineBmiAndNutrition(rUser);

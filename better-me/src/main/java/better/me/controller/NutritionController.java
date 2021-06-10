@@ -6,9 +6,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import better.me.dto.GroceryDTO;
 import better.me.services.NutritionService;
 
 @RestController
@@ -32,6 +35,24 @@ public class NutritionController {
 	public ResponseEntity<?> getReport() {
 		try {
 			return new ResponseEntity<>(nutritionService.getReport(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping(value = "/all-allergens")
+	public ResponseEntity<?> getAllAllergens() {
+		try {
+			return new ResponseEntity<>(nutritionService.getAllAllergens(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping(value = "/new-grocery")
+	public ResponseEntity<?> createGrocery(@RequestBody GroceryDTO dto) {
+		try {
+			return new ResponseEntity<>(nutritionService.createGrocery(dto), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}

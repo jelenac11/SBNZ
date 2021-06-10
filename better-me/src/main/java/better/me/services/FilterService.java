@@ -68,12 +68,18 @@ public class FilterService {
 		kieSession.dispose();
 		
 		SortedMealsDTO retval = new SortedMealsDTO();
+		System.out.println("sorted: " + sorted.getSortedList().size());
+		System.out.println("with allergens: " + withAllergens.size());
 		for (Meal m: sorted.getSortedList()) {
 			if (withAllergens.contains(m)) {
+				System.out.println("Allergen: " + m.getName());
 				retval.getSorted().add(new ResponseMealDTO(m, true));
+			} else {
+				System.out.println("Not: " + m.getName());
+				retval.getSorted().add(new ResponseMealDTO(m, false));				
 			}
-			retval.getSorted().add(new ResponseMealDTO(m, false));
 		}
+		System.out.println("retval: " + retval.getSorted().size());
 		return retval;
 	}
 	
@@ -107,6 +113,16 @@ public class FilterService {
 				retval.getSorted().add(new ResponseGroceryDTO(g, true));
 			}
 			retval.getSorted().add(new ResponseGroceryDTO(g, false));
+		}
+		return retval;
+	}
+
+	public Object getAllGroceries() {
+		List<GroceryDB> allGroceries = groceryRepository.findAll();
+		List<Grocery> groceries = allGroceries.stream().map(Grocery::new).collect(Collectors.toList());
+		List<ResponseGroceryDTO> retval = new ArrayList<ResponseGroceryDTO>();
+		for (Grocery g: groceries) {
+			retval.add(new ResponseGroceryDTO(g, false));
 		}
 		return retval;
 	}

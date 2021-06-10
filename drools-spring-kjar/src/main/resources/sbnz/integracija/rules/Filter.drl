@@ -10,6 +10,33 @@ import java.util.List;
 
 global MyLogger myLogger;
 
+rule "Filter meals by diet"
+	salience Integer.MAX_VALUE
+	agenda-group "filter"
+	no-loop
+	lock-on-active
+	when
+		$allMeals: List(size > 0)
+		$user: RegisteredUser($diet: diet)
+        $meals: List ()  from accumulate ( 
+			Meal ($meal: this, $ingredients: ingredients) from $allMeals,
+			init( List<Meal> notDietMeals = new ArrayList(); ),
+			action(  
+				for (Object ingredient : $ingredients) {
+					if (((Ingredient)ingredient).getGrocery().getDiet().compareTo(Diet.valueOf($diet)) > 0) {
+						myLogger.log("adding meal not diet: " + $meal.getName() + " because of ingredient: " + ((Ingredient)ingredient).getGrocery().getName());
+						notDietMeals.add($meal);
+						break;
+					}
+				}
+			 ),
+			result ( notDietMeals )
+		)
+	then
+		myLogger.log("Filtering meals by diet. Removed meals: " + $meals.size());
+		modify ( $allMeals ) { removeAll($meals); }
+end	
+
 rule "Filter meals by allergens"
 	salience 100
 	agenda-group "filter"
@@ -22,6 +49,7 @@ rule "Filter meals by allergens"
 			$meal: Meal($ingredients: ingredients) from $allMeals,
 			init( List<Meal> withAllergens = new ArrayList(); ),
 			action(
+				myLogger.log("allMeals.size() = " + $allMeals.size());
 				for (Object ingredient : $ingredients) {
 					for (Object allergen : $allergens) {
 						if (((Allergen)allergen).getName().equals( ((Ingredient)ingredient).getGrocery().getName())) {
@@ -34,6 +62,7 @@ rule "Filter meals by allergens"
 			result ( withAllergens )
 		)
 	then 
+		myLogger.log("2. allMeals.size() = " + $allMeals.size());
 		myLogger.log("Filtering meals by allergens");
 		modify ($notOkMeals) {addAll($meals);}
 end
@@ -67,33 +96,7 @@ rule "Filter meals by name"
 		myLogger.log("Filtering meals by name");
 		modify ( $allMeals ) { removeAll($allMeals); }
 		modify ( $allMeals) { addAll($meals); }
-end
-
-rule "Filter meals by diet"
-	salience Integer.MAX_VALUE
-	agenda-group "filter"
-	no-loop
-	lock-on-active
-	when
-		$allMeals: List(size > 0)
-		$user: RegisteredUser($diet: diet)
-        $meals: List ()  from accumulate ( 
-			Meal ($meal: this, $ingredients: ingredients) from $allMeals,
-			init( List<Meal> notDietMeals = new ArrayList(); ),
-			action(  
-				for (Object ingredient : $ingredients) {
-					if (((Ingredient)ingredient).getGrocery().getDiet().compareTo(Diet.valueOf($diet)) > 0) {
-						notDietMeals.add($meal);
-						break;
-					}
-				}
-			 ),
-			result ( notDietMeals )
-		)
-	then
-		myLogger.log("Filtering meals by diet");
-		modify ( $allMeals ) { removeAll($meals); }
-end		
+end	
 		
 rule "Sort meals by calories ascending"
 	salience -$cals

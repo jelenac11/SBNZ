@@ -53,7 +53,10 @@
                                     <v-row>
                                         <v-col v-for="item in props.items" :key="item.name" cols="12" sm="6" md="4" lg="3">
                                             <v-card>
-                                                <v-card-title class="subheading font-weight-bold green--text">
+                                                <v-card-title class="subheading font-weight-bold orange--text" v-if="item.allergen">
+                                                    {{ item.name }}<v-icon class="ml-2" color="orange" medium>warning</v-icon>
+                                                </v-card-title>
+                                                <v-card-title class="subheading font-weight-bold green--text" v-else>
                                                     {{ item.name }}
                                                 </v-card-title>
                                                 <v-divider></v-divider>

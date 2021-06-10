@@ -27,6 +27,8 @@ public class AgeController {
 		try {
 			return new ResponseEntity<>(ageService.changeBoundaries(boundaries), HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
