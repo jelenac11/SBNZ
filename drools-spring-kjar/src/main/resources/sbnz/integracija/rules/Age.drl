@@ -41,7 +41,3 @@ rule "Classify User By Age CHILD"
 	then
 	    modify($user){ setAgeCategory("CHILD"); }
 	end
-
-
-modify($user){ setAgeCategory("ELDER"); }
-end

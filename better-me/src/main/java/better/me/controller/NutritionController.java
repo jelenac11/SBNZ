@@ -49,6 +49,15 @@ public class NutritionController {
 		}
 	}
 	
+	@GetMapping(value = "/all-groceries")
+	public ResponseEntity<?> getAllGroceries() {
+		try {
+			return new ResponseEntity<>(nutritionService.getAllGroceries(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@PostMapping(value = "/new-grocery")
 	public ResponseEntity<?> createGrocery(@RequestBody GroceryDTO dto) {
 		try {

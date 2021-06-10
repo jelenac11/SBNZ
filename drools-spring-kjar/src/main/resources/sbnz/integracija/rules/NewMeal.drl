@@ -17,7 +17,7 @@ rule "Calculate calories for created meal"
 			sum(($grocery.getCalories() * $grams) / 100)
 		)
     then
-        myLogger.log("Calculating calories for created meal");
+        myLogger.log("Calculated calories for created meal: " + $value);
         modify ($meal) {setCalories($value);}
 end
 
@@ -30,7 +30,7 @@ rule "Calculate fats for created meal"
 			sum(($grocery.getFats() * $grams) / 100)
 		)
     then
-        myLogger.log("Calculating fats for created meal");
+        myLogger.log("Calculated fats for created meal: " + $value);
         modify ($meal) {setFats($value);}
 end
 
@@ -43,7 +43,7 @@ rule "Calculate proteins for created meal"
 			sum(($grocery.getProteins() * $grams) / 100)
 		)
     then
-        myLogger.log("Calculating proteins for created meal");
+        myLogger.log("Calculated proteins for created meal: " + $value);
         modify ($meal) {setProteins($value);}
 end
 
@@ -56,6 +56,6 @@ rule "Calculate carbs for created meal"
 			sum(($grocery.getCarbs() * $grams) / 100)
 		)
     then
-        myLogger.log("Calculating carbs for created meal");
+        myLogger.log("Calculated carbs for created meal: " + $value);
         modify ($meal) {setCarbs($value);}
 end
