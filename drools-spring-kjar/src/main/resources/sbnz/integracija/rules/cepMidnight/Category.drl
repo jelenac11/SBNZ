@@ -7,14 +7,14 @@ import better.me.events.*;
 rule "Rule PRO Rule"
 	agenda-group "category"
 	when 
-		$user : RegisteredUser($score: score, $score >= 2320, $score < 2147483647, category.equals("PRO")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 2470, $score < 2147483647, category.equals("PRO")) @Watch(!category, !previousCategory)
 	then
 		modify($user){ setCategory("PRO"); }
 	end
 rule "Rule PRO Rule if category changes"
 	agenda-group "category"
 	when 
-		$user : RegisteredUser($score: score, $score >= 2320, $score < 2147483647, $category: category, !category.equals("PRO")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 2470, $score < 2147483647, $category: category, !category.equals("PRO")) @Watch(!category, !previousCategory)
 	then
 		modify($user){ setPreviousCategory($category); }
 		modify($user){ setCategory("PRO"); }
@@ -24,14 +24,14 @@ rule "Rule PRO Rule if category changes"
 rule "Rule ADVANCED Rule"
 	agenda-group "category"
 	when 
-		$user : RegisteredUser($score: score, $score >= 500, $score < 2320, category.equals("ADVANCED")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 740, $score < 2470, category.equals("ADVANCED")) @Watch(!category, !previousCategory)
 	then
 		modify($user){ setCategory("ADVANCED"); }
 	end
 rule "Rule ADVANCED Rule if category changes"
 	agenda-group "category"
 	when 
-		$user : RegisteredUser($score: score, $score >= 500, $score < 2320, $category: category, !category.equals("ADVANCED")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 740, $score < 2470, $category: category, !category.equals("ADVANCED")) @Watch(!category, !previousCategory)
 	then
 		modify($user){ setPreviousCategory($category); }
 		modify($user){ setCategory("ADVANCED"); }
@@ -41,14 +41,14 @@ rule "Rule ADVANCED Rule if category changes"
 rule "Rule INTERMEDIATE Rule"
 	agenda-group "category"
 	when 
-		$user : RegisteredUser($score: score, $score >= 200, $score < 500, category.equals("INTERMEDIATE")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 200, $score < 740, category.equals("INTERMEDIATE")) @Watch(!category, !previousCategory)
 	then
 		modify($user){ setCategory("INTERMEDIATE"); }
 	end
 rule "Rule INTERMEDIATE Rule if category changes"
 	agenda-group "category"
 	when 
-		$user : RegisteredUser($score: score, $score >= 200, $score < 500, $category: category, !category.equals("INTERMEDIATE")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 200, $score < 740, $category: category, !category.equals("INTERMEDIATE")) @Watch(!category, !previousCategory)
 	then
 		modify($user){ setPreviousCategory($category); }
 		modify($user){ setCategory("INTERMEDIATE"); }
@@ -71,5 +71,4 @@ rule "Rule BEGINNER Rule if category changes"
 		modify($user){ setCategory("BEGINNER"); }
 		insert(new CategoryChangedEvent($user));
 	end
-
 

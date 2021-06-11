@@ -3,6 +3,7 @@ package better.me.services;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -53,6 +54,10 @@ public class AgeService {
         data.add(new AgeBoundaries(dto.getAdultFrom(),  dto.getElderFrom(), "ADULT"));
         data.add(new AgeBoundaries(dto.getElderFrom(),  Integer.MAX_VALUE, "ELDER"));
         
+        PrintWriter writer = new PrintWriter(ageDRL);
+        writer.print("");
+        writer.close();
+
         InputStream template = new FileInputStream(ageTemplate);
         String drl = (new ObjectDataCompiler()).compile(data, template);
         Files.write(Paths.get(ageDRL), drl.getBytes(), StandardOpenOption.WRITE);

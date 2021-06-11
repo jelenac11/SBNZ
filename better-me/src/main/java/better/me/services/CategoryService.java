@@ -3,6 +3,7 @@ package better.me.services;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -51,6 +52,10 @@ public class CategoryService {
         data.add(new CategoryBoundaries("INTERMEDIATE", dto.getIntermediateFrom(), dto.getAdvancedFrom()));
         data.add(new CategoryBoundaries("ADVANCED", dto.getAdvancedFrom(), dto.getProFrom()));
         data.add(new CategoryBoundaries("PRO", dto.getProFrom(), Integer.MAX_VALUE));
+        
+        PrintWriter writer = new PrintWriter(categoryDRL);
+        writer.print("");
+        writer.close();
         
         InputStream template = new FileInputStream(categoryTemplate);
         String drl = (new ObjectDataCompiler()).compile(data, template);

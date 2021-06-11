@@ -38,18 +38,18 @@ rule "Filter meals by diet"
 end	
 
 rule "Filter meals by allergens"
-	salience 100
+	salience -Integer.MAX_VALUE
 	agenda-group "filter"
 	lock-on-active
 	when
         $user: RegisteredUser($allergens:allergens, $allergens != null)
-        $allMeals: List(size > 0)
+        $sorted: SortedMeals($sortedList: sortedList)
         $notOkMeals: List(size == 0)
 		$meals : List() from accumulate ( 
-			$meal: Meal($ingredients: ingredients) from $allMeals,
+			$meal: Meal($ingredients: ingredients) from $sortedList,
 			init( List<Meal> withAllergens = new ArrayList(); ),
 			action(
-				myLogger.log("allMeals.size() = " + $allMeals.size());
+				myLogger.log("sortedList.size() = " + $sortedList.size());
 				for (Object ingredient : $ingredients) {
 					for (Object allergen : $allergens) {
 						if (((Allergen)allergen).getName().equals( ((Ingredient)ingredient).getGrocery().getName())) {
@@ -62,7 +62,7 @@ rule "Filter meals by allergens"
 			result ( withAllergens )
 		)
 	then 
-		myLogger.log("2. allMeals.size() = " + $allMeals.size());
+		myLogger.log("2. sortedList.size() = " + $sortedList.size());
 		myLogger.log("Filtering meals by allergens");
 		modify ($notOkMeals) {addAll($meals);}
 end
@@ -107,6 +107,7 @@ rule "Sort meals by calories ascending"
 	    $meal: Meal( $cals: calories)
 	    $allMeals: List(size > 0, this contains $meal)
 	then
+		myLogger.log("SallMeals.size() = " + $allMeals.size());
 		myLogger.log("Sorting meals by calories ascending");
 		modify( $sorted ){ getSortedList().add( $meal ) }
 		delete($meal)

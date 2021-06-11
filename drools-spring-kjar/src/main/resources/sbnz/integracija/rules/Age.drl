@@ -5,7 +5,7 @@ import better.me.model.*;
 rule "Classify User By Age ELDER"
 	agenda-group "age"
 	when
-	    $user: RegisteredUser( age >= 103 && age < 2147483647 ) @Watch(!ageCategory)
+	    $user: RegisteredUser( age >= 67 && age < 2147483647 ) @Watch(!ageCategory)
 	then
 	    modify($user){ setAgeCategory("ELDER"); }
 	end
@@ -13,7 +13,7 @@ rule "Classify User By Age ELDER"
 rule "Classify User By Age ADULT"
 	agenda-group "age"
 	when
-	    $user: RegisteredUser( age >= 30 && age < 103 ) @Watch(!ageCategory)
+	    $user: RegisteredUser( age >= 34 && age < 67 ) @Watch(!ageCategory)
 	then
 	    modify($user){ setAgeCategory("ADULT"); }
 	end
@@ -21,7 +21,7 @@ rule "Classify User By Age ADULT"
 rule "Classify User By Age YOUNG_ADULT"
 	agenda-group "age"
 	when
-	    $user: RegisteredUser( age >= 20 && age < 30 ) @Watch(!ageCategory)
+	    $user: RegisteredUser( age >= 22 && age < 34 ) @Watch(!ageCategory)
 	then
 	    modify($user){ setAgeCategory("YOUNG_ADULT"); }
 	end
@@ -29,7 +29,7 @@ rule "Classify User By Age YOUNG_ADULT"
 rule "Classify User By Age TEEN"
 	agenda-group "age"
 	when
-	    $user: RegisteredUser( age >= 13 && age < 20 ) @Watch(!ageCategory)
+	    $user: RegisteredUser( age >= 13 && age < 22 ) @Watch(!ageCategory)
 	then
 	    modify($user){ setAgeCategory("TEEN"); }
 	end
@@ -41,3 +41,5 @@ rule "Classify User By Age CHILD"
 	then
 	    modify($user){ setAgeCategory("CHILD"); }
 	end
+
+
