@@ -1,4 +1,4 @@
-package sbnz.integracija.rules.cepReport;
+package sbnz.integracija.rules.cep;
 
 import better.me.enums.*;
 import better.me.model.*;
@@ -21,6 +21,7 @@ end
 
 rule "New meal eaten event added, create Meal statistics event"
 	salience Integer.MAX_VALUE - 1
+	agenda-group "admin-reports"
 	when
 		$event : MealEatenEvent($meal: meal);
 		not MealStatisticsEvent($meal.getName() == meal.getMeal());
@@ -31,6 +32,7 @@ end
 
 rule "Meal already eaten and meal statistics event exists in the memory"
 	salience Integer.MAX_VALUE
+	agenda-group "admin-reports"
 	when
 		$event : MealEatenEvent($meal: meal);
 		$mealStats: MealStatisticsEvent($meal.getName() == meal.getMeal());
@@ -40,6 +42,7 @@ rule "Meal already eaten and meal statistics event exists in the memory"
 end
 
 rule "Number of all meals eaten in the last 30 days"
+	agenda-group "admin-reports"
 	when
 		$r: AdminReport();
 		accumulate(
@@ -52,6 +55,7 @@ rule "Number of all meals eaten in the last 30 days"
 end
 
 rule "Get 5 most eaten meals in the last 30 days"
+	agenda-group "admin-reports"
 	salience -Integer.MAX_VALUE
 	when
 		$r: AdminReport($meals: mostPopularMeals, mostPopularMeals.size() < 5);

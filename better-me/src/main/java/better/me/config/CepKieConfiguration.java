@@ -14,30 +14,9 @@ public class CepKieConfiguration {
 	@Autowired
 	private KieContainer kieContainer;
 	
-	@Bean(name = "cepReportSession")
+	@Bean(name = "cepSession")
 	public KieSession cepReportSessionRealtimeClock() {
-		KieSession kieSession = kieContainer.newKieSession("cepReportSession");
-		kieSession.setGlobal("myLogger", new MyLogger());
-		return kieSession;
-	}
-	
-	@Bean(name = "cepLoginSession")
-	public KieSession cepLoginSessionRealtimeClock() {
-		KieSession kieSession = kieContainer.newKieSession("cepLoginSession");
-		kieSession.setGlobal("myLogger", new MyLogger());
-		return kieSession;
-	}
-	
-	@Bean(name = "cepMidnightSession")
-	public KieSession cepMidnightSessionRealtimeClock() {
-		KieSession kieSession = kieContainer.newKieSession("cepMidnightSession");
-		kieSession.setGlobal("myLogger", new MyLogger());
-		return kieSession;
-	}
-	
-	@Bean(name = "cepAllowedToEatSession")
-	public KieSession cepAllowedToEatSessionRealtimeClock() {
-		KieSession kieSession = kieContainer.newKieSession("cepAllowedToEatSession");
+		KieSession kieSession = kieContainer.newKieSession("cepSession");
 		kieSession.setGlobal("myLogger", new MyLogger());
 		return kieSession;
 	}

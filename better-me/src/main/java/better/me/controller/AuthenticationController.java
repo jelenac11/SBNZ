@@ -64,7 +64,7 @@ public class AuthenticationController {
 
 
 	@Autowired
-	@Qualifier(value = "cepLoginSession")
+	@Qualifier(value = "cepSession")
 	private KieSession cepLoginSession;
 	
 	public AuthenticationController() {

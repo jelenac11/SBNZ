@@ -4,20 +4,8 @@
    <kbase name="rules" packages="sbnz.integracija.rules">
         <ksession name="session" type="stateful"/>
    </kbase>
-   <kbase name="cepReport" eventProcessingMode="stream" packages="sbnz.integracija.rules.cepReport">
-    	<ksession name="cepReportSession" clockType="realtime"/>
-        <ksession name="cepReportKsessionPseudoClock" clockType="pseudo"/>
-    </kbase>
-    <kbase name="cepLogin" eventProcessingMode="stream" packages="sbnz.integracija.rules.cepLogin">
-    	<ksession name="cepLoginSession" clockType="realtime"/>
-        <ksession name="cepLoginSessionPseudoClock" clockType="pseudo"/>
-    </kbase>
-    <kbase name="cepMidnight" eventProcessingMode="stream" packages="sbnz.integracija.rules.cepMidnight">
-    	<ksession name="cepMidnightSession" clockType="realtime"/>
-        <ksession name="cepMidnightSessionPseudoClock" clockType="pseudo"/>
-    </kbase>
-    <kbase name="cepAllowedToEat" eventProcessingMode="stream" packages="sbnz.integracija.rules.cepAllowedToEat">
-    	<ksession name="cepAllowedToEatSession" clockType="realtime"/>
-        <ksession name="cepAllowedToEatSessionPseudoClock" clockType="pseudo"/>
+   <kbase name="cep" eventProcessingMode="stream" packages="sbnz.integracija.rules.cep">
+    	<ksession name="cepSession" clockType="realtime"/>
+        <ksession name="cepKsessionPseudoClock" clockType="pseudo"/>
     </kbase>
 </kmodule>

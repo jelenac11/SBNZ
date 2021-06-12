@@ -32,7 +32,7 @@ public class CepTest {
 	public void test_cepMidnightEventTest() {
 		KieServices ks = KieServices.Factory.get();
 		KieContainer kc = ks.newKieClasspathContainer();
-		KieSession ksession = kc.newKieSession("cepMidnightSessionPseudoClock");
+		KieSession ksession = kc.newKieSession("cepKsessionPseudoClock");
 		ksession.getAgenda().getAgendaGroup("end-day").setFocus();
 		SessionPseudoClock clock = ksession.getSessionClock();
 		ksession.setGlobal("myLogger", myLogger);
@@ -132,13 +132,13 @@ public class CepTest {
     	week2.setGoalCarbs(200);
     	week2.setGoalFats(100);
     	
-    	week2.getDays().set(0, new Day(1L, false, 1000, 200, 150, 100, false, null)); // lose kalorije
-    	week2.getDays().set(1, new Day(2L, false, 1000, 200, 150, 100, false, null)); // lose kalorije
-    	week2.getDays().set(2, new Day(3L, false, 1000, 200, 150, 100, false, null)); // lose kalorije
-    	week2.getDays().set(3, new Day(4L, false, 2000, 100, 100, 200, false, null)); // losi makronutrijenti
-    	week2.getDays().set(4, new Day(5L, false, 2000, 100, 100, 200, false, null));
-    	week2.getDays().set(5, new Day(6L, false, 2000, 200, 150, 100, false, null));
-    	week2.getDays().set(6, new Day(7L, false, 1000, 100, 100, 200, false, null));
+    	week2.getDays().set(0, new Day(1L, false, 1000, 100, 10, 0, false, null)); // lose kalorije
+    	week2.getDays().set(1, new Day(2L, false, 1000, 100, 10, 0, false, null)); // lose kalorije
+    	week2.getDays().set(2, new Day(3L, false, 1000, 100, 10, 0, false, null)); // lose kalorije
+    	week2.getDays().set(3, new Day(4L, false, 2000, 100, 100, 100, false, null)); 
+    	week2.getDays().set(4, new Day(5L, false, 2000, 100, 100, 200, false, null)); //losi makronutrijenti
+    	week2.getDays().set(5, new Day(6L, false, 2000, 0, 50, 10, false, null)); // losi makro
+    	week2.getDays().set(6, new Day(7L, false, 1000, 200, 0, 100, false, null));
     	
     	ksession.insert(user);
     	
@@ -165,7 +165,7 @@ public class CepTest {
     	ksession.fireAllRules();
     	
     	assertEquals(true, week2.getDays().get(2).isSubmitted());
-    	assertEquals(203, user.getScore());
+    	assertEquals(183, user.getScore());
     	
     	ksession.insert(new MidnightEvent(user, 2));
     	ksession.getAgenda().getAgendaGroup("end-day").setFocus();
@@ -177,8 +177,26 @@ public class CepTest {
     	clock.advanceTime(1, TimeUnit.DAYS);
     	ksession.fireAllRules();
     	
+    	ksession.insert(new MidnightEvent(user, 2));
+    	ksession.getAgenda().getAgendaGroup("end-day").setFocus();
+    	clock.advanceTime(1, TimeUnit.DAYS);
+    	ksession.fireAllRules();
+    	
+    	assertEquals(true, week2.getDays().get(3).isSubmitted());
     	assertEquals(true, week2.getDays().get(4).isSubmitted());
-    	assertEquals(173, user.getScore());
+    	assertEquals(true, week2.getDays().get(5).isSubmitted());
+    	assertEquals(133, user.getScore());
+    	
+    	ksession.insert(new MidnightEvent(user, 2));
+    	ksession.getAgenda().getAgendaGroup("end-day").setFocus();
+    	clock.advanceTime(1, TimeUnit.DAYS);
+    	ksession.fireAllRules();
+    	
+    	assertEquals(true, week2.getDays().get(6).isSubmitted());
+    	assertEquals(172, user.getScore());
+    	assertEquals(3, user.getWeeks().size());
+    	assertEquals("BEGINNER", user.getCategory());
+    	assertEquals(false, user.getWeeks().get(2).isCheat());
     }
 
 	/*
@@ -190,7 +208,7 @@ public class CepTest {
 	public void test_cepReportRulesTestTop5EatenMeals() {
 		KieServices ks = KieServices.Factory.get();
 		KieContainer kc = ks.newKieClasspathContainer();
-		KieSession ksession = kc.newKieSession("cepReportKsessionPseudoClock");
+		KieSession ksession = kc.newKieSession("cepKsessionPseudoClock");
 		SessionPseudoClock clock = ksession.getSessionClock();
 		ksession.setGlobal("myLogger", myLogger);
 
@@ -212,26 +230,27 @@ public class CepTest {
 		AdminReport r = new AdminReport();
 
 		FactHandle reportFactHandle = ksession.insert(r);
-		ksession.insert(new MealEatenEvent(meal1));
-		ksession.insert(new MealEatenEvent(meal1));
-		ksession.insert(new MealEatenEvent(meal2));
-		ksession.insert(new MealEatenEvent(meal2));
-		ksession.insert(new MealEatenEvent(meal2));
-		ksession.insert(new MealEatenEvent(meal2));
-		ksession.insert(new MealEatenEvent(meal3));
-		ksession.insert(new MealEatenEvent(meal3));
-		ksession.insert(new MealEatenEvent(meal3));
-		ksession.insert(new MealEatenEvent(meal4));
-		ksession.insert(new MealEatenEvent(meal4));
-		ksession.insert(new MealEatenEvent(meal4));
-		ksession.insert(new MealEatenEvent(meal4));
-		ksession.insert(new MealEatenEvent(meal4));
-		ksession.insert(new MealEatenEvent(meal5));
-		ksession.insert(new MealEatenEvent(meal5));
-		ksession.insert(new MealEatenEvent(meal5));
-		ksession.insert(new MealEatenEvent(meal5));
-		ksession.insert(new MealEatenEvent(meal5));
-		ksession.insert(new MealEatenEvent(meal5));
+		ksession.getAgenda().getAgendaGroup("admin-reports").setFocus();
+		
+		for (int i = 0; i < 2; i++) {
+			ksession.insert(new MealEatenEvent(meal1));
+		}
+		
+		for (int i = 0; i < 4; i++) {
+			ksession.insert(new MealEatenEvent(meal2));
+		}
+		
+		for (int i = 0; i < 3; i++) {
+			ksession.insert(new MealEatenEvent(meal3));
+		}
+
+		for (int i = 0; i < 5; i++) {
+			ksession.insert(new MealEatenEvent(meal4));
+		}
+		
+		for (int i = 0; i < 6; i++) {
+			ksession.insert(new MealEatenEvent(meal5));
+		}
 		ksession.insert(new MealEatenEvent(meal6));
 		ksession.insert(new MealEatenEvent(meal7));
 
@@ -277,7 +296,8 @@ public class CepTest {
 	public void test_cepReportRulesTestTop5RatedMeals() {
 		KieServices ks = KieServices.Factory.get();
 		KieContainer kc = ks.newKieClasspathContainer();
-		KieSession ksession = kc.newKieSession("cepReportKsessionPseudoClock");
+		KieSession ksession = kc.newKieSession("cepKsessionPseudoClock");
+		ksession.getAgenda().getAgendaGroup("admin-reports").setFocus();
 		SessionPseudoClock clock = ksession.getSessionClock();
 		ksession.setGlobal("myLogger", myLogger);
 
@@ -357,7 +377,7 @@ public class CepTest {
 	public void testUnsuccessfulEatingAfterThreeMeals() {
 		KieServices ks = KieServices.Factory.get();
 		KieContainer kc = ks.newKieClasspathContainer();
-		KieSession ksession = kc.newKieSession("cepAllowedToEatSessionPseudoClock");
+		KieSession ksession = kc.newKieSession("cepKsessionPseudoClock");
 		SessionPseudoClock clock = ksession.getSessionClock();
 		ksession.setGlobal("myLogger", myLogger);
 		
@@ -386,7 +406,7 @@ public class CepTest {
 	public void testSuccessfulEating() {
 		KieServices ks = KieServices.Factory.get();
 		KieContainer kc = ks.newKieClasspathContainer();
-		KieSession ksession = kc.newKieSession("cepAllowedToEatSessionPseudoClock");
+		KieSession ksession = kc.newKieSession("cepKsessionPseudoClock");
 		ksession.setGlobal("myLogger", myLogger);
 		
 		RegisteredUser u = new RegisteredUser();
@@ -407,7 +427,7 @@ public class CepTest {
 	public void testUnsuccessfulLoginAfterThreeAttempts() {
 		KieServices ks = KieServices.Factory.get();
 		KieContainer kc = ks.newKieClasspathContainer();
-		KieSession ksession = kc.newKieSession("cepLoginSession");
+		KieSession ksession = kc.newKieSession("cepSession");
 		ksession.setGlobal("myLogger", myLogger);
 		
 		User u = new User(1L, "aleksag12", "aleksa.g.98@gmail.com", "Aleksa", "Goljovic", true);
@@ -430,7 +450,7 @@ public class CepTest {
 	public void testSuccessfulLoginWhenNoUnsuccessfulLogingEventsInWorkingMemory() {
 		KieServices ks = KieServices.Factory.get();
 		KieContainer kc = ks.newKieClasspathContainer();
-		KieSession ksession = kc.newKieSession("cepLoginSession");
+		KieSession ksession = kc.newKieSession("cepSession");
 		ksession.setGlobal("myLogger", myLogger);
 
 		User u = new User(1L, "aleksag12", "aleksa.g.98@gmail.com", "Aleksa", "Goljovic", true);
@@ -450,7 +470,7 @@ public class CepTest {
 	public void testSuccessfulLoginAfter5MinutesOfBlocking() {
 		KieServices ks = KieServices.Factory.get();
 		KieContainer kc = ks.newKieClasspathContainer();
-		KieSession ksession = kc.newKieSession("cepLoginSessionPseudoClock");
+		KieSession ksession = kc.newKieSession("cepKsessionPseudoClock");
 		SessionPseudoClock clock = ksession.getSessionClock();
 		ksession.setGlobal("myLogger", myLogger);
 

@@ -22,12 +22,8 @@ import better.me.services.ReportService;
 public class CronJobs {
 
 	@Autowired
-	@Qualifier(value = "cepReportSession")
-	private KieSession cepReportSession;
-
-	@Autowired
-	@Qualifier(value = "cepMidnightSession")
-	private KieSession cepMidnightSession;
+	@Qualifier(value = "cepSession")
+	private KieSession cepSession;
 
 	@Autowired
 	private ReportService reportService;
@@ -42,10 +38,11 @@ public class CronJobs {
 	public void fireReportRules() {
 		AdminReport report = new AdminReport();
 		report.setDate(new Date());
-		FactHandle factHandle = cepReportSession.insert(report);
-		cepReportSession.fireAllRules();
+		FactHandle factHandle = cepSession.insert(report);
+		cepSession.getAgenda().getAgendaGroup("admin-reports").setFocus();
+		cepSession.fireAllRules();
 		reportService.save(report);
-		cepReportSession.delete(factHandle);
+		cepSession.delete(factHandle);
 	}
 
 	@Scheduled(cron = "0 0 0 * * *")
@@ -54,12 +51,12 @@ public class CronJobs {
 		List<RegisteredUser> users = registeredUserService.findAll().stream()
 				.filter(user -> user.getWeeks().get(user.getWeeks().size() - 1).getGoal() != null)
 				.collect(Collectors.toList());
-		List<FactHandle> userFacts = users.stream().map(user -> cepMidnightSession.insert(user))
+		List<FactHandle> userFacts = users.stream().map(user -> cepSession.insert(user))
 				.collect(Collectors.toList());
-		users.forEach(user -> cepMidnightSession.insert(new MidnightEvent(user, user.getWeeks().size())));
-		cepMidnightSession.fireAllRules();
+		users.forEach(user -> cepSession.insert(new MidnightEvent(user, user.getWeeks().size())));
+		cepSession.fireAllRules();
 		users.forEach(user -> registeredUserService.save(user));
-		userFacts.forEach(user -> cepMidnightSession.delete(user));
+		userFacts.forEach(user -> cepSession.delete(user));
 	}
 
 }

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import better.me.dto.CategoryBoundariesDTO;
+import better.me.events.ScoreChangedEvent;
 import better.me.exceptions.RequestException;
 import better.me.model.CategoryBoundaries;
 import better.me.model.RegisteredUser;
@@ -68,9 +69,9 @@ public class CategoryService {
 
 	private void updateUsers() {
 		List<RegisteredUserDB> allUsers = registeredUserRepository.findAll();
-		kieSession.getAgenda().getAgendaGroup("category").setFocus();
 		
 		allUsers.stream().map(user -> this.kieSession.insert(new RegisteredUser(user)));
+		allUsers.stream().map(user -> this.kieSession.insert(new ScoreChangedEvent(new RegisteredUser(user))));
 		kieSession.fireAllRules();
 		kieSession.dispose();
 	}

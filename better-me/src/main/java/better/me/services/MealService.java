@@ -59,7 +59,7 @@ public class MealService {
 	private IDayRepository dayRepository;
 
 	@Autowired
-	@Qualifier(value = "cepReportSession")
+	@Qualifier(value = "cepSession")
 	private KieSession cepReportSession;
 
 	public DailyNutrition calculateNutritions(EatenMealDTO dto) throws NotLoggedInException, RequestException {

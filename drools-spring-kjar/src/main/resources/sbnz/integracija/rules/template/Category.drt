@@ -3,31 +3,38 @@ newCategory
 from
 to
 
-package sbnz.integracija.rules;
+package sbnz.integracija.rules.cep;
 
 import better.me.enums.*;
 import better.me.model.*;
 import better.me.util.*;
 import better.me.events.*;
 
+declare window score
+	@doc("score changed event")
+	ScoreChangedEvent() over window:time(1m)
+end
+
 template "Category template"
 
 rule "Rule @{newCategory} Rule"
-	agenda-group "category"
 	when 
 		$user : RegisteredUser($score: score, $score >= @{from}, $score < @{to}, category.equals("@{newCategory}")) @Watch(!category, !previousCategory)
+		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setCategory("@{newCategory}"); }
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("new-week").setFocus();
 	end
 	
 rule "Rule @{newCategory} Rule if category changes"
-	agenda-group "category"
 	when 
 		$user : RegisteredUser($score: score, $score >= @{from}, $score < @{to}, $category: category, !category.equals("@{newCategory}")) @Watch(!category, !previousCategory)
+		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setPreviousCategory($category); }
 		modify($user){ setCategory("@{newCategory}"); }
 		insert(new CategoryChangedEvent($user));
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("new-week").setFocus();
 	end
 	
 end template

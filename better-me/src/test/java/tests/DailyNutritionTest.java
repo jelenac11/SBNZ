@@ -50,16 +50,7 @@ public class DailyNutritionTest {
 		kieSession.insert(week);
 		kieSession.insert(user);
 	}
-    
-    @Test
-    public void numberOfSubmittedDaysRule_twoSubmittedDaysGiven_shouldReturnTwo() {
-    	DailyNutrition nutrition = new DailyNutrition();
-    	kieSession.insert(nutrition);
-        int firedRules = kieSession.fireAllRules();
-        assertEquals(1, firedRules);
-        assertEquals(2, (int) nutrition.getDay());
-    }
-    
+ 
     @Test
     public void calculateDailyNutrition_allMealsGiven_shouldReturnDailyNutrition() {
     	DailyNutrition nutrition = new DailyNutrition();
@@ -78,7 +69,7 @@ public class DailyNutritionTest {
 		kieSession.insert(nutrition);
 		
 		int firedRules = kieSession.fireAllRules();
-        assertEquals(5, firedRules);
+        assertEquals(4, firedRules);
         assertEquals(1050, nutrition.getCalories(), 0.0);
         assertEquals(87, nutrition.getCarbs(), 0.0);
         assertEquals(27, nutrition.getProteins(), 0.0);
@@ -101,7 +92,7 @@ public class DailyNutritionTest {
 		kieSession.insert(nutrition);
 		
 		int firedRules = kieSession.fireAllRules();
-        assertEquals(5, firedRules);
+        assertEquals(4, firedRules);
         assertEquals(350, nutrition.getCalories(), 0.0);
         assertEquals(29, nutrition.getCarbs(), 0.0);
         assertEquals(9, nutrition.getProteins(), 0.0);
@@ -125,7 +116,7 @@ public class DailyNutritionTest {
 		kieSession.insert(nutrition);
 		
 		int firedRules = kieSession.fireAllRules();
-        assertEquals(5, firedRules);
+        assertEquals(4, firedRules);
         assertEquals(700, nutrition.getCalories(), 0.0);
         assertEquals(58, nutrition.getCarbs(), 0.0);
         assertEquals(18, nutrition.getProteins(), 0.0);
@@ -151,7 +142,7 @@ public class DailyNutritionTest {
 		kieSession.insert(n);
 
 		int firedRules = kieSession.fireAllRules();
-        assertEquals(6, firedRules);
+        assertEquals(5, firedRules);
         assertEquals(2100, nutrition.getCalories(), 0.0);
         assertEquals(174, nutrition.getCarbs(), 0.0);
         assertEquals(54, nutrition.getProteins(), 0.0);
@@ -178,7 +169,7 @@ public class DailyNutritionTest {
 		kieSession.insert(n);
 
 		int firedRules = kieSession.fireAllRules();
-        assertEquals(6, firedRules);
+        assertEquals(5, firedRules);
         assertEquals(700, nutrition.getCalories(), 0.0);
         assertEquals("Calories left: 800.0", n.getMessage());
     }

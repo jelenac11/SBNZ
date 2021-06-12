@@ -1,4 +1,4 @@
-package sbnz.integracija.rules.cepMidnight;
+package sbnz.integracija.rules.cep;
 
 import better.me.enums.*;
 import better.me.model.*;

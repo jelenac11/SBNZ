@@ -1,74 +1,87 @@
-package sbnz.integracija.rules;
+package sbnz.integracija.rules.cep;
 import better.me.enums.*;
 import better.me.model.*;
 import better.me.util.*;
 import better.me.events.*;
 
+declare window score
+	@doc("score changed event")
+	ScoreChangedEvent() over window:time(1m)
+end
+
 rule "Rule PRO Rule"
-	agenda-group "category"
 	when 
 		$user : RegisteredUser($score: score, $score >= 2470, $score < 2147483647, category.equals("PRO")) @Watch(!category, !previousCategory)
+		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setCategory("PRO"); }
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("new-week").setFocus();
 	end
 rule "Rule PRO Rule if category changes"
-	agenda-group "category"
 	when 
 		$user : RegisteredUser($score: score, $score >= 2470, $score < 2147483647, $category: category, !category.equals("PRO")) @Watch(!category, !previousCategory)
+		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setPreviousCategory($category); }
 		modify($user){ setCategory("PRO"); }
 		insert(new CategoryChangedEvent($user));
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("new-week").setFocus();
 	end
 
 rule "Rule ADVANCED Rule"
-	agenda-group "category"
 	when 
 		$user : RegisteredUser($score: score, $score >= 740, $score < 2470, category.equals("ADVANCED")) @Watch(!category, !previousCategory)
+		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setCategory("ADVANCED"); }
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("new-week").setFocus();
 	end
 rule "Rule ADVANCED Rule if category changes"
-	agenda-group "category"
 	when 
 		$user : RegisteredUser($score: score, $score >= 740, $score < 2470, $category: category, !category.equals("ADVANCED")) @Watch(!category, !previousCategory)
+		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setPreviousCategory($category); }
 		modify($user){ setCategory("ADVANCED"); }
 		insert(new CategoryChangedEvent($user));
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("new-week").setFocus();
 	end
 
 rule "Rule INTERMEDIATE Rule"
-	agenda-group "category"
 	when 
 		$user : RegisteredUser($score: score, $score >= 200, $score < 740, category.equals("INTERMEDIATE")) @Watch(!category, !previousCategory)
+		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setCategory("INTERMEDIATE"); }
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("new-week").setFocus();
 	end
 rule "Rule INTERMEDIATE Rule if category changes"
-	agenda-group "category"
 	when 
 		$user : RegisteredUser($score: score, $score >= 200, $score < 740, $category: category, !category.equals("INTERMEDIATE")) @Watch(!category, !previousCategory)
+		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setPreviousCategory($category); }
 		modify($user){ setCategory("INTERMEDIATE"); }
 		insert(new CategoryChangedEvent($user));
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("new-week").setFocus();
 	end
 
 rule "Rule BEGINNER Rule"
-	agenda-group "category"
 	when 
 		$user : RegisteredUser($score: score, $score >= 0, $score < 200, category.equals("BEGINNER")) @Watch(!category, !previousCategory)
+		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setCategory("BEGINNER"); }
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("new-week").setFocus();
 	end
 rule "Rule BEGINNER Rule if category changes"
-	agenda-group "category"
 	when 
 		$user : RegisteredUser($score: score, $score >= 0, $score < 200, $category: category, !category.equals("BEGINNER")) @Watch(!category, !previousCategory)
+		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setPreviousCategory($category); }
 		modify($user){ setCategory("BEGINNER"); }
 		insert(new CategoryChangedEvent($user));
+		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("new-week").setFocus();
 	end
 

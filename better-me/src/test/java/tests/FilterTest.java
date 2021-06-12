@@ -96,32 +96,6 @@ public class FilterTest {
     	kieSession.dispose();
     }
     
-    @Test
-    public void filterMealByAllergensRule_OneAllergenGiven_shouldNotReturnAllMeals()  {
-    	RegisteredUser user = new RegisteredUser();
-    	user.setId(1L);
-    	user.setFirstName("Jelena");
-    	user.setLastName("Cupac");
-    	user.setDiet("OMNIVORE");
-    	ArrayList<Allergen> a = new ArrayList<Allergen>();
-    	a.add(new Allergen(1L, "peanut"));
-    	a.add(new Allergen(2L, "apple"));
-    	user.setAllergens(a);
-    	List<Meal> meals = new ArrayList<Meal>();
-    	
-    	kieSession.insert(meals);
-    	kieSession.insert(user);
-    	
-        int firedRules = kieSession.fireAllRules();
-        assertEquals(2, firedRules);
-       
-    	assertEquals(2, meals.size());
-    	
-        assertEquals("meal2", meals.get(0).getName());
-        assertEquals("meal3", meals.get(1).getName());
-        kieSession.dispose();
-    }
-    
     @ParameterizedTest
 	@CsvSource({ 
 		"'', 0, 0, 3, 3, false, meal2, meal3, meal1", 

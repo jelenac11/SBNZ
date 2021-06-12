@@ -1,4 +1,4 @@
-package sbnz.integracija.rules.cepMidnight;
+package sbnz.integracija.rules.cep;
 
 import better.me.enums.*;
 import better.me.model.*;
@@ -8,6 +8,11 @@ import java.util.List;
 
 global MyLogger myLogger;
 
+declare ScoreChangedEvent
+    @role(event)
+    user: RegisteredUser
+end
+
 declare window progress
 	@doc("user changed category at the end of a week event")
 	CategoryChangedEvent() over window:time(5m)
@@ -16,6 +21,13 @@ end
 declare window midnightEvents
 	@doc("number of midnight events in the last 7 days")
 	MidnightEvent() over window:time(8d)
+end
+
+query checkIfWholeWeekIsSubmitted(Week $week)
+	 $num := Number(intValue == 7) from accumulate(
+		Day($t:this, submitted == true) from $week.getDays(),
+		count($t)
+ 	 )
 end
 
 rule "When midnight event appears, set submit to true for current day"
@@ -29,7 +41,7 @@ rule "When midnight event appears, set submit to true for current day"
 			count($me)
 		)
     then
-    	myLogger.log("Submitting day, midnight event appeared: " + $day);
+    	myLogger.log("Submitting day, midnight event appeared: " + $day + " for user: " + $user.getUsername());
         modify ($user) {getWeeks().get($weeks.size() - 1).getDays().get($day.intValue() - 1).setSubmitted(true);}
 end
 
@@ -51,8 +63,9 @@ rule "Punish user if he failed today and yesterday - more/less than 10% calories
 		not(Alarm(user.getId() == $user.getId()))
     then
     	System.out.println("CALORIES - User failed other two days in a row: " + $user.getUsername());
-    	modify($user) {setScore($user.getScore() - 30);}
+    	modify($user) {setScore($user.getScore() - 50);}
         insert(new Alarm($user, "You failed to follow your nutrition plan in the last two days. Be more careful in following days."));
+        insert(new ScoreChangedEvent($user));
 end
 
 rule "Punish user if he failed today and yesterday - more/less than 10% proteins/carbs/fats intake"
@@ -77,16 +90,45 @@ rule "Punish user if he failed today and yesterday - more/less than 10% proteins
 		eval(!($week.isCheat() == true && $day.intValue() == 2))
     then
     	System.out.println("CALORIES - User failed two days in a row: " + $user.getUsername());
-    	modify($user) {setScore($user.getScore() - 30);}
+    	modify($user) {setScore($user.getScore() - 50);}
         insert(new Alarm($user, "You failed to follow your nutrition plan in the last two days. Be more careful in following days."));
+        insert(new ScoreChangedEvent($user));
 end
 
-rule "Change agenda-group to score"
+rule "Calculating score for previous week"
 	agenda-group "end-day"
-	salience -Integer.MAX_VALUE
-	when
-		MidnightEvent()
-	then
-		myLogger.log("Changed agenda-group from end-day to score");
-		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("score").setFocus();
+	no-loop
+    when
+    	$user: RegisteredUser($id: id, $score: score, $week: weeks.get(weeks.size() - 1))
+    	checkIfWholeWeekIsSubmitted($week;)
+    	$daysCaloriesOK: Number(intValue >= 0) from accumulate (
+       		$day: Day() from $week.getDays(),
+			init( int ok = 0; ),
+			action(
+				if ($day.getCalories() >= $week.getGoalCalories() * 0.9 && $day.getCalories() <= $week.getGoalCalories() * 1.1) {
+					ok += 1;
+				}
+			 ),
+			result ( ok )
+        )
+        $daysMacroOK: Number(intValue >= 0) from accumulate (
+       		$day: Day() from $week.getDays(),
+			init( int ok = 0; ),
+			action(
+				if ($day.getProteins() >= $week.getGoalProteins() * 0.9 && $day.getProteins() <= $week.getGoalProteins() * 1.1) {
+					ok += 1;
+				}
+				if ($day.getCarbs() >= $week.getGoalCarbs() * 0.9 && $day.getCarbs() <= $week.getGoalCarbs() * 1.1) {
+					ok += 1;
+				}
+				if ($day.getFats() >= $week.getGoalFats() * 0.9 && $day.getFats() <= $week.getGoalFats() * 1.1) {
+					ok += 1;
+				}
+			 ),
+			result ( ok )
+        )
+    then
+        myLogger.log("Calculating score for previous week: " + ($score + $daysCaloriesOK.intValue() * 10 + $daysMacroOK.intValue() * 3));
+        modify ($user) {setScore($score + $daysCaloriesOK.intValue() * 10 + $daysMacroOK.intValue() * 3);}
+		insert(new ScoreChangedEvent($user));
 end
