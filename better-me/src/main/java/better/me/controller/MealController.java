@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import better.me.dto.EatenMealDTO;
 import better.me.dto.NewMealDTO;
+import better.me.model.ConcreteMeal;
 import better.me.services.MealService;
 
 @RestController
@@ -31,6 +32,15 @@ public class MealController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@PostMapping("/eaten-custom-meal")
+	public ResponseEntity<?> customMeal(@RequestBody ConcreteMeal dto) {
+		try {
+			return new ResponseEntity<>(mealService.eatCustomMeal(dto), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
 
 	@PostMapping
 	public ResponseEntity<?> create(@RequestBody NewMealDTO dto) {
@@ -45,6 +55,25 @@ public class MealController {
 	public ResponseEntity<?> rateMeal(@PathVariable(value = "name") String name, @PathVariable(value = "value") Integer value) {
 		try {
 			return new ResponseEntity<>(mealService.rate(name, value), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping(value = "/{name}")
+	public ResponseEntity<?> getRate(@PathVariable(value = "name") String name) {
+		try {
+			return new ResponseEntity<>(mealService.getRate(name), HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping(value = "/all-meals")
+	public ResponseEntity<?> getAllMeals() {
+		try {
+			return new ResponseEntity<>(mealService.findAll(), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}

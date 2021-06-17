@@ -24,7 +24,6 @@ rule "Filter meals by diet"
 			action(  
 				for (Object ingredient : $ingredients) {
 					if (((Ingredient)ingredient).getGrocery().getDiet().compareTo(Diet.valueOf($diet)) > 0) {
-						myLogger.log("adding meal not diet: " + $meal.getName() + " because of ingredient: " + ((Ingredient)ingredient).getGrocery().getName());
 						notDietMeals.add($meal);
 						break;
 					}
@@ -49,7 +48,6 @@ rule "Filter meals by allergens"
 			$meal: Meal($ingredients: ingredients) from $sortedList,
 			init( List<Meal> withAllergens = new ArrayList(); ),
 			action(
-				myLogger.log("sortedList.size() = " + $sortedList.size());
 				for (Object ingredient : $ingredients) {
 					for (Object allergen : $allergens) {
 						if (((Allergen)allergen).getName().equals( ((Ingredient)ingredient).getGrocery().getName())) {
@@ -73,8 +71,8 @@ rule "Filter meals by preparation time"
 	no-loop true
 	when
 		$allMeals: List()
-		$filter: FilterDTO($fromTime:fromTime, $fromTime != 0, $toTime: toTime, $toTime != 0)
-		$meals : List () from collect ( 
+		$filter: FilterDTO($fromTime:fromTime, $toTime: toTime, $fromTime != 0 || $toTime != 0)
+		$meals : List () from collect (
 			Meal(time < $fromTime || time > $toTime) from $allMeals
 		)
 	then 
@@ -107,7 +105,6 @@ rule "Sort meals by calories ascending"
 	    $meal: Meal( $cals: calories)
 	    $allMeals: List(size > 0, this contains $meal)
 	then
-		myLogger.log("SallMeals.size() = " + $allMeals.size());
 		myLogger.log("Sorting meals by calories ascending");
 		modify( $sorted ){ getSortedList().add( $meal ) }
 		delete($meal)

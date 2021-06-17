@@ -1,6 +1,5 @@
 package better.me.modelDB;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,7 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
+@Entity(name = "admin_reports")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,7 +31,7 @@ public class AdminReportDB {
 	private Long id;
 
 	@Column
-	private Date date;
+	private long date;
 
 	@OneToMany(mappedBy = "reportMostPopular")
 	private Set<MealPopularityDB> mostPopularMeals;

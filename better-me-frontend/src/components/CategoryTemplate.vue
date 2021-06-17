@@ -38,6 +38,9 @@
                 </v-card>
             </v-flex>
         </v-layout>
+        <v-snackbar v-model="success" top color="green darken-4">
+            Category template changed successfully.
+        </v-snackbar>
     </div>
 </template>
 

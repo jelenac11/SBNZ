@@ -10,6 +10,7 @@ global MyLogger myLogger;
 
 rule "Calculate calories for created meal"
 	agenda-group "new-meal"
+	no-loop
     when
     	$meal: Meal(calories == 0, $ingredients: ingredients)
         Number( $value: doubleValue)  from accumulate ( 
@@ -23,6 +24,7 @@ end
 
 rule "Calculate fats for created meal"
 	agenda-group "new-meal"
+	no-loop
     when
     	$meal: Meal(fats == 0, $ingredients: ingredients)
         Number( $value: doubleValue) from accumulate ( 
@@ -36,6 +38,7 @@ end
 
 rule "Calculate proteins for created meal"
 	agenda-group "new-meal"
+	no-loop
     when
     	$meal: Meal(proteins == 0, $ingredients: ingredients)
         Number( $value: doubleValue) from accumulate ( 
@@ -49,6 +52,7 @@ end
 
 rule "Calculate carbs for created meal"
 	agenda-group "new-meal"
+	no-loop
     when
     	$meal: Meal(carbs == 0, $ingredients: ingredients)
         Number( $value: doubleValue) from accumulate ( 

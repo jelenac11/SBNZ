@@ -16,6 +16,7 @@ import better.me.model.ConcreteMeal;
 import better.me.model.Day;
 import better.me.model.Grade;
 import better.me.model.Grocery;
+import better.me.model.GroceryFlag;
 import better.me.model.Ingredient;
 import better.me.model.Meal;
 import better.me.model.RegisteredUser;
@@ -36,14 +37,14 @@ public class RecommendationTest {
 		KieContainer kContainer = ks
 				.newKieContainer(ks.newReleaseId("sbnz.integracija", "drools-spring-kjar", "0.0.1-SNAPSHOT"));
 		kieSession = kContainer.newKieSession("session");
-		kieSession.getAgenda().getAgendaGroup("grocery-flags").setFocus();
+		kieSession.getAgenda().getAgendaGroup("prepare-for-recommendation").setFocus();
 		kieSession.setGlobal("myLogger", myLogger);
 	}
 	
 	@Test
 	public void mealRecommendationRule_allValuesGiven_shouldRecommendMeals() {
-		Grocery pepper = new Grocery(1L, "pepper", Diet.OMNIVORE, 150, 9, 7, 1);
-		Grocery banana = new Grocery(2L, "banana", Diet.OMNIVORE, 100, 10, 1, 1);
+		Grocery pepper = new Grocery(1L, "pepper", Diet.VEGAN, 150, 9, 7, 1);
+		Grocery banana = new Grocery(2L, "banana", Diet.VEGAN, 100, 10, 1, 1);
 		Grocery peanut = new Grocery(3L, "peanut", Diet.OMNIVORE, 120, 20, 4, 2);
 		Grocery milk = new Grocery(4L, "milk", Diet.OMNIVORE, 70, 11, 2, 5);
 		Grocery coconut = new Grocery(5L, "coconut", Diet.OMNIVORE, 35, 14, 2, 5);
@@ -136,13 +137,14 @@ public class RecommendationTest {
 		r1.setDiet("OMNIVORE");
 		
 		kieSession.insert(r1);
+		kieSession.insert(new GroceryFlag());
 		kieSession.insert(allMeals);
     	
         int firedRules = kieSession.fireAllRules();
         kieSession.getAgenda().getAgendaGroup("meal-recommendation").setFocus();
-      
+        kieSession.fireAllRules();
 
-        assertEquals(6, firedRules);
+        assertEquals(11, firedRules);
        
     	kieSession.dispose();
 	}

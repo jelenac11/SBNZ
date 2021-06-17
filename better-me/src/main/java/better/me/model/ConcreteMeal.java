@@ -23,7 +23,10 @@ public class ConcreteMeal {
 	private List<Ingredient> ingredients;
 	
 	public ConcreteMeal(ConcreteMealDB cm) {
-		this(cm.getId(), cm.getGrams(), cm.isCustomMeal(), new Meal(cm.getMeal()), cm.getDay().getId(), (new ArrayList<IngredientDB>(cm.getIngredients())).stream().map(Ingredient::new).collect(Collectors.toList()));
+		this(cm.getId(), cm.getGrams(), cm.isCustomMeal(), null, cm.getDay().getId(), (new ArrayList<IngredientDB>(cm.getIngredients())).stream().map(Ingredient::new).collect(Collectors.toList()));
+		if (cm.getMeal() != null) {
+			this.meal = new Meal(cm.getMeal());
+		}
 	}
 	
 	public ConcreteMeal() {

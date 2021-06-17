@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,6 +35,7 @@ public class WeekDB {
 	private Long id;
 
 	@Column
+	@Enumerated(EnumType.STRING)
 	private Goal goal;
 
 	@Column
@@ -52,7 +56,7 @@ public class WeekDB {
 	@Column
 	private boolean cheat;
 
-	@OneToMany(mappedBy = "week")
+	@OneToMany(mappedBy = "week", cascade = CascadeType.ALL)
 	private Set<DayDB> days;
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
@@ -64,7 +68,9 @@ public class WeekDB {
 				fact.getGoalFats(), false, fact.isCheat(), new HashSet<DayDB>(), rUser);
 		ArrayList<DayDB> days = new ArrayList<DayDB>();
 		for (int i = 0; i < 7; i++) {
-			days.add(new DayDB());
+			DayDB day = new DayDB();
+			day.setWeek(this);
+			days.add(day);
 		}
 		this.days = new HashSet<DayDB>(days);
 	}
@@ -72,7 +78,9 @@ public class WeekDB {
 	public WeekDB() {
 		ArrayList<DayDB> days = new ArrayList<DayDB>();
 		for (int i = 0; i < 7; i++) {
-			days.add(new DayDB());
+			DayDB day = new DayDB();
+			day.setWeek(this);
+			days.add(day);
 		}
 		this.days = new HashSet<DayDB>(days);
 	}

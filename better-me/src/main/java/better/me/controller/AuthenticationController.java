@@ -4,6 +4,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,7 @@ import better.me.dto.ResponseUserDTO;
 import better.me.dto.UserDTO;
 import better.me.dto.UserLoginDTO;
 import better.me.events.LoginEvent;
+import better.me.events.SuspiciousUserEvent;
 import better.me.helper.RegisteredUserMapper;
 import better.me.model.User;
 import better.me.modelDB.AuthorityDB;
@@ -82,11 +85,20 @@ public class AuthenticationController {
 		} catch (BadCredentialsException e) {
 			user = userDetailsService.findByEmail(authenticationRequest.getEmail());
 			if (user != null) {
-				LoginEvent loginEvent = new LoginEvent(new User(user), false);
+				User u = new User(user);
+				LoginEvent loginEvent = new LoginEvent(u, false);
 				cepLoginSession.insert(loginEvent);
 				cepLoginSession.fireAllRules();
-				user.setAllowedToLogin(loginEvent.getUser().isAllowedToLogin());
-				userDetailsService.save(user);
+				
+				QueryResults results = cepLoginSession.getQueryResults( "getSuspiciousUserEvent" ); 
+				for ( QueryResultsRow row : results ) {
+					SuspiciousUserEvent event = ( SuspiciousUserEvent ) row.get( "$result" );
+					if (event.getUser().getId() == u.getId()) {
+						user.setAllowedToLogin(false);
+						userDetailsService.save(user);
+					}
+				}
+				
 				if(!user.isAllowedToLogin()) {
 					return new ResponseEntity<>("You can not login after three failed attempts. Try again after 5 minutes.", HttpStatus.FORBIDDEN);
 				}

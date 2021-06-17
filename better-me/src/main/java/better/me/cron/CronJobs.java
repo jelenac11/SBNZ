@@ -6,11 +6,14 @@ import java.util.stream.Collectors;
 
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
+import better.me.events.Alarm;
 import better.me.events.MidnightEvent;
 import better.me.model.AdminReport;
 import better.me.model.RegisteredUser;
@@ -37,7 +40,7 @@ public class CronJobs {
 	@Scheduled(cron = "0 0 0 1 1/1 *")
 	public void fireReportRules() {
 		AdminReport report = new AdminReport();
-		report.setDate(new Date());
+		report.setDate((new Date()).getTime());
 		FactHandle factHandle = cepSession.insert(report);
 		cepSession.getAgenda().getAgendaGroup("admin-reports").setFocus();
 		cepSession.fireAllRules();
@@ -55,6 +58,13 @@ public class CronJobs {
 				.collect(Collectors.toList());
 		users.forEach(user -> cepSession.insert(new MidnightEvent(user, user.getWeeks().size())));
 		cepSession.fireAllRules();
+		
+		QueryResults results = cepSession.getQueryResults( "getAlarms" ); 
+		for ( QueryResultsRow row : results ) {
+			Alarm alarm = ( Alarm ) row.get( "$result" );
+			alarmService.save(alarm);
+		}
+		
 		users.forEach(user -> registeredUserService.save(user));
 		userFacts.forEach(user -> cepSession.delete(user));
 	}

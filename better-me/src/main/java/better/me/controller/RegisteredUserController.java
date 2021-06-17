@@ -42,6 +42,11 @@ public class RegisteredUserController {
 		return new ResponseEntity<>(registeredUserMapper.toResDTO(registeredUser), HttpStatus.OK);
 	}
 	
+	@GetMapping(value = "/week-and-day")
+	public ResponseEntity<?> getWeekAndDay() {
+		return new ResponseEntity<>(registeredUserService.getWeekAndDayNumber(), HttpStatus.OK);
+	}
+	
 	@PostMapping(value = "/fill-info", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> fillInfo(@Valid @RequestBody RegisteredUserDTO user) throws Exception {
 		try {
@@ -49,6 +54,16 @@ public class RegisteredUserController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	@GetMapping(value = "/week")
+	public ResponseEntity<?> getWeek() {
+		return new ResponseEntity<>(registeredUserService.getWeek(), HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/day")
+	public ResponseEntity<?> getDay() {
+		return new ResponseEntity<>(registeredUserService.getDay(), HttpStatus.OK);
 	}
 
 }

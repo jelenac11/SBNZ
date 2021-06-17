@@ -1,6 +1,8 @@
 package better.me.services;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import better.me.dto.RegisteredUserDTO;
+import better.me.dto.WeekDTO;
 import better.me.enums.ActivityLevel;
 import better.me.enums.BodyType;
 import better.me.enums.Category;
@@ -21,16 +24,19 @@ import better.me.enums.Diet;
 import better.me.enums.Sex;
 import better.me.exceptions.NotLoggedInException;
 import better.me.exceptions.RequestException;
+import better.me.model.Day;
 import better.me.model.RegisteredUser;
 import better.me.model.Week;
 import better.me.modelDB.AllergenDB;
 import better.me.modelDB.AuthorityDB;
+import better.me.modelDB.DayDB;
 import better.me.modelDB.RegisteredUserDB;
 import better.me.modelDB.UserDB;
 import better.me.modelDB.WeekDB;
 import better.me.repositories.IAllergenRepository;
 import better.me.repositories.IRegisteredUser;
 import better.me.repositories.IUserRepository;
+import better.me.repositories.IWeekRepository;
 
 @Service
 public class RegisteredUserService {
@@ -43,6 +49,9 @@ public class RegisteredUserService {
 
 	@Autowired
 	private IUserRepository userRepository;
+	
+	@Autowired
+	private IWeekRepository weekRepository;
 
 	@Autowired
 	private AuthorityService authService;
@@ -94,9 +103,11 @@ public class RegisteredUserService {
 		
 		rUser.setBmi(userFact.getBmi());
 		rUser.setActivityCount(userFact.getActivityCount());
-		rUser.getWeeks().add(new WeekDB(weekFact, rUser));
+		WeekDB weekDB = new WeekDB(weekFact, rUser);
+		rUser.getWeeks().add(weekDB);
 		
 		registeredUserRepository.save(rUser);
+		weekRepository.save(weekDB);
 		return rUser;
 	}
 	
@@ -145,6 +156,51 @@ public class RegisteredUserService {
 	}
 	public RegisteredUserDB findByUsername(String username) {
 		return registeredUserRepository.findByUsername(username);
+	}
+
+	public String getWeekAndDayNumber() {
+		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
+		int dayNum = 8;
+		for (WeekDB w : rUser.getWeeks()) {
+			for (DayDB day : w.getDays()) {
+				if (!day.isSubmitted()) dayNum--;
+			}
+		}
+		return rUser.getWeeks().size() + " " + dayNum;
+	}
+
+	public WeekDTO getWeek() {
+		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
+		WeekDTO forReturn = null;
+		for (WeekDB w : rUser.getWeeks()) {
+			for (DayDB day : w.getDays()) {
+				if (!day.isSubmitted()) forReturn = new WeekDTO(w);
+			}
+		}
+		return forReturn;
+	}
+
+	public Day getDay() {
+		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
+		Day forReturn = null;
+		for (WeekDB w : rUser.getWeeks()) {
+			ArrayList<DayDB> days = new ArrayList<DayDB>(w.getDays());
+			Collections.sort(days, new Comparator<DayDB>(){
+			    public int compare(DayDB d1, DayDB d2) {
+			        return d1.getId().compareTo(d2.getId());
+			    }
+			});
+			for (DayDB day : days) {
+				if (!day.isSubmitted()) {
+					forReturn = new Day(day);
+					break;
+				}
+			}
+		}
+		return forReturn;
 	}
 
 }

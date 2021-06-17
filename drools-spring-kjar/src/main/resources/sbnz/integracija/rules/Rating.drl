@@ -3,6 +3,8 @@ package sbnz.integracija.rules;
 import better.me.enums.*;
 import better.me.model.*;
 
+global MyLogger myLogger;
+
 rule "Rate meal"
 	agenda-group "rate-meal"
 	when
@@ -13,5 +15,6 @@ rule "Rate meal"
 			sum($value)
 		)
 	then
-	    modify($meal){ setAverageGrade(($gradesSum + $newValue)/($meal.getGrades().size() + 1.0)); }
+		myLogger.log("Meal rated with rate: " + $newValue + ", grade sum is: " + $gradesSum + ", average rate is now: " + ((double) $gradesSum)/($meal.getGrades().size()) + ", rate count is: " + $meal.getGrades().size());
+	    modify($meal){ setAverageGrade(((double) $gradesSum)/$meal.getGrades().size()); }
 end

@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
+@Entity(name = "alarms")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -33,4 +33,9 @@ public class AlarmDB {
 	
 	@Column
 	private String message;
+	
+	public AlarmDB(RegisteredUserDB ru, String m) {
+		this.user = ru;
+		this.message = m;
+	}
 }

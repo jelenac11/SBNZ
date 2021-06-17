@@ -67,4 +67,13 @@ public class NutritionController {
 		}
 	}
 	
+	@GetMapping(value = "/recommended")
+	public ResponseEntity<?> getRecommended() {
+		try {
+			return new ResponseEntity<>(nutritionService.getRecommended(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 }

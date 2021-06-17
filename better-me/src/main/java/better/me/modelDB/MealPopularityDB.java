@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
+@Entity(name = "meal_popularity")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,11 +30,11 @@ public class MealPopularityDB {
 	@Column
 	private String meal;
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "admin_report_most_popular_id", referencedColumnName = "admin_report_id")
 	private AdminReportDB reportMostPopular;
 	
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "admin_report_most_rated_id", referencedColumnName = "admin_report_id")
 	private AdminReportDB reportMostRated;
 

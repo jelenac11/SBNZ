@@ -5,6 +5,8 @@ INSERT INTO users_table("type", email, first_name, last_name, "password", userna
 insert into user_authority(user_id, authority_id) values(1,2);
 INSERT INTO users_table("type", email, first_name, last_name, "password", username, last_password_reset_date, allowed_to_login, age, height, weight, bmi, activity_count, score, allowed_to_eat, sex, body_type, activity_level, diet, category, previous_category, age_category) VALUES('RU', 'jelena@gmail.com', 'Jelena', 'Cupac', '$2a$10$pW9Eee2ptMXCv41gjTsFrujLAo6WTRI8LcfA1/qHtyTU5Gn2xHoym', 'jelenac11', 1608560339402, true, 0, 0, 0, 0, 0, 0, true, 'MALE', 'ECTOMORPH', 'INACTIVE', 'OMNIVORE', 'BEGINNER', 'BEGINNER', 'CHILD');
 insert into user_authority(user_id, authority_id) values(2,1);
+INSERT INTO users_table("type", email, first_name, last_name, "password", username, last_password_reset_date, allowed_to_login, age, height, weight, bmi, activity_count, score, allowed_to_eat, sex, body_type, activity_level, diet, category, previous_category, age_category) VALUES('RU', 'aleksa@gmail.com', 'Aleksa', 'Goljovic', '$2a$10$pW9Eee2ptMXCv41gjTsFrujLAo6WTRI8LcfA1/qHtyTU5Gn2xHoym', 'aleksag12', 1608560339402, true, 22, 186, 85, 23.5, 1, 255, true, 'MALE', 'MESOMORPH', 'INACTIVE', 'OMNIVORE', 'INTERMEDIATE', 'BEGINNER', 'YOUNG_ADULT');
+insert into user_authority(user_id, authority_id) values(3,1);
 
 insert into groceries(name, diet, calories, carbs, proteins, fats) values('Chicken Breast', 'OMNIVORE', 110, 0, 23.1, 1.2);
 insert into groceries(name, diet, calories, carbs, proteins, fats) values('Beef', 'OMNIVORE', 272, 0, 27, 17.4);
@@ -144,3 +146,54 @@ insert into ingredients(grams, grocery_id) values(200, 2); -- Beef
 insert into ingredients(grams, grocery_id) values(300, 8); -- Potato
 insert into meals_ingredients(meal_id, ingredient_id) values(10, 27);
 insert into meals_ingredients(meal_id, ingredient_id) values(10, 28);
+
+
+-- Admin Report
+insert into admin_reports("date", eatings) values(1623276000000, 350);
+
+insert into meal_popularity(meal, admin_report_most_popular_id, admin_report_most_rated_id, eaten, rate) values('Tuna Salad', 1, null, 57, 0);
+insert into meal_popularity(meal, admin_report_most_popular_id, admin_report_most_rated_id, eaten, rate) values('Caesar Salad', 1, null, 49, 0);
+insert into meal_popularity(meal, admin_report_most_popular_id, admin_report_most_rated_id, eaten, rate) values('French Omlette', 1, null, 42, 0);
+insert into meal_popularity(meal, admin_report_most_popular_id, admin_report_most_rated_id, eaten, rate) values('Fruit Salad', 1, null, 37, 0);
+insert into meal_popularity(meal, admin_report_most_popular_id, admin_report_most_rated_id, eaten, rate) values('Rice Cake', 1, null, 31, 0);
+
+insert into meal_popularity(meal, admin_report_most_popular_id, admin_report_most_rated_id, eaten, rate) values('French Omlette', null, 1, 0, 4.9);
+insert into meal_popularity(meal, admin_report_most_popular_id, admin_report_most_rated_id, eaten, rate) values('Caesar Salad', null, 1, 0, 4.7);
+insert into meal_popularity(meal, admin_report_most_popular_id, admin_report_most_rated_id, eaten, rate) values('Avocado Salad', null, 1, 0, 4.3);
+insert into meal_popularity(meal, admin_report_most_popular_id, admin_report_most_rated_id, eaten, rate) values('Tuna Salad', null, 1, 0, 4.1);
+insert into meal_popularity(meal, admin_report_most_popular_id, admin_report_most_rated_id, eaten, rate) values('Chicken with Rice', null, 1, 0, 3.9);
+
+
+-- Weeks and days
+insert into allergen_user(user_id, allergen_id) values(3, 1); -- Chicken
+insert into allergen_user(user_id, allergen_id) values(3, 2); -- Beef
+
+insert into weeks(goal_calories, goal_carbs, goal_proteins, goal_fats, submitted, cheat, user_id, goal) values(2000, 160, 210, 70, true, false, 3, 'GAIN_WEIGHT');
+insert into weeks(goal_calories, goal_carbs, goal_proteins, goal_fats, submitted, cheat, user_id, goal) values(2000, 160, 210, 70, true, false, 3, 'MAINTAIN_WEIGHT');
+insert into weeks(goal_calories, goal_carbs, goal_proteins, goal_fats, submitted, cheat, user_id, goal) values(2000, 160, 210, 70, true, false, 3, 'LOSE_WEIGHT');
+insert into weeks(goal_calories, goal_carbs, goal_proteins, goal_fats, submitted, cheat, user_id, goal) values(2000, 160, 210, 70, true, false, 3, 'LOSE_WEIGHT');
+insert into weeks(goal_calories, goal_carbs, goal_proteins, goal_fats, submitted, cheat, user_id, goal) values(2000, 160, 210, 70, true, false, 3, 'MAINTAIN_WEIGHT');
+insert into weeks(goal_calories, goal_carbs, goal_proteins, goal_fats, submitted, cheat, user_id, goal) values(2000, 160, 210, 70, false, false, 3, 'MAINTAIN_WEIGHT');
+
+insert into days(submitted, calories, carbs, proteins, fats, exceed, week_id) values(true, 2000, 160, 210, 70, false, 6);
+insert into days(submitted, calories, carbs, proteins, fats, exceed, week_id) values(true, 2000, 160, 210, 70, false, 6);
+insert into days(submitted, calories, carbs, proteins, fats, exceed, week_id) values(true, 2000, 160, 210, 70, false, 6);
+insert into days(submitted, calories, carbs, proteins, fats, exceed, week_id) values(false, 1895, 77, 130, 58, false, 6);
+insert into days(submitted, calories, carbs, proteins, fats, exceed, week_id) values(false, 0, 0, 0, 0, false, 6);
+insert into days(submitted, calories, carbs, proteins, fats, exceed, week_id) values(false, 0, 0, 0, 0, false, 6);
+insert into days(submitted, calories, carbs, proteins, fats, exceed, week_id) values(false, 0, 0, 0, 0, false, 6);
+
+insert into concrete_meals(grams, is_custom_meal, meal_id, day_id) values(150, false, 1, 4);
+insert into concrete_meals(grams, is_custom_meal, meal_id, day_id) values(200, true, null, 4);
+insert into concrete_meals(grams, is_custom_meal, meal_id, day_id) values(350, false, 2, 4);
+insert into concrete_meals(grams, is_custom_meal, meal_id, day_id) values(80, false, 3, 4);
+
+insert into ingredients(grams, grocery_id) values(250, 7); -- Milk, id 29
+insert into ingredients(grams, grocery_id) values(40, 22); -- Chocolate, id 30
+insert into ingredients(grams, grocery_id) values(35, 19); -- Almonds, id 31
+
+insert into concrete_meals_ingredients(concrete_meal_id, ingredient_id) values(2, 29);
+insert into concrete_meals_ingredients(concrete_meal_id, ingredient_id) values(2, 30);
+insert into concrete_meals_ingredients(concrete_meal_id, ingredient_id) values(2, 31);
+
+insert into alarms(user_id, message) values(3, 'You failed to follow your nutrition plan in the last two days. Be more careful in following days.');

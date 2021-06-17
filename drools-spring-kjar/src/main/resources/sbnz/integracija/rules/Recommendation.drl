@@ -10,13 +10,6 @@ import java.util.List;
 
 global MyLogger myLogger;
 
-declare GroceryFlag
-	grocery: Grocery
-	rate: double
-	rateNum: int
-	eaten: int
-end
-
 declare RecommendedPoints
 	points: double
 	meal: Meal
@@ -26,8 +19,71 @@ declare ActivatedAgeDietRecommendation
 	activated:boolean
 end
 
+query "getRecommendedMeal"
+    $result: RecommendedMeal()
+end
+
+rule "Filter all meals by diet"
+	salience Integer.MAX_VALUE
+	agenda-group "prepare-for-recommendation"
+	no-loop
+	lock-on-active
+	when
+		$allMeals: List(size > 0)
+		$user: RegisteredUser($diet: diet)
+        $meals: List ()  from accumulate ( 
+			Meal ($meal: this, $ingredients: ingredients) from $allMeals,
+			init( List<Meal> notDietMeals = new ArrayList(); ),
+			action(  
+				for (Object ingredient : $ingredients) {
+					if (((Ingredient)ingredient).getGrocery().getDiet().compareTo(Diet.valueOf($diet)) > 0) {
+						myLogger.log("adding meal not diet: " + $meal.getName() + " because of ingredient: " + ((Ingredient)ingredient).getGrocery().getName());
+						notDietMeals.add($meal);
+						break;
+					}
+				}
+			 ),
+			result ( notDietMeals )
+		)
+	then
+		myLogger.log("Filtering meals by diet. Removed meals: " + $meals.size());
+		modify ( $allMeals ) { removeAll($meals); }
+end
+
+rule "Remove all eaten meals"
+	agenda-group "prepare-for-recommendation"
+	salience Integer.MAX_VALUE - 1
+	no-loop
+	when
+        $user: RegisteredUser($weeks:weeks)
+        $allMeals: List(size > 0)
+		$meals : List() from accumulate ( 
+			$meal: Meal() from $allMeals,
+			init( List<Meal> alreadyEaten = new ArrayList(); ),
+			action(
+				outerloop: for (Object week : $weeks) {
+					for (Object day : ((Week)week).getDays()) {
+						for (Object meal: ((Day)day).getConcreteMeals()) {
+							if (((ConcreteMeal)meal).getMeal() != null) {
+								if (((ConcreteMeal)meal).getMeal().getName().equals($meal.getName())) {
+									alreadyEaten.add($meal);
+									break outerloop;	
+								}	
+							}
+						}
+					}
+				}
+			 ),
+			result ( alreadyEaten )
+		)
+	then 
+		myLogger.log("Removing all eaten meals: " + $meals.size());
+		modify ($allMeals) {removeAll($meals);}
+end
+
 rule "Collect informations about groceries"
-	agenda-group "grocery-flags"
+	agenda-group "prepare-for-recommendation"
+	salience Integer.MAX_VALUE - 2
 	lock-on-active
     when
     	$grocery : Grocery( $id : id );
@@ -61,45 +117,14 @@ rule "Collect informations about groceries"
     	insert(new GroceryFlag($grocery, $rate, $rateNum, $eatenInMeals + $eatenInCustomMeals));
 end
 
-rule "Remove all eaten meals"
-	agenda-group "meal-recommendation"
-	salience Integer.MAX_VALUE
-	no-loop
-	when
-        $user: RegisteredUser($weeks:weeks)
-        $allMeals: List(size > 0)
-		$meals : List() from accumulate ( 
-			$meal: Meal() from $allMeals,
-			init( List<Meal> alreadyEaten = new ArrayList(); ),
-			action(
-				outerloop: for (Object week : $weeks) {
-					for (Object day : ((Week)week).getDays()) {
-						for (Object meal: ((Day)day).getConcreteMeals()) {
-							if (((ConcreteMeal)meal).getMeal() != null) {
-								if (((ConcreteMeal)meal).getMeal().getName().equals($meal.getName())) {
-									alreadyEaten.add($meal);
-									break outerloop;	
-								}	
-							}
-						}
-					}
-				}
-			 ),
-			result ( alreadyEaten )
-		)
-	then 
-		myLogger.log("Removing all eaten meals: " + $meals.size());
-		modify ($allMeals) {removeAll($meals);}
-end
-
 rule "Reward good rated grocery"
 	agenda-group "meal-recommendation"
-	salience Integer.MAX_VALUE - 1
+	salience Integer.MAX_VALUE - 3
 	lock-on-active
     when
     	$allMeals: List();
     	$flags : List() from collect(GroceryFlag());
-        GroceryFlag($grocery: grocery, rate >= 3, $rate : rate, $rateNum : rateNum) from $flags;
+        $groceryFlag: GroceryFlag($grocery: grocery, rate >= 3, $rate : rate, $rateNum : rateNum) from $flags;
         $meal : Meal($ingredients: ingredients) from $allMeals;
         $ingredient: Ingredient(grocery == $grocery) from $ingredients;
     then
@@ -109,7 +134,7 @@ end
 
 rule "Punish bad rated grocery"
 	agenda-group "meal-recommendation"
-	salience Integer.MAX_VALUE - 1
+	salience Integer.MAX_VALUE - 3
 	lock-on-active
     when
     	$allMeals: List();
@@ -122,10 +147,9 @@ rule "Punish bad rated grocery"
         myLogger.log("Punished bad rated grocery: " + $grocery.getName() + " for meal " + $meal.getName() + " with " + (-0.5/$rate)*$rateNum + " points.");
 end
 
-
 rule "Reward most eaten grocery"
 	agenda-group "meal-recommendation"
-	salience Integer.MAX_VALUE - 1
+	salience Integer.MAX_VALUE - 3
 	lock-on-active
     when
     	$allMeals: List();
@@ -141,7 +165,7 @@ end
 
 rule "Punish least eaten grocery"
 	agenda-group "meal-recommendation"
-	salience Integer.MAX_VALUE - 1
+	salience Integer.MAX_VALUE - 3
 	lock-on-active
     when
     	$allMeals: List();
@@ -157,7 +181,7 @@ end
 
 rule "Punish meal with allergens"
 	agenda-group "meal-recommendation"
-	salience Integer.MAX_VALUE - 1
+	salience Integer.MAX_VALUE - 3
 	lock-on-active
     when
     	$allMeals: List();
@@ -186,6 +210,22 @@ rule "Collect all points of one meal into one recommendation"
     	myLogger.log("Collecting all points for " + $meal.getName() + ", points: " + $points);
 end
 
+rule "Unsuccessful recommendation"
+	agenda-group "meal-recommendation"
+	salience -200
+	no-loop
+    when
+    	Number(intValue < 3) from accumulate(
+        	$rm: RecommendedMeal(points >= 0),
+        	count($rm)
+        );
+        not ActivatedAgeDietRecommendation();
+    then
+    	myLogger.log("Unsuccessful recommendation");
+    	insert(new ActivatedAgeDietRecommendation(true));
+        kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("age-diet-recommendation").setFocus();
+end
+
 rule "Delete points when RecommendedMeal inserted"
 	agenda-group "meal-recommendation"
 	salience -Integer.MAX_VALUE
@@ -194,22 +234,6 @@ rule "Delete points when RecommendedMeal inserted"
 		$rp: RecommendedPoints(meal.getId() == $meal.getId());
 	then
 		delete($rp);
-end
-
-rule "Unsuccessful recommendation"
-	agenda-group "meal-recommendation"
-	salience -200
-	no-loop
-    when
-    	Number(intValue < 3) from accumulate(
-        	$rm: RecommendedMeal(points > 0),
-        	count($rm)
-        );
-        not ActivatedAgeDietRecommendation();
-    then
-    	myLogger.log("Unsuccessful recommendation");
-    	insert(new ActivatedAgeDietRecommendation(true));
-        kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("age-diet-recommendation").setFocus();
 end
 
 rule "Points for highly rated meals by users of same age and diet"

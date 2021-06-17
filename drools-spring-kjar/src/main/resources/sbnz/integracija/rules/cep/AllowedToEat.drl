@@ -7,14 +7,13 @@ import better.me.util.*;
 
 global MyLogger myLogger;
 
-declare NotAllowedToEatEvent
-    @role(event)
-    user: RegisteredUser
-end
-
 declare window timesEating
 	@doc("eaten meals events from users in last 6 hours")
 	UserAteMealEvent() over window:time(6h)
+end
+
+query "getNotAllowedToEatEvent"
+    $result: NotAllowedToEatEvent()
 end
 
 rule "More than 3 meals in 6 hours from same user"
@@ -26,6 +25,7 @@ rule "More than 3 meals in 6 hours from same user"
 		)
 		not (NotAllowedToEatEvent(user.getId() == $user.getId()))
     then
+    	myLogger.log("More than 3 meals eaten in 6 hours for user: " + $user.getEmail());
     	$user.setAllowedToEat(false);
     	insert(new NotAllowedToEatEvent($user));
 end

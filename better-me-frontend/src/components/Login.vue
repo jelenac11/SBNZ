@@ -1,7 +1,7 @@
 <template>
     <v-container fluid fill-height class="login-container">
         <v-layout align-center justify-center>
-            <v-flex xs12 sm8 md4>
+            <v-flex xs12 sm8 md3>
                 <v-card class="elevation-12" style="padding: 20px">
                     <v-card-text>
                         <h1 style="color: #4CAF50; margin-bottom: 30px; margin-top: 10px">Login</h1>
@@ -42,8 +42,11 @@
                 </v-card>
             </v-flex>
         </v-layout>
-        <v-snackbar v-model="wrong" top color="red darken-4">
+        <v-snackbar v-model="wrong" top color="red darken-3">
             Wrong email or password. Try again.
+        </v-snackbar>
+        <v-snackbar v-model="forbidden" top color="red darken-3">
+            You can not login after three failed attempts. Try again after 5 minutes.
         </v-snackbar>
     </v-container>
 </template>
@@ -61,6 +64,7 @@
         },
         isValid: true,
         wrong: false,
+        forbidden: false,
         token: null
     }),
     created() {
@@ -73,8 +77,11 @@
             this.$store.dispatch('login', { email, password })
             .then(() => this.$router.push('/'))
             .catch(err => {
-                console.log(err);
-                this.wrong = true;
+                if (err.response.status === 403) {
+                    this.forbidden = true;
+                } else {
+                    this.wrong = true;
+                }
             });
 		},
     }

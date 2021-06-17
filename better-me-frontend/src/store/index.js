@@ -16,6 +16,7 @@ export default new Vuex.Store({
     state: {
         token: localStorage.getItem('token') || '',
         user: {},
+        adminReport: {},
         allMeals: [],
         allGroceries: [],
         allergens: [],
@@ -28,6 +29,10 @@ export default new Vuex.Store({
     mutations: {
         setMeals (state, meals) {
             state.allMeals = meals;
+        },
+
+        setAdminReport (state, adminReport) {
+            state.getAdminReport = adminReport;
         },
 
         setAllergens (state, allergens) {
@@ -57,11 +62,141 @@ export default new Vuex.Store({
         },
     },
     actions: {
-        getAllMeals ({ commit }) {
+        getAllMeals ({ commit }, filter) {
             return new Promise((resolve, reject) => {
-                axios({url: 'http://localhost:8081/api/filter/meals', data: { name: '', fromTime: 0, toTime: 0, descending: false }, method: 'POST' })
+                axios({url: 'http://localhost:8081/api/filter/meals', data: filter, method: 'POST' })
                 .then(resp => {
                     commit('setMeals', resp.data.sorted);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        getAllGroceries ({ commit }, filter) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/filter/groceries', data: filter, method: 'POST' })
+                .then(resp => {
+                    commit('setGroceries', resp.data.sorted);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        getWeekAndDayNumber ({ commit }) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/registered-users/week-and-day', method: 'GET' })
+                .then(resp => {
+                    commit('setAdminReport', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        getWeek ({ commit }) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/registered-users/week', method: 'GET' })
+                .then(resp => {
+                    commit('setAdminReport', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        getDay ({ commit }) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/registered-users/day', method: 'GET' })
+                .then(resp => {
+                    commit('setAdminReport', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        getAdminReport ({ commit }) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/reports/admin-report', method: 'GET' })
+                .then(resp => {
+                    commit('setAdminReport', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        getRate ({ commit }, mealName) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/meals/' + mealName, method: 'GET' })
+                .then(resp => {
+                    commit('setGroceries', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        getAlarm ({ commit }) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/alarms', method: 'GET' })
+                .then(resp => {
+                    commit('setAdminReport', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        getRecommended ({ commit }) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/nutrition/recommended', method: 'GET' })
+                .then(resp => {
+                    commit('setAdminReport', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        getReport ({ commit }) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/reports/user-report', method: 'GET' })
+                .then(resp => {
+                    commit('setAdminReport', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        rateMeal ({ commit }, meal) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/meals/' + meal.name + "/" + meal.currentRating, method: 'GET' })
+                .then(resp => {
+                    commit('setGroceries', resp.data);
                     resolve(resp);
                 })
                 .catch(err => {
@@ -88,6 +223,19 @@ export default new Vuex.Store({
                 axios({url: 'http://localhost:8081/api/nutrition/all-groceries', method: 'GET' })
                 .then(resp => {
                     commit('setGroceries', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        getAllMealsAdmin ({ commit }) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/meals/all-meals', method: 'GET' })
+                .then(resp => {
+                    commit('setMeals', resp.data);
                     resolve(resp);
                 })
                 .catch(err => {
@@ -171,6 +319,32 @@ export default new Vuex.Store({
                 axios({url: 'http://localhost:8081/api/meals', data: meal, method: 'POST' })
                 .then(resp => {
                     commit('setAllergens', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        eatMeal({ commit }, meal) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/meals/eaten-meal', data: meal, method: 'POST' })
+                .then(resp => {
+                    commit('setAdminReport', resp.data);
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err);
+                });
+            });
+        },
+
+        eatCustomMeal({ commit }, meal) {
+            return new Promise((resolve, reject) => {
+                axios({url: 'http://localhost:8081/api/meals/eaten-custom-meal', data: meal, method: 'POST' })
+                .then(resp => {
+                    commit('setAdminReport', resp.data);
                     resolve(resp);
                 })
                 .catch(err => {

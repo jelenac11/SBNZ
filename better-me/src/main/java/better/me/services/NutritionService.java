@@ -1,9 +1,13 @@
 package better.me.services;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,20 +15,26 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import better.me.dto.GroceryDTO;
+import better.me.dto.RecommendedMealDTO;
 import better.me.dto.RegisteredUserDTO;
 import better.me.enums.Category;
 import better.me.exceptions.NotLoggedInException;
+import better.me.model.Grocery;
+import better.me.model.Meal;
+import better.me.model.RecommendedMeal;
 import better.me.model.RegisteredUser;
 import better.me.model.Report;
 import better.me.model.Week;
 import better.me.modelDB.AllergenDB;
 import better.me.modelDB.DayDB;
 import better.me.modelDB.GroceryDB;
+import better.me.modelDB.MealDB;
 import better.me.modelDB.RegisteredUserDB;
 import better.me.modelDB.UserDB;
 import better.me.modelDB.WeekDB;
 import better.me.repositories.IAllergenRepository;
 import better.me.repositories.IGroceryRepository;
+import better.me.repositories.IMealRepository;
 import better.me.repositories.IRegisteredUser;
 
 @Service
@@ -38,6 +48,9 @@ public class NutritionService {
 	
 	@Autowired
 	private IGroceryRepository groceryRepository;
+	
+	@Autowired
+	private IMealRepository mealRepository;
 	
 	@Autowired
 	private KieSession kieSession;
@@ -113,5 +126,38 @@ public class NutritionService {
 		return new ResponseEntity<>("Grocery " + dto.getName() + " added.", HttpStatus.OK);
 	}
 
+	public List<RecommendedMealDTO> getRecommended() {
+		UserDB current = (UserDB) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		RegisteredUserDB rUser = registeredUserRepository.findByEmail(current.getEmail());
+		kieSession.insert(new RegisteredUser(rUser));
+		
+		List<MealDB> allMealsDB = mealRepository.findAll();
+		List<Meal> allMeals = new ArrayList<Meal>();
+		allMealsDB.forEach(meal -> allMeals.add(new Meal(meal)));
+		kieSession.insert(allMeals);
+		
+		List<GroceryDB> allGroceries = groceryRepository.findAll();
+		allGroceries.forEach(grocery -> kieSession.insert(new Grocery(grocery)));
+		
+		kieSession.getAgenda().getAgendaGroup("meal-recommendation").setFocus();
+        kieSession.fireAllRules();
+		
+		List<RecommendedMealDTO> forReturn = new ArrayList<RecommendedMealDTO>();
+		QueryResults results = kieSession.getQueryResults( "getRecommendedMeal" ); 
+		for ( QueryResultsRow row : results ) {
+			RecommendedMeal rm = ( RecommendedMeal ) row.get( "$result" );
+			forReturn.add(new RecommendedMealDTO(rm));
+		}
+		
+		Collections.sort(forReturn, new Comparator<RecommendedMealDTO>(){
+		    public int compare(RecommendedMealDTO r1, RecommendedMealDTO r2) {
+		        return new Double(r1.getPoints()).compareTo(new Double(r2.getPoints()));
+		    }
+		});
+		
+        kieSession.dispose();
+        
+		return forReturn;
+	}
 	
 }

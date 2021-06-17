@@ -111,7 +111,7 @@
         <v-snackbar v-model="wrong" top color="red darken-4">
             Grocery with given name already exists.
         </v-snackbar>
-        <v-snackbar v-model="success" top color="green">
+        <v-snackbar v-model="success" top color="green darken-4">
             Grocery added successfully.
         </v-snackbar>
     </div>

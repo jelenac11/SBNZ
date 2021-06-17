@@ -39,7 +39,7 @@
                 </v-card>
             </v-flex>
         </v-layout>
-        <v-snackbar v-model="success" top color="green">
+        <v-snackbar v-model="success" top color="green darken-4">
             Age template changed successfully.
         </v-snackbar>
     </div>

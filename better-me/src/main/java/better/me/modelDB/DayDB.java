@@ -2,6 +2,7 @@ package better.me.modelDB;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -47,7 +48,7 @@ public class DayDB {
 	@Column
 	private boolean exceed;
 	
-	@OneToMany(mappedBy = "day")
+	@OneToMany(mappedBy = "day", cascade = CascadeType.ALL)
 	private Set<ConcreteMealDB> concreteMeals;
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)

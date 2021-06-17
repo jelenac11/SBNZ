@@ -39,6 +39,7 @@
                                 <v-row>
                                     <v-col cols="12" sm="6" md="12" class="mt-n7">
                                         <v-textarea
+                                            color="green"
                                             label="Description"
                                             no-resize
                                             counter
@@ -120,13 +121,13 @@
                 </v-card>
             </v-flex>
         </v-layout>
-        <v-snackbar v-model="wrongIngredients" top color="red darken-4">
+        <v-snackbar v-model="wrongIngredients" top color="red darken-3">
             You must add at least one ingredient.
         </v-snackbar>
-        <v-snackbar v-model="wrong" top color="red darken-4">
+        <v-snackbar v-model="wrong" top color="red darken-3">
             Meal with given name already exists.
         </v-snackbar>
-        <v-snackbar v-model="success" top color="green">
+        <v-snackbar v-model="success" top color="green darken-4">
             Meal added successfully.
         </v-snackbar>
     </div>

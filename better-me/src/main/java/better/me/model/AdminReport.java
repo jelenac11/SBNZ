@@ -1,7 +1,6 @@
 package better.me.model;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -14,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AdminReport {
 
-	private Date date;
+	private long date;
 	private List<MealPopularity> mostPopularMeals;
 	private List<MealPopularity> mostRatedMeals;
 	private int eatings;

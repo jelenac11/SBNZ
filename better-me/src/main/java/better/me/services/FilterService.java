@@ -54,7 +54,7 @@ public class FilterService {
 		List<Meal> meals = allMeals.stream().map(Meal::new).collect(Collectors.toList());
 		List<Meal> withAllergens = new ArrayList<Meal>();
 		SortedMeals sorted = new SortedMeals();
-		
+	
 		kieSession.getAgenda().getAgendaGroup("filter").setFocus();
 		kieSession.insert(filter);
 		kieSession.insert(meals);
@@ -68,18 +68,13 @@ public class FilterService {
 		kieSession.dispose();
 		
 		SortedMealsDTO retval = new SortedMealsDTO();
-		System.out.println("sorted: " + sorted.getSortedList().size());
-		System.out.println("with allergens: " + withAllergens.size());
 		for (Meal m: sorted.getSortedList()) {
 			if (withAllergens.contains(m)) {
-				System.out.println("Allergen: " + m.getName());
 				retval.getSorted().add(new ResponseMealDTO(m, true));
 			} else {
-				System.out.println("Not: " + m.getName());
 				retval.getSorted().add(new ResponseMealDTO(m, false));				
 			}
 		}
-		System.out.println("retval: " + retval.getSorted().size());
 		return retval;
 	}
 	

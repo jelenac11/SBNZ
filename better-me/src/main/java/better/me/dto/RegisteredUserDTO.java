@@ -32,13 +32,14 @@ public class RegisteredUserDTO extends ResponseUserDTO {
 	private List<AllergenDB> allergens;
 	private double activityCount;
 	private int score;
+	private boolean allowedToEat;
 
 	public RegisteredUserDTO(RegisteredUserDB user) {
 		this(user.getRealUsername(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getAge(),
 				user.getSex().getValue(), user.getHeight(), user.getWeight(), user.getBodyType().getValue(),
 				user.getActivityLevel().getValue(), user.getDiet().getValue(), user.getCategory().getValue(),
 				user.getPreviousCategory().getValue(), user.getBmi(), new ArrayList<AllergenDB>(user.getAllergens()),
-				user.getActivityCount(), user.getScore());
+				user.getActivityCount(), user.getScore(), user.isAllowedToEat());
 		this.role = "ROLE_REGISTERED_USER";
 	}
 
@@ -46,7 +47,7 @@ public class RegisteredUserDTO extends ResponseUserDTO {
 		this(user.getUsername(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getAge(), user.getSex(),
 				user.getHeight(), user.getWeight(), user.getBodyType(), user.getActivityLevel(), user.getDiet(),
 				user.getCategory(), user.getPreviousCategory(), user.getBmi(), null, user.getActivityCount(),
-				user.getScore());
+				user.getScore(), user.isAllowedToEat());
 		this.role = "ROLE_REGISTERED_USER";
 	}
 	

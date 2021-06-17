@@ -29,13 +29,19 @@ public class Meal {
 	private double averageGrade;
 
 	public Meal(MealDB m) {
-		this(m.getId(), m.getName(), m.getCalories(), m.getCarbs(), m.getProteins(), m.getFats(), m.getTime(),
-				m.getDescription(),
-				(new ArrayList<IngredientDB>(m.getIngredients())).stream().map(Ingredient::new)
-						.collect(Collectors.toList()),
-				(new ArrayList<GradeDB>(m.getGrades())).stream().map(Grade::new)
-						.collect(Collectors.toList()),
-				m.getAverageGrade());
+		if (m != null) {
+			this.id = m.getId();
+			this.name = m.getName();
+			this.calories = m.getCalories();
+			this.proteins = m.getProteins();
+			this.carbs = m.getCarbs();
+			this.fats = m.getFats();
+			this.time = m.getTime();
+			this.description = m.getDescription();
+			this.ingredients = (new ArrayList<IngredientDB>(m.getIngredients())).stream().map(Ingredient::new).collect(Collectors.toList());
+			this.grades = (new ArrayList<GradeDB>(m.getGrades())).stream().map(Grade::new).collect(Collectors.toList());
+			this.averageGrade = m.getAverageGrade();
+		}
 	}
 
 	public Meal() {

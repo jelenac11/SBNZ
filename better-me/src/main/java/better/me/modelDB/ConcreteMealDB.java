@@ -37,7 +37,7 @@ public class ConcreteMealDB {
 	@Column
 	private boolean isCustomMeal;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "meal_id")
 	private MealDB meal;
 	

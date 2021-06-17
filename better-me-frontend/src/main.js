@@ -5,7 +5,9 @@ import vuetify from './plugins/vuetify'
 import router from './router'
 import store from './store';
 import axios from 'axios'
+import VueEllipseProgress from 'vue-ellipse-progress';
 
+Vue.use(VueEllipseProgress);
 Vue.config.productionTip = false
 Vue.use(Vuetify, {
     theme: {

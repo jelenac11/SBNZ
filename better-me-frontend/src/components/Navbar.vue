@@ -19,6 +19,15 @@
         <v-btn class="mr-4" outlined @click="goToCategoryTemplate()" v-if="currentUser.role ==='ROLE_ADMIN'">
             category template
         </v-btn>
+        <v-btn class="mr-4" outlined @click="goToAdminMeals()" v-if="currentUser.role ==='ROLE_ADMIN'">
+            meals
+        </v-btn>
+        <v-btn class="mr-4" outlined @click="goToAdminGroceries()" v-if="currentUser.role ==='ROLE_ADMIN'">
+            groceries
+        </v-btn>
+        <v-btn class="mr-4" outlined @click="goToAdminReport()" v-if="currentUser.role ==='ROLE_ADMIN'">
+            report
+        </v-btn>
         <v-spacer></v-spacer>
         <v-menu open-on-click transition="slide-y-transition" bottom left offset-y>
             <template v-slot:activator="{ on, attrs }">
@@ -75,6 +84,18 @@
             },
             goToCategoryTemplate: function() {
                 let path = '/category-template';
+                if (this.$route.path !== path) this.$router.push(path);
+            },
+            goToAdminMeals: function() {
+                let path = '/all-meals';
+                if (this.$route.path !== path) this.$router.push(path);
+            },
+            goToAdminGroceries: function() {
+                let path = '/all-groceries';
+                if (this.$route.path !== path) this.$router.push(path);
+            },
+            goToAdminReport: function() {
+                let path = '/admin-report';
                 if (this.$route.path !== path) this.$router.push(path);
             },
         },

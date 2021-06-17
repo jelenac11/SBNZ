@@ -7,14 +7,13 @@ import better.me.util.*;
 
 global MyLogger myLogger;
 
-declare SuspiciousUserEvent
-    @role(event)
-    user: User
-end
-
 declare window numberOfLogins
 	@doc("Number of failed login attempts in the last 5 minutes")
 	LoginEvent() over window:time(5m)
+end
+
+query "getSuspiciousUserEvent"
+    $result: SuspiciousUserEvent()
 end
 
 rule "More than 3 unsuccessful login attempts in 5 minutes from one user"
@@ -27,7 +26,7 @@ rule "More than 3 unsuccessful login attempts in 5 minutes from one user"
 		not (SuspiciousUserEvent(user.getId() == $user.getId()))
     then
     	myLogger.log("Many unsuccessful login attempts from same username " + $user.getEmail());
-    	$user.setAllowedToLogin(false);
+    	$event.getUser().setAllowedToLogin(false);
     	insert(new SuspiciousUserEvent($user));    
 end
 
