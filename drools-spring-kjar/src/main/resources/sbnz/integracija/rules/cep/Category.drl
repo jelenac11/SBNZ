@@ -3,7 +3,6 @@ import better.me.enums.*;
 import better.me.model.*;
 import better.me.util.*;
 import better.me.events.*;
-
 declare window score
 	@doc("score changed event")
 	ScoreChangedEvent() over window:time(1m)
@@ -11,7 +10,7 @@ end
 
 rule "Rule PRO Rule"
 	when 
-		$user : RegisteredUser($score: score, $score >= 2470, $score < 2147483647, category.equals("PRO")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 2000, $score < 2147483647, category.equals("PRO")) @Watch(!category, !previousCategory)
 		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setCategory("PRO"); }
@@ -19,7 +18,7 @@ rule "Rule PRO Rule"
 	end
 rule "Rule PRO Rule if category changes"
 	when 
-		$user : RegisteredUser($score: score, $score >= 2470, $score < 2147483647, $category: category, !category.equals("PRO")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 2000, $score < 2147483647, $category: category, !category.equals("PRO")) @Watch(!category, !previousCategory)
 		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setPreviousCategory($category); }
@@ -30,7 +29,7 @@ rule "Rule PRO Rule if category changes"
 
 rule "Rule ADVANCED Rule"
 	when 
-		$user : RegisteredUser($score: score, $score >= 740, $score < 2470, category.equals("ADVANCED")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 500, $score < 2000, category.equals("ADVANCED")) @Watch(!category, !previousCategory)
 		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setCategory("ADVANCED"); }
@@ -38,7 +37,7 @@ rule "Rule ADVANCED Rule"
 	end
 rule "Rule ADVANCED Rule if category changes"
 	when 
-		$user : RegisteredUser($score: score, $score >= 740, $score < 2470, $category: category, !category.equals("ADVANCED")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 500, $score < 2000, $category: category, !category.equals("ADVANCED")) @Watch(!category, !previousCategory)
 		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setPreviousCategory($category); }
@@ -49,7 +48,7 @@ rule "Rule ADVANCED Rule if category changes"
 
 rule "Rule INTERMEDIATE Rule"
 	when 
-		$user : RegisteredUser($score: score, $score >= 200, $score < 740, category.equals("INTERMEDIATE")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 320, $score < 500, category.equals("INTERMEDIATE")) @Watch(!category, !previousCategory)
 		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setCategory("INTERMEDIATE"); }
@@ -57,7 +56,7 @@ rule "Rule INTERMEDIATE Rule"
 	end
 rule "Rule INTERMEDIATE Rule if category changes"
 	when 
-		$user : RegisteredUser($score: score, $score >= 200, $score < 740, $category: category, !category.equals("INTERMEDIATE")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 320, $score < 500, $category: category, !category.equals("INTERMEDIATE")) @Watch(!category, !previousCategory)
 		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setPreviousCategory($category); }
@@ -68,7 +67,7 @@ rule "Rule INTERMEDIATE Rule if category changes"
 
 rule "Rule BEGINNER Rule"
 	when 
-		$user : RegisteredUser($score: score, $score >= 0, $score < 200, category.equals("BEGINNER")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 0, $score < 320, category.equals("BEGINNER")) @Watch(!category, !previousCategory)
 		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setCategory("BEGINNER"); }
@@ -76,7 +75,7 @@ rule "Rule BEGINNER Rule"
 	end
 rule "Rule BEGINNER Rule if category changes"
 	when 
-		$user : RegisteredUser($score: score, $score >= 0, $score < 200, $category: category, !category.equals("BEGINNER")) @Watch(!category, !previousCategory)
+		$user : RegisteredUser($score: score, $score >= 0, $score < 320, $category: category, !category.equals("BEGINNER")) @Watch(!category, !previousCategory)
 		ScoreChangedEvent(user.getId() == $user.getId()) from window score;
 	then
 		modify($user){ setPreviousCategory($category); }
@@ -84,4 +83,5 @@ rule "Rule BEGINNER Rule if category changes"
 		insert(new CategoryChangedEvent($user));
 		kcontext.getKnowledgeRuntime().getAgenda().getAgendaGroup("new-week").setFocus();
 	end
+
 

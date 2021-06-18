@@ -8,11 +8,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.drools.core.ClassObjectFilter;
 import org.drools.template.ObjectDataCompiler;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import better.me.dto.AgeBoundariesDTO;
+import better.me.enums.AgeCategory;
 import better.me.exceptions.RequestException;
 import better.me.model.AgeBoundaries;
 import better.me.model.RegisteredUser;
@@ -73,6 +77,17 @@ public class AgeService {
 		
 		allUsers.stream().map(user -> this.kieSession.insert(new RegisteredUser(user)));
 		kieSession.fireAllRules();
+		
+		@SuppressWarnings("unchecked")
+		Collection<RegisteredUser> users = (Collection<RegisteredUser>) kieSession
+				.getObjects(new ClassObjectFilter(RegisteredUser.class));
+		
+		for (RegisteredUser u: users) {
+			Optional<RegisteredUserDB> db = registeredUserRepository.findById(u.getId());
+			db.get().setAgeCategory(AgeCategory.valueOf(u.getAgeCategory()));
+			registeredUserRepository.save(db.get());
+		}
+		
 		kieSession.dispose();
 	}
 	

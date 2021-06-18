@@ -22,3 +22,7 @@ query "Get number of days submitted"(Week $week)
 		count($t)
  	 )
 end
+
+query "getUsers"
+	 $result : RegisteredUser()
+end

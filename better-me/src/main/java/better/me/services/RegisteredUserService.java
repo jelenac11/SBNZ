@@ -203,4 +203,8 @@ public class RegisteredUserService {
 		return forReturn;
 	}
 
+	public void save(RegisteredUserDB rdb) {
+		registeredUserRepository.save(rdb);
+	}
+
 }

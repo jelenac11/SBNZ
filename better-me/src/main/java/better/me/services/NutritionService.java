@@ -135,9 +135,10 @@ public class NutritionService {
 		List<GroceryDB> allGroceries = groceryRepository.findAll();
 		allGroceries.forEach(grocery -> kieSession.insert(new Grocery(grocery)));
 		
-		kieSession.getAgenda().getAgendaGroup("meal-recommendation").setFocus();
+		kieSession.getAgenda().getAgendaGroup("prepare-for-recommendation").setFocus();
         kieSession.fireAllRules();
-		
+        kieSession.getAgenda().getAgendaGroup("meal-recommendation").setFocus();
+        kieSession.fireAllRules();
 		List<RecommendedMealDTO> forReturn = new ArrayList<RecommendedMealDTO>();
 		QueryResults results = kieSession.getQueryResults( "getRecommendedMeal" ); 
 		for ( QueryResultsRow row : results ) {
