@@ -97,9 +97,9 @@ public class RecommendationTest {
 		
 		RegisteredUser r1 = new RegisteredUser();
 		
-		Grade g1 = new Grade(2, meal1, r1);
-		Grade g2 = new Grade(4, meal2, r1);
-		Grade g3 = new Grade(2, meal3, r1);
+		Grade g1 = new Grade(5, meal1, r1);
+		Grade g2 = new Grade(5, meal2, r1);
+		Grade g3 = new Grade(5, meal3, r1);
 		ArrayList<Grade> grades1 = new ArrayList<Grade>();
 		grades1.add(g1);
 		grades1.add(g2);
@@ -144,7 +144,7 @@ public class RecommendationTest {
         kieSession.getAgenda().getAgendaGroup("meal-recommendation").setFocus();
         kieSession.fireAllRules();
 
-        assertEquals(11, firedRules);
+        assertEquals(8, firedRules);
        
     	kieSession.dispose();
 	}

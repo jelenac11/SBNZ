@@ -8,18 +8,23 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.drools.core.ClassObjectFilter;
 import org.drools.template.ObjectDataCompiler;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import better.me.dto.CategoryBoundariesDTO;
+import better.me.enums.Category;
 import better.me.events.ScoreChangedEvent;
 import better.me.exceptions.RequestException;
 import better.me.model.CategoryBoundaries;
@@ -41,7 +46,8 @@ public class CategoryService {
 	private IRegisteredUser registeredUserRepository;
 	
 	@Autowired
-	private KieSession kieSession;
+	@Qualifier(value = "cepSession")
+	private KieSession cep;
 	
 	public String changeBoundaries(@Valid CategoryBoundariesDTO dto) throws IOException, MavenInvocationException, RequestException {
 		if (dto.getIntermediateFrom() > dto.getAdvancedFrom() || dto.getIntermediateFrom() > dto.getProFrom() || dto.getAdvancedFrom() > dto.getProFrom()) {
@@ -63,17 +69,25 @@ public class CategoryService {
         Files.write(Paths.get(categoryDRL), drl.getBytes(), StandardOpenOption.WRITE);
         RuleBasedSystemUtil.mavenCleanAndInstall();
         
-        this.updateUsers();
-        return "Rule created!";
-	}
+        List<RegisteredUserDB> allUsers = registeredUserRepository.findAll();
 
-	private void updateUsers() {
-		List<RegisteredUserDB> allUsers = registeredUserRepository.findAll();
+		for (RegisteredUserDB u: allUsers) {
+			RegisteredUser ru = new RegisteredUser(u);
+			cep.insert(ru);
+			cep.insert(new ScoreChangedEvent(ru));
+		}
+		cep.fireAllRules();
 		
-		allUsers.stream().map(user -> this.kieSession.insert(new RegisteredUser(user)));
-		allUsers.stream().map(user -> this.kieSession.insert(new ScoreChangedEvent(new RegisteredUser(user))));
-		kieSession.fireAllRules();
-		kieSession.dispose();
+		@SuppressWarnings("unchecked")
+		Collection<RegisteredUser> results = (Collection<RegisteredUser>) cep
+				.getObjects(new ClassObjectFilter(RegisteredUser.class));
+		for ( RegisteredUser row : results ) {
+			Optional<RegisteredUserDB> db = registeredUserRepository.findById(row.getId());
+			db.get().setCategory(Category.valueOf(row.getCategory()));
+			registeredUserRepository.save(db.get());
+		}
+
+        return "Rule created!";
 	}
 	
 }

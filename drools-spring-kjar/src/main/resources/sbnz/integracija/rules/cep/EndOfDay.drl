@@ -30,6 +30,10 @@ query checkIfWholeWeekIsSubmitted(Week $week)
  	 )
 end
 
+query "getAlarms"
+    $result: Alarm()
+end
+
 rule "When midnight event appears, set submit to true for current day"
 	agenda-group "end-day"
 	salience Integer.MAX_VALUE

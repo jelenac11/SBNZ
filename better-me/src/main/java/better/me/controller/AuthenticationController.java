@@ -1,8 +1,11 @@
 package better.me.controller;
 
+import java.util.Collection;
 import java.util.List;
+
 import javax.validation.Valid;
 
+import org.drools.core.ClassObjectFilter;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
@@ -30,9 +33,12 @@ import better.me.dto.ResponseLoginDTO;
 import better.me.dto.ResponseUserDTO;
 import better.me.dto.UserDTO;
 import better.me.dto.UserLoginDTO;
+import better.me.enums.Category;
 import better.me.events.LoginEvent;
+import better.me.events.ScoreChangedEvent;
 import better.me.events.SuspiciousUserEvent;
 import better.me.helper.RegisteredUserMapper;
+import better.me.model.RegisteredUser;
 import better.me.model.User;
 import better.me.modelDB.AuthorityDB;
 import better.me.modelDB.RegisteredUserDB;
@@ -124,7 +130,20 @@ public class AuthenticationController {
 
 			ResponseUserDTO responseUser = null;
 			if (auth.get(0).getName().equals("ROLE_REGISTERED_USER")) {
-				responseUser = new RegisteredUserDTO(this.registeredUserService.findByEmail(user.getEmail()));
+				RegisteredUserDB rdb = this.registeredUserService.findByEmail(user.getEmail());
+				responseUser = new RegisteredUserDTO(rdb);
+				if (rdb.getBmi() != 0) {
+					cepLoginSession.insert(new ScoreChangedEvent(new RegisteredUser(rdb)));
+					cepLoginSession.insert(new RegisteredUser(rdb));
+					cepLoginSession.fireAllRules();
+					@SuppressWarnings("unchecked")
+					Collection<RegisteredUser> results = (Collection<RegisteredUser>) cepLoginSession
+							.getObjects(new ClassObjectFilter(RegisteredUser.class));
+					for ( RegisteredUser row : results ) {
+						rdb.setCategory(Category.valueOf(row.getCategory()));
+						registeredUserService.save(rdb);
+					}
+				}
 			} else {
 				responseUser = new AdminDTO(this.adminService.findByEmail(user.getEmail()));
 			}
