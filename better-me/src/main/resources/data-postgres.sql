@@ -24,7 +24,7 @@ insert into groceries(name, diet, calories, carbs, proteins, fats) values('Peanu
 insert into groceries(name, diet, calories, carbs, proteins, fats) values('Avocado', 'VEGAN', 160, 8.5, 2, 14.7);
 insert into groceries(name, diet, calories, carbs, proteins, fats) values('Beans', 'VEGAN', 143, 26.2, 9, 0.7);
 insert into groceries(name, diet, calories, carbs, proteins, fats) values('Rice', 'VEGAN', 130, 28.2, 2.7, 0.3);
-insert into groceries(name, diet, calories, carbs, proteins, fats) values('Muesli', 'VEGAN', 406, 65.6, 12.5, 10.9);
+insert into groceries(name, diet, calories, carbs, proteins, fats) values('Wheat', 'VEGAN', 406, 65.6, 12.5, 10.9);
 insert into groceries(name, diet, calories, carbs, proteins, fats) values('Pork', 'OMNIVORE', 117, 0, 22.4, 2.3);
 insert into groceries(name, diet, calories, carbs, proteins, fats) values('Almonds', 'VEGAN', 577, 19.7, 21.3, 50.6);
 insert into groceries(name, diet, calories, carbs, proteins, fats) values('Ketchup', 'VEGAN', 97, 25.2, 1.7, 0.3);
@@ -34,31 +34,15 @@ insert into groceries(name, diet, calories, carbs, proteins, fats) values('Honey
 insert into groceries(name, diet, calories, carbs, proteins, fats) values('Sugar', 'VEGAN', 389, 99.6, 0, 0.2);
 insert into groceries(name, diet, calories, carbs, proteins, fats) values('Bread', 'VEGAN', 265, 49.1, 9.2, 3.2);
 
-insert into allergens(name) values ('Chicken Breast');
-insert into allergens(name) values ('Beef');
-insert into allergens(name) values ('Bacon');
-insert into allergens(name) values ('Ham');
 insert into allergens(name) values ('Tuna');
 insert into allergens(name) values ('Egg');
 insert into allergens(name) values ('Milk');
-insert into allergens(name) values ('Potato');
 insert into allergens(name) values ('Tomato');
-insert into allergens(name) values ('Iceberg Lettuce');
 insert into allergens(name) values ('Banana');
-insert into allergens(name) values ('Apple');
 insert into allergens(name) values ('Peanuts');
-insert into allergens(name) values ('Avocado');
-insert into allergens(name) values ('Beans');
-insert into allergens(name) values ('Rice');
-insert into allergens(name) values ('Muesli');
-insert into allergens(name) values ('Pork');
+insert into allergens(name) values ('Wheat');
 insert into allergens(name) values ('Almonds');
-insert into allergens(name) values ('Ketchup');
-insert into allergens(name) values ('Sour cream');
 insert into allergens(name) values ('Chocolate');
-insert into allergens(name) values ('Honey');
-insert into allergens(name) values ('Sugar');
-insert into allergens(name) values ('Bread');
 
 insert into meals(name, calories, carbs, proteins, fats, "time", description, average_grade) values ('Tuna Salad', 254, 9.3, 24.3, 4.4, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0);
 insert into meals(name, calories, carbs, proteins, fats, "time", description, average_grade) values ('Caesar Salad', 187, 4.1, 18.5, 1.1, 15, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 0);

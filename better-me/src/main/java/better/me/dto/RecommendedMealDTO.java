@@ -12,11 +12,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RecommendedMealDTO {
 
-	private String meal;
+	private ResponseMealDTO meal;
 	private double points;
 	
 	public RecommendedMealDTO(RecommendedMeal m) {
-		this.meal = m.getMeal().getName();
+		this.meal = new ResponseMealDTO(m.getMeal(), false);
 		this.points = m.getPoints();
 	}
 	

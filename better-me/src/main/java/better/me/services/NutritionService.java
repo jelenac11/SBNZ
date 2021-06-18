@@ -25,7 +25,6 @@ import better.me.model.RecommendedMeal;
 import better.me.model.RegisteredUser;
 import better.me.model.Report;
 import better.me.model.Week;
-import better.me.modelDB.AllergenDB;
 import better.me.modelDB.DayDB;
 import better.me.modelDB.GroceryDB;
 import better.me.modelDB.MealDB;
@@ -119,10 +118,7 @@ public class NutritionService {
 		if (existName != null) {
 			return new ResponseEntity<>("Grocery with name " + dto.getName() + " already exists.", HttpStatus.CONFLICT);
 		}
-		AllergenDB allergen = new AllergenDB();
-		allergen.setName(dto.getName());
 		groceryRepository.save(new GroceryDB(dto));
-		allergenRepository.save(allergen);
 		return new ResponseEntity<>("Grocery " + dto.getName() + " added.", HttpStatus.OK);
 	}
 

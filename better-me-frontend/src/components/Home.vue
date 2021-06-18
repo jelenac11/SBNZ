@@ -346,6 +346,23 @@
                                                     </v-card-title>
                                                     <v-divider></v-divider>
                                                     <v-list dense>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4">Time: <b>{{ this.recMeal1.time }}m</b></span>
+                                                        </v-list-item-content>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4 mt-n3">Calories: <b>{{ this.recMeal1.calories }}</b></span>
+                                                        </v-list-item-content>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4 mt-n3">Fats: <b>{{ this.recMeal1.fats }}g</b></span>
+                                                        </v-list-item-content>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4 mt-n3">Carbs: <b>{{ this.recMeal1.carbs }}g</b></span>
+                                                        </v-list-item-content>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4 mt-n3">Proteins: <b>{{ this.recMeal1.proteins }}g</b></span>
+                                                        </v-list-item-content>
+                                                        <p class="ml-4 mr-6 mt-1" style="text-justify: inter-word;">Ingredients: <b>{{ printIngredients(this.recMeal1) }}</b></p>
+                                                        <p class="ml-4 mr-6 mt-1" style="text-justify: inter-word;">{{ this.recMeal1.description }}</p>
                                                         <v-form v-model="isValidRec1" ref="formRec1">
                                                             <v-list-item-content class="px-4 mt-n4">
                                                                 <v-text-field
@@ -380,6 +397,23 @@
                                                     </v-card-title>
                                                     <v-divider></v-divider>
                                                     <v-list dense>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4">Time: <b>{{ this.recMeal2.time }}m</b></span>
+                                                        </v-list-item-content>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4 mt-n3">Calories: <b>{{ this.recMeal2.calories }}</b></span>
+                                                        </v-list-item-content>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4 mt-n3">Fats: <b>{{ this.recMeal2.fats }}g</b></span>
+                                                        </v-list-item-content>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4 mt-n3">Carbs: <b>{{ this.recMeal2.carbs }}g</b></span>
+                                                        </v-list-item-content>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4 mt-n3">Proteins: <b>{{ this.recMeal2.proteins }}g</b></span>
+                                                        </v-list-item-content>
+                                                        <p class="ml-4 mr-6 mt-1" style="text-justify: inter-word;">Ingredients: <b>{{ printIngredients(this.recMeal2) }}</b></p>
+                                                        <p class="ml-4 mr-6 mt-1" style="text-justify: inter-word;">{{ this.recMeal2.description }}</p>
                                                         <v-form v-model="isValidRec2" ref="formRec2">
                                                             <v-list-item-content class="px-4 mt-n4">
                                                                 <v-text-field
@@ -414,6 +448,23 @@
                                                     </v-card-title>
                                                     <v-divider></v-divider>
                                                     <v-list dense>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4">Time: <b>{{ this.recMeal3.time }}m</b></span>
+                                                        </v-list-item-content>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4 mt-n3">Calories: <b>{{ this.recMeal3.calories }}</b></span>
+                                                        </v-list-item-content>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4 mt-n3">Fats: <b>{{ this.recMeal3.fats }}g</b></span>
+                                                        </v-list-item-content>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4 mt-n3">Carbs: <b>{{ this.recMeal3.carbs }}g</b></span>
+                                                        </v-list-item-content>
+                                                        <v-list-item-content>
+                                                            <span class="ml-4 mt-n3">Proteins: <b>{{ this.recMeal3.proteins }}g</b></span>
+                                                        </v-list-item-content>
+                                                        <p class="ml-4 mr-6 mt-1" style="text-justify: inter-word;">Ingredients: <b>{{ printIngredients(this.recMeal3) }}</b></p>
+                                                        <p class="ml-4 mr-6 mt-1" style="text-justify: inter-word;">{{ this.recMeal3.description }}</p>
                                                         <v-form v-model="isValidRec3" ref="formRec3">
                                                             <v-list-item-content class="px-4 mt-n4">
                                                                 <v-text-field
@@ -542,6 +593,9 @@
                 grams: null,
                 name: 'Fruit Salad',
             },
+            recMeal1: {},
+            recMeal2: {},
+            recMeal3: {},
             rec2: {
                 grams: null,
                 name: 'Avocado Salad',
@@ -659,13 +713,16 @@
                     this.$store.dispatch('getRecommended').then(resp => {
                         this.recommended = resp.data;
                         if (this.recommended.length >= 1) {
-                            this.rec1.name = this.recommended[0].meal;
+                            this.rec1.name = this.recommended[0].meal.name;
+                            this.recMeal1 = this.recommended[0].meal;
                         }
                         if (this.recommended.length >= 2) {
-                            this.rec2.name = this.recommended[1].meal;
+                            this.rec2.name = this.recommended[1].meal.name;
+                            this.recMeal2 = this.recommended[1].meal;
                         }
                         if (this.recommended.length >= 3) {
-                            this.rec3.name = this.recommended[2].meal;
+                            this.rec3.name = this.recommended[2].meal.name;
+                            this.recMeal3 = this.recommended[2].meal;
                         }
                     });
                 })
@@ -871,6 +928,13 @@
                 }
                 return ings.slice(0, ings.length - 2);
             },
+            printIngredients : function (meal) {
+                let ings = "";
+                for (let i = 0; i < meal.ingredients.length; ++i) {
+                    ings += meal.ingredients[i].grocery.name + ", ";
+                }
+                return ings.slice(0, ings.length - 2);
+            },
         },
         computed: {
             ...mapState({
@@ -908,15 +972,17 @@
                     });
                     this.$store.dispatch('getRecommended').then(resp => {
                         this.recommended = resp.data;
-                        console.log(resp.data);
                         if (this.recommended.length >= 1) {
-                            this.rec1.name = this.recommended[0].meal;
+                            this.rec1.name = this.recommended[0].meal.name;
+                            this.recMeal1 = this.recommended[0].meal;
                         }
                         if (this.recommended.length >= 2) {
-                            this.rec2.name = this.recommended[1].meal;
+                            this.rec2.name = this.recommended[1].meal.name;
+                            this.recMeal2 = this.recommended[1].meal;
                         }
                         if (this.recommended.length >= 3) {
-                            this.rec3.name = this.recommended[2].meal;
+                            this.rec3.name = this.recommended[2].meal.name;
+                            this.recMeal3 = this.recommended[2].meal;
                         }
                     })
                     .catch(err => {

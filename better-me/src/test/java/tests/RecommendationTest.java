@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 
 import better.me.enums.Diet;
 import better.me.model.ConcreteMeal;
@@ -19,6 +21,7 @@ import better.me.model.Grocery;
 import better.me.model.GroceryFlag;
 import better.me.model.Ingredient;
 import better.me.model.Meal;
+import better.me.model.RecommendedMeal;
 import better.me.model.RegisteredUser;
 import better.me.model.Week;
 import better.me.util.MyLogger;
@@ -97,9 +100,9 @@ public class RecommendationTest {
 		
 		RegisteredUser r1 = new RegisteredUser();
 		
-		Grade g1 = new Grade(2, meal1, r1);
-		Grade g2 = new Grade(4, meal2, r1);
-		Grade g3 = new Grade(2, meal3, r1);
+		Grade g1 = new Grade(5, meal1, r1);
+		Grade g2 = new Grade(5, meal2, r1);
+		Grade g3 = new Grade(5, meal3, r1);
 		ArrayList<Grade> grades1 = new ArrayList<Grade>();
 		grades1.add(g1);
 		grades1.add(g2);
@@ -143,8 +146,14 @@ public class RecommendationTest {
         int firedRules = kieSession.fireAllRules();
         kieSession.getAgenda().getAgendaGroup("meal-recommendation").setFocus();
         kieSession.fireAllRules();
+        
+        QueryResults results = kieSession.getQueryResults( "getRecommendedMeal" ); 
+		for ( QueryResultsRow row : results ) {
+			RecommendedMeal meal = ( RecommendedMeal ) row.get( "$result" );
+			assertEquals(8.0, meal.getPoints(), 0.0);
+		}
 
-        assertEquals(11, firedRules);
+        assertEquals(8, firedRules);
        
     	kieSession.dispose();
 	}

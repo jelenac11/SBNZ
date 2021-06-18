@@ -90,6 +90,7 @@
                                                     <v-list-item-content>
                                                         <span class="ml-4">Proteins: <b>{{ item.proteins }}g</b></span>
                                                     </v-list-item-content>
+                                                    <p class="ml-4 mr-6 mt-3" style="text-justify: inter-word;">Ingredients: <b>{{ printIngredients(item) }}</b></p>
                                                     <p class="ml-4 mr-6 mt-3" style="text-justify: inter-word;">{{ item.description }}</p>
                                                 </v-list>
                                             </v-card>
@@ -190,6 +191,13 @@
                 this.$store.dispatch('rateMeal', meal).then(resp => {
                     this.mealsItems[this.mealsItems.indexOf(meal)].averageGrade = resp.data;
                 });
+            },
+            printIngredients : function (meal) {
+                let ings = "";
+                for (let i = 0; i < meal.ingredients.length; ++i) {
+                    ings += meal.ingredients[i].grocery.name + ", ";
+                }
+                return ings.slice(0, ings.length - 2);
             },
         },
         created () {

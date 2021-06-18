@@ -55,6 +55,10 @@ public class FilterService {
 		List<Meal> withAllergens = new ArrayList<Meal>();
 		SortedMeals sorted = new SortedMeals();
 	
+		if (filter.getToTime() == -1) {
+			filter.setToTime(Integer.MAX_VALUE);
+		}
+		
 		kieSession.getAgenda().getAgendaGroup("filter").setFocus();
 		kieSession.insert(filter);
 		kieSession.insert(meals);

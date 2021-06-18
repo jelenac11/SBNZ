@@ -204,6 +204,7 @@ rule "Collect all points of one meal into one recommendation"
         	RecommendedPoints(meal.getId() == $meal.getId(), $p: points),
         	sum($p)
         );
+        not RecommendedMeal(meal.getId() == $meal.getId());
         not ActivatedAgeDietRecommendation();
     then
     	insert(new RecommendedMeal($meal, $points));
